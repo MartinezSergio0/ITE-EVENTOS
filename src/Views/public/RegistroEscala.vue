@@ -1555,101 +1555,66 @@ function validarFormulario() {
 // REGISTRAR
 // ============================================
 
-function registrar() {
+async function registrar() {
 
   if (!validarFormulario()) {
-
-    window.scrollTo({
-
-      top: 0,
-
-      behavior: "smooth"
-
-    });
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
     return;
-
   }
 
-
   loading.value = true;
-
   error.value = "";
 
+  try {
 
-  // Generar folio
-
-  const nuevoFolio =
-    generarFolio();
-
-
-  // Crear registro
-
-  const registro = {
-
-    ...form,
-
-    evento:
-      "Congreso ESCALA",
-
-    eventoId:
-      1,
-
-    folio:
-      nuevoFolio,
-
-    estadoRegistro:
-      "Registrado",
-
-    fechaRegistro:
-      new Date().toISOString()
-
-  };
-
-
-  // Guardar temporalmente
-
-  localStorage.setItem(
-
-    "registroEscala",
-
-    JSON.stringify(registro)
-
-  );
-
-
-  // Guardar folio
-
-  localStorage.setItem(
-
-    "folioEscala",
-
-    nuevoFolio
-
-  );
-
-
-  // Simular proceso de registro
-
-  setTimeout(() => {
-
-    loading.value = false;
-
-    folio.value =
-      nuevoFolio;
-
-    registroExitoso.value =
-      true;
-
-    window.scrollTo({
-
-      top: 0,
-
-      behavior: "smooth"
-
+    const response = await fetch("http://localhost:3000/eventos/4/inscripciones", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        apellidoPaterno: form.apellidoPaterno.trim(),
+        apellidoMaterno: form.apellidoMaterno.trim(),
+        nombre: form.nombre.trim(),
+        numeroControl: form.numeroControl.trim(),
+        edad: Number(form.edad),
+        sexo: form.sexo,
+        email: form.email.trim(),
+        telefono: form.telefono.trim(),
+        estado: form.estado,
+        institucion: form.institucion,
+        otraInstitucion: form.otraInstitucion,
+        carrera: form.carrera,
+        otraCarrera: form.otraCarrera,
+        contactoEmergenciaNombre: form.contactoEmergenciaNombre.trim(),
+        contactoEmergenciaTelefono: form.contactoEmergenciaTelefono.trim(),
+        tipoParticipacion: form.tipoParticipacion,
+        comoSeEntero: form.comoSeEntero,
+        otroMedio: form.otroMedio,
+        consentimiento: form.consentimiento,
+      }),
     });
 
-  }, 700);
+    if (!response.ok) {
+      let errorData = {};
+      try { errorData = await response.json(); } catch { errorData = {}; }
+      throw new Error(errorData.message || "No se pudo completar el registro.");
+    }
+
+    const data = await response.json();
+
+    if (!data.folio) {
+      throw new Error("El servidor no devolvió un folio de registro.");
+    }
+
+    folio.value = data.folio;
+    registroExitoso.value = true;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+  } catch (e) {
+    console.error("Error al registrar:", e);
+    error.value = e.message || "No se pudo completar el registro. Intenta de nuevo.";
+  } finally {
+    loading.value = false;
+  }
 
 }
 

@@ -8,11 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "prisma:generate": "prisma generate",
-    "prisma:copy": "copyfiles -u 2 \"src/generated/prisma/**/*\" \"dist/src/generated/prisma\"",
-    "prisma:setup": "npm run prisma:generate && npm run prisma:copy",
     "start": "nest start",
-    "start:dev": "npm run prisma:setup && nest start --watch",
+    "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
