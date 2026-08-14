@@ -180,7 +180,7 @@
               </div>
 
 
-                <!-- APELLIDO MATERNO -->
+              <!-- APELLIDO MATERNO -->
 
               <div class="form-group">
 
@@ -220,25 +220,43 @@
             </div>
 
 
+            <!-- NÚMERO DE CONTROL -->
+
+            <div class="form-group">
+
+              <label>
+                Número de control
+              </label>
+
+              <input
+                v-model="form.numeroControl"
+                type="text"
+                placeholder="Número de control"
+                maxlength="20"
+              />
+
+            </div>
+
+
             <!-- EDAD -->
 
-          <div class="form-group">
+            <div class="form-group">
 
-            <label>
-              Edad
-              <span>*</span>
-            </label>
+              <label>
+                Edad
+                <span>*</span>
+              </label>
 
-            <input
-              v-model="form.edad"
-              type="number"
-              min="1"
-              max="120"
-              placeholder="Escribe tu edad"
-              required
-            />
+              <input
+                v-model="form.edad"
+                type="number"
+                min="1"
+                max="120"
+                placeholder="Escribe tu edad"
+                required
+              />
 
-          </div>
+            </div>
 
 
             <!-- SEXO -->
@@ -721,7 +739,8 @@
 
             <div class="form-grid">
 
-            <!-- NOMBRE -->
+              <!-- NOMBRE -->
+
               <div class="form-group">
 
                 <label>
@@ -739,7 +758,8 @@
               </div>
 
 
-                <!-- CELULAR -->
+              <!-- CELULAR -->
+
               <div class="form-group">
 
                 <label>
@@ -1226,6 +1246,8 @@ const form = reactive({
 
   nombre: "",
 
+  numeroControl: "",
+
   edad: "",
 
   sexo: "",
@@ -1595,7 +1617,9 @@ function registrar() {
 
   );
 
-    // Guardar folio
+
+  // Guardar folio
+
   localStorage.setItem(
 
     "folioEscala",
@@ -1678,7 +1702,7 @@ function nuevoRegistro() {
 
 * {
   margin: 0;
-  padding: 0; 
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -2033,6 +2057,19 @@ function nuevoRegistro() {
   color: #dc2626;
 
   margin-left: 2px;
+
+}
+
+
+.form-group label .optional-label {
+
+  color: #64748b;
+
+  font-size: 0.75rem;
+
+  font-weight: 400;
+
+  margin-left: 5px;
 
 }
 
@@ -2727,7 +2764,7 @@ function nuevoRegistro() {
 
   .event-info {
 
-  position: static;
+    position: static;
 
     order: -1;
 
