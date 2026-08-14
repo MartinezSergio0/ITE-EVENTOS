@@ -438,17 +438,17 @@
 
         <button
           class="generate-button"
-          @click="generarReferencia"
+          @click="buscarReferencia "
           :disabled="cargando"
           type="button"
         >
 
           <span v-if="!cargando">
-            Generar referencia bancaria
+            Consultar referencia bancaria
           </span>
 
           <span v-else>
-            Generando referencia...
+            Buscando...
           </span>
 
           <span
@@ -496,7 +496,7 @@
           <div>
 
             <h2>
-              ¡Referencia generada correctamente!
+              ¡Referencia Encontrada!
             </h2>
 
             <p>
@@ -1179,185 +1179,66 @@ function validarFormulario() {
 // GENERAR REFERENCIA
 // ============================================
 
-async function generarReferencia() {
+async function buscarReferencia() {
 
   if (cargando.value) {
-
     return;
-
   }
-
 
   if (!validarFormulario()) {
-
     return;
-
   }
 
-
   cargando.value = true;
-
   error.value = "";
-
 
   try {
 
+    const params = new URLSearchParams({
+      correo: form.correo.trim(),
+      control: form.control.trim() || "0",
+    });
+
     const response = await fetch(
-      "http://localhost:3000/eventos/4/inscripciones",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-
-          primerApellido:
-            form.primerApellido.trim(),
-
-          segundoApellido:
-            form.segundoApellido.trim(),
-
-          nombres:
-            form.nombres.trim(),
-
-          edad:
-            Number(form.edad),
-
-          sexo:
-            form.sexo,
-
-          control:
-            form.control.trim() || "0",
-
-          correo:
-            form.correo.trim(),
-
-          whatsapp:
-            form.whatsapp.trim(),
-
-          institucion:
-            form.institucion,
-
-          tipoParticipacion:
-            form.tipoParticipacion
-
-        })
-
-      }
+      `http://localhost:3000/eventos/4/inscripciones/buscar?${params}`
     );
-
-
-    // ========================================
-    // ERROR DEL BACKEND
-    // ========================================
 
     if (!response.ok) {
 
       let errorData = {};
 
       try {
-
-        errorData =
-          await response.json();
-
+        errorData = await response.json();
       } catch {
-
         errorData = {};
-
       }
 
-
       throw new Error(
-
         errorData.message ||
-        errorData.error ||
-        "Error al generar la referencia bancaria."
-
+        "No se encontró un registro con esos datos. Verifica tu correo y número de control, o regístrate primero."
       );
 
     }
 
-
-    // ========================================
-    // RESPUESTA
-    // ========================================
-
-    const data =
-      await response.json();
-
-
-    // ========================================
-    // VALIDAR REFERENCIA
-    // ========================================
+    const data = await response.json();
 
     if (!data.referencia_bancaria) {
-
-      throw new Error(
-        "El servidor no devolvió la referencia bancaria."
-      );
-
+      throw new Error("Tu registro no tiene una referencia bancaria asociada.");
     }
 
+    referencia.value = String(data.referencia_bancaria).trim();
+    referenciaGenerada.value = true;
 
-    const referenciaRecibida =
-      String(data.referencia_bancaria).trim();
-
-
-    // La referencia DEBE tener exactamente
-    // 10 dígitos.
-
-    if (!/^\d{10}$/.test(referenciaRecibida)) {
-
-      throw new Error(
-        "La referencia bancaria recibida no tiene exactamente 10 dígitos."
-      );
-
-    }
-
-
-    // ========================================
-    // GUARDAR REFERENCIA
-    // ========================================
-
-    referencia.value =
-      referenciaRecibida;
-
-
-    referenciaGenerada.value =
-      true;
-
-
-    // ========================================
-    // SUBIR AL INICIO
-    // ========================================
-
-    window.scrollTo({
-
-      top: 0,
-
-      behavior: "smooth"
-
-    });
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
   } catch (e) {
 
-    console.error(
-      "Error al generar referencia:",
-      e
-    );
+    console.error("Error al buscar referencia:", e);
 
-
-    error.value =
-      e.message ||
-      "No se pudo generar la referencia. Intenta de nuevo.";
+    error.value = e.message || "No se pudo consultar la referencia. Intenta de nuevo.";
 
   } finally {
-
     cargando.value = false;
-
   }
 
 }

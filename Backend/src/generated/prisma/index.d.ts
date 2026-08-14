@@ -9733,6 +9733,7 @@ export namespace Prisma {
     validacion: number | null
     estado: number | null
     asistencias_minimas: number | null
+    costo: Decimal | null
   }
 
   export type EventoSumAggregateOutputType = {
@@ -9742,6 +9743,7 @@ export namespace Prisma {
     validacion: number | null
     estado: number | null
     asistencias_minimas: number | null
+    costo: Decimal | null
   }
 
   export type EventoMinAggregateOutputType = {
@@ -9759,6 +9761,7 @@ export namespace Prisma {
     validacion: number | null
     estado: number | null
     asistencias_minimas: number | null
+    costo: Decimal | null
   }
 
   export type EventoMaxAggregateOutputType = {
@@ -9776,6 +9779,7 @@ export namespace Prisma {
     validacion: number | null
     estado: number | null
     asistencias_minimas: number | null
+    costo: Decimal | null
   }
 
   export type EventoCountAggregateOutputType = {
@@ -9793,6 +9797,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas: number
+    costo: number
     _all: number
   }
 
@@ -9804,6 +9809,7 @@ export namespace Prisma {
     validacion?: true
     estado?: true
     asistencias_minimas?: true
+    costo?: true
   }
 
   export type EventoSumAggregateInputType = {
@@ -9813,6 +9819,7 @@ export namespace Prisma {
     validacion?: true
     estado?: true
     asistencias_minimas?: true
+    costo?: true
   }
 
   export type EventoMinAggregateInputType = {
@@ -9830,6 +9837,7 @@ export namespace Prisma {
     validacion?: true
     estado?: true
     asistencias_minimas?: true
+    costo?: true
   }
 
   export type EventoMaxAggregateInputType = {
@@ -9847,6 +9855,7 @@ export namespace Prisma {
     validacion?: true
     estado?: true
     asistencias_minimas?: true
+    costo?: true
   }
 
   export type EventoCountAggregateInputType = {
@@ -9864,6 +9873,7 @@ export namespace Prisma {
     validacion?: true
     estado?: true
     asistencias_minimas?: true
+    costo?: true
     _all?: true
   }
 
@@ -9968,6 +9978,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas: number | null
+    costo: Decimal | null
     _count: EventoCountAggregateOutputType | null
     _avg: EventoAvgAggregateOutputType | null
     _sum: EventoSumAggregateOutputType | null
@@ -10004,6 +10015,7 @@ export namespace Prisma {
     validacion?: boolean
     estado?: boolean
     asistencias_minimas?: boolean
+    costo?: boolean
     actividad_actividad_eventoToevento?: boolean | evento$actividad_actividad_eventoToeventoArgs<ExtArgs>
     asistencia_asistencia_eventoToevento?: boolean | evento$asistencia_asistencia_eventoToeventoArgs<ExtArgs>
     estado_evento?: boolean | estado_eventoDefaultArgs<ExtArgs>
@@ -10032,6 +10044,7 @@ export namespace Prisma {
     validacion?: boolean
     estado?: boolean
     asistencias_minimas?: boolean
+    costo?: boolean
     estado_evento?: boolean | estado_eventoDefaultArgs<ExtArgs>
     tipo_evento?: boolean | tipo_eventoDefaultArgs<ExtArgs>
     tipo_validacion?: boolean | tipo_validacionDefaultArgs<ExtArgs>
@@ -10052,6 +10065,7 @@ export namespace Prisma {
     validacion?: boolean
     estado?: boolean
     asistencias_minimas?: boolean
+    costo?: boolean
     estado_evento?: boolean | estado_eventoDefaultArgs<ExtArgs>
     tipo_evento?: boolean | tipo_eventoDefaultArgs<ExtArgs>
     tipo_validacion?: boolean | tipo_validacionDefaultArgs<ExtArgs>
@@ -10072,9 +10086,10 @@ export namespace Prisma {
     validacion?: boolean
     estado?: boolean
     asistencias_minimas?: boolean
+    costo?: boolean
   }
 
-  export type eventoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "tipo" | "logo" | "banner" | "descripcion" | "inicio" | "final" | "lugar" | "capacidad" | "contacto" | "validacion" | "estado" | "asistencias_minimas", ExtArgs["result"]["evento"]>
+  export type eventoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "tipo" | "logo" | "banner" | "descripcion" | "inicio" | "final" | "lugar" | "capacidad" | "contacto" | "validacion" | "estado" | "asistencias_minimas" | "costo", ExtArgs["result"]["evento"]>
   export type eventoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     actividad_actividad_eventoToevento?: boolean | evento$actividad_actividad_eventoToeventoArgs<ExtArgs>
     asistencia_asistencia_eventoToevento?: boolean | evento$asistencia_asistencia_eventoToeventoArgs<ExtArgs>
@@ -10128,6 +10143,7 @@ export namespace Prisma {
       validacion: number
       estado: number
       asistencias_minimas: number | null
+      costo: Prisma.Decimal | null
     }, ExtArgs["result"]["evento"]>
     composites: {}
   }
@@ -10575,6 +10591,7 @@ export namespace Prisma {
     readonly validacion: FieldRef<"evento", 'Int'>
     readonly estado: FieldRef<"evento", 'Int'>
     readonly asistencias_minimas: FieldRef<"evento", 'Int'>
+    readonly costo: FieldRef<"evento", 'Decimal'>
   }
     
 
@@ -15527,6 +15544,11 @@ export namespace Prisma {
     tipo_participacion: number | null
     referencia_bancaria: string | null
     monto: Decimal | null
+    estado_procedencia: string | null
+    contacto_emergencia_nombre: string | null
+    contacto_emergencia_telefono: string | null
+    medio_difusion: string | null
+    consentimiento: boolean | null
   }
 
   export type ParticipantesMaxAggregateOutputType = {
@@ -15548,6 +15570,11 @@ export namespace Prisma {
     tipo_participacion: number | null
     referencia_bancaria: string | null
     monto: Decimal | null
+    estado_procedencia: string | null
+    contacto_emergencia_nombre: string | null
+    contacto_emergencia_telefono: string | null
+    medio_difusion: string | null
+    consentimiento: boolean | null
   }
 
   export type ParticipantesCountAggregateOutputType = {
@@ -15569,6 +15596,11 @@ export namespace Prisma {
     tipo_participacion: number
     referencia_bancaria: number
     monto: number
+    estado_procedencia: number
+    contacto_emergencia_nombre: number
+    contacto_emergencia_telefono: number
+    medio_difusion: number
+    consentimiento: number
     _all: number
   }
 
@@ -15612,6 +15644,11 @@ export namespace Prisma {
     tipo_participacion?: true
     referencia_bancaria?: true
     monto?: true
+    estado_procedencia?: true
+    contacto_emergencia_nombre?: true
+    contacto_emergencia_telefono?: true
+    medio_difusion?: true
+    consentimiento?: true
   }
 
   export type ParticipantesMaxAggregateInputType = {
@@ -15633,6 +15670,11 @@ export namespace Prisma {
     tipo_participacion?: true
     referencia_bancaria?: true
     monto?: true
+    estado_procedencia?: true
+    contacto_emergencia_nombre?: true
+    contacto_emergencia_telefono?: true
+    medio_difusion?: true
+    consentimiento?: true
   }
 
   export type ParticipantesCountAggregateInputType = {
@@ -15654,6 +15696,11 @@ export namespace Prisma {
     tipo_participacion?: true
     referencia_bancaria?: true
     monto?: true
+    estado_procedencia?: true
+    contacto_emergencia_nombre?: true
+    contacto_emergencia_telefono?: true
+    medio_difusion?: true
+    consentimiento?: true
     _all?: true
   }
 
@@ -15762,6 +15809,11 @@ export namespace Prisma {
     tipo_participacion: number | null
     referencia_bancaria: string | null
     monto: Decimal | null
+    estado_procedencia: string | null
+    contacto_emergencia_nombre: string | null
+    contacto_emergencia_telefono: string | null
+    medio_difusion: string | null
+    consentimiento: boolean
     _count: ParticipantesCountAggregateOutputType | null
     _avg: ParticipantesAvgAggregateOutputType | null
     _sum: ParticipantesSumAggregateOutputType | null
@@ -15802,6 +15854,11 @@ export namespace Prisma {
     tipo_participacion?: boolean
     referencia_bancaria?: boolean
     monto?: boolean
+    estado_procedencia?: boolean
+    contacto_emergencia_nombre?: boolean
+    contacto_emergencia_telefono?: boolean
+    medio_difusion?: boolean
+    consentimiento?: boolean
     estado_participantes_estadoToestado?: boolean | participantes$estado_participantes_estadoToestadoArgs<ExtArgs>
     evento_participantes_eventoToevento?: boolean | eventoDefaultArgs<ExtArgs>
     genero_participantes_generoTogenero?: boolean | participantes$genero_participantes_generoTogeneroArgs<ExtArgs>
@@ -15827,6 +15884,11 @@ export namespace Prisma {
     tipo_participacion?: boolean
     referencia_bancaria?: boolean
     monto?: boolean
+    estado_procedencia?: boolean
+    contacto_emergencia_nombre?: boolean
+    contacto_emergencia_telefono?: boolean
+    medio_difusion?: boolean
+    consentimiento?: boolean
     estado_participantes_estadoToestado?: boolean | participantes$estado_participantes_estadoToestadoArgs<ExtArgs>
     evento_participantes_eventoToevento?: boolean | eventoDefaultArgs<ExtArgs>
     genero_participantes_generoTogenero?: boolean | participantes$genero_participantes_generoTogeneroArgs<ExtArgs>
@@ -15852,6 +15914,11 @@ export namespace Prisma {
     tipo_participacion?: boolean
     referencia_bancaria?: boolean
     monto?: boolean
+    estado_procedencia?: boolean
+    contacto_emergencia_nombre?: boolean
+    contacto_emergencia_telefono?: boolean
+    medio_difusion?: boolean
+    consentimiento?: boolean
     estado_participantes_estadoToestado?: boolean | participantes$estado_participantes_estadoToestadoArgs<ExtArgs>
     evento_participantes_eventoToevento?: boolean | eventoDefaultArgs<ExtArgs>
     genero_participantes_generoTogenero?: boolean | participantes$genero_participantes_generoTogeneroArgs<ExtArgs>
@@ -15877,9 +15944,14 @@ export namespace Prisma {
     tipo_participacion?: boolean
     referencia_bancaria?: boolean
     monto?: boolean
+    estado_procedencia?: boolean
+    contacto_emergencia_nombre?: boolean
+    contacto_emergencia_telefono?: boolean
+    medio_difusion?: boolean
+    consentimiento?: boolean
   }
 
-  export type participantesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"folio" | "evento" | "nombre" | "genero" | "fecha_nacimiento" | "correo_electronico" | "telefono" | "matricula" | "institucion" | "carrera" | "estado" | "talla_camisa" | "comprobante_pago" | "participante_num" | "edad" | "tipo_participacion" | "referencia_bancaria" | "monto", ExtArgs["result"]["participantes"]>
+  export type participantesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"folio" | "evento" | "nombre" | "genero" | "fecha_nacimiento" | "correo_electronico" | "telefono" | "matricula" | "institucion" | "carrera" | "estado" | "talla_camisa" | "comprobante_pago" | "participante_num" | "edad" | "tipo_participacion" | "referencia_bancaria" | "monto" | "estado_procedencia" | "contacto_emergencia_nombre" | "contacto_emergencia_telefono" | "medio_difusion" | "consentimiento", ExtArgs["result"]["participantes"]>
   export type participantesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     estado_participantes_estadoToestado?: boolean | participantes$estado_participantes_estadoToestadoArgs<ExtArgs>
     evento_participantes_eventoToevento?: boolean | eventoDefaultArgs<ExtArgs>
@@ -15926,6 +15998,11 @@ export namespace Prisma {
       tipo_participacion: number | null
       referencia_bancaria: string | null
       monto: Prisma.Decimal | null
+      estado_procedencia: string | null
+      contacto_emergencia_nombre: string | null
+      contacto_emergencia_telefono: string | null
+      medio_difusion: string | null
+      consentimiento: boolean
     }, ExtArgs["result"]["participantes"]>
     composites: {}
   }
@@ -16371,6 +16448,11 @@ export namespace Prisma {
     readonly tipo_participacion: FieldRef<"participantes", 'Int'>
     readonly referencia_bancaria: FieldRef<"participantes", 'String'>
     readonly monto: FieldRef<"participantes", 'Decimal'>
+    readonly estado_procedencia: FieldRef<"participantes", 'String'>
+    readonly contacto_emergencia_nombre: FieldRef<"participantes", 'String'>
+    readonly contacto_emergencia_telefono: FieldRef<"participantes", 'String'>
+    readonly medio_difusion: FieldRef<"participantes", 'String'>
+    readonly consentimiento: FieldRef<"participantes", 'Boolean'>
   }
     
 
@@ -24680,7 +24762,8 @@ export namespace Prisma {
     contacto: 'contacto',
     validacion: 'validacion',
     estado: 'estado',
-    asistencias_minimas: 'asistencias_minimas'
+    asistencias_minimas: 'asistencias_minimas',
+    costo: 'costo'
   };
 
   export type EventoScalarFieldEnum = (typeof EventoScalarFieldEnum)[keyof typeof EventoScalarFieldEnum]
@@ -24738,7 +24821,12 @@ export namespace Prisma {
     edad: 'edad',
     tipo_participacion: 'tipo_participacion',
     referencia_bancaria: 'referencia_bancaria',
-    monto: 'monto'
+    monto: 'monto',
+    estado_procedencia: 'estado_procedencia',
+    contacto_emergencia_nombre: 'contacto_emergencia_nombre',
+    contacto_emergencia_telefono: 'contacto_emergencia_telefono',
+    medio_difusion: 'medio_difusion',
+    consentimiento: 'consentimiento'
   };
 
   export type ParticipantesScalarFieldEnum = (typeof ParticipantesScalarFieldEnum)[keyof typeof ParticipantesScalarFieldEnum]
@@ -24910,6 +24998,13 @@ export namespace Prisma {
    * Reference to a field of type 'Decimal[]'
    */
   export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -25289,6 +25384,7 @@ export namespace Prisma {
     validacion?: IntFilter<"evento"> | number
     estado?: IntFilter<"evento"> | number
     asistencias_minimas?: IntNullableFilter<"evento"> | number | null
+    costo?: DecimalNullableFilter<"evento"> | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: ActividadListRelationFilter
     asistencia_asistencia_eventoToevento?: AsistenciaListRelationFilter
     estado_evento?: XOR<Estado_eventoScalarRelationFilter, estado_eventoWhereInput>
@@ -25316,6 +25412,7 @@ export namespace Prisma {
     validacion?: SortOrder
     estado?: SortOrder
     asistencias_minimas?: SortOrderInput | SortOrder
+    costo?: SortOrderInput | SortOrder
     actividad_actividad_eventoToevento?: actividadOrderByRelationAggregateInput
     asistencia_asistencia_eventoToevento?: asistenciaOrderByRelationAggregateInput
     estado_evento?: estado_eventoOrderByWithRelationInput
@@ -25346,6 +25443,7 @@ export namespace Prisma {
     validacion?: IntFilter<"evento"> | number
     estado?: IntFilter<"evento"> | number
     asistencias_minimas?: IntNullableFilter<"evento"> | number | null
+    costo?: DecimalNullableFilter<"evento"> | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: ActividadListRelationFilter
     asistencia_asistencia_eventoToevento?: AsistenciaListRelationFilter
     estado_evento?: XOR<Estado_eventoScalarRelationFilter, estado_eventoWhereInput>
@@ -25373,6 +25471,7 @@ export namespace Prisma {
     validacion?: SortOrder
     estado?: SortOrder
     asistencias_minimas?: SortOrderInput | SortOrder
+    costo?: SortOrderInput | SortOrder
     _count?: eventoCountOrderByAggregateInput
     _avg?: eventoAvgOrderByAggregateInput
     _max?: eventoMaxOrderByAggregateInput
@@ -25398,6 +25497,7 @@ export namespace Prisma {
     validacion?: IntWithAggregatesFilter<"evento"> | number
     estado?: IntWithAggregatesFilter<"evento"> | number
     asistencias_minimas?: IntNullableWithAggregatesFilter<"evento"> | number | null
+    costo?: DecimalNullableWithAggregatesFilter<"evento"> | Decimal | DecimalJsLike | number | string | null
   }
 
   export type evento_campoWhereInput = {
@@ -25606,6 +25706,11 @@ export namespace Prisma {
     tipo_participacion?: IntNullableFilter<"participantes"> | number | null
     referencia_bancaria?: StringNullableFilter<"participantes"> | string | null
     monto?: DecimalNullableFilter<"participantes"> | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: StringNullableFilter<"participantes"> | string | null
+    contacto_emergencia_nombre?: StringNullableFilter<"participantes"> | string | null
+    contacto_emergencia_telefono?: StringNullableFilter<"participantes"> | string | null
+    medio_difusion?: StringNullableFilter<"participantes"> | string | null
+    consentimiento?: BoolFilter<"participantes"> | boolean
     estado_participantes_estadoToestado?: XOR<EstadoNullableScalarRelationFilter, estadoWhereInput> | null
     evento_participantes_eventoToevento?: XOR<EventoScalarRelationFilter, eventoWhereInput>
     genero_participantes_generoTogenero?: XOR<GeneroNullableScalarRelationFilter, generoWhereInput> | null
@@ -25631,6 +25736,11 @@ export namespace Prisma {
     tipo_participacion?: SortOrderInput | SortOrder
     referencia_bancaria?: SortOrderInput | SortOrder
     monto?: SortOrderInput | SortOrder
+    estado_procedencia?: SortOrderInput | SortOrder
+    contacto_emergencia_nombre?: SortOrderInput | SortOrder
+    contacto_emergencia_telefono?: SortOrderInput | SortOrder
+    medio_difusion?: SortOrderInput | SortOrder
+    consentimiento?: SortOrder
     estado_participantes_estadoToestado?: estadoOrderByWithRelationInput
     evento_participantes_eventoToevento?: eventoOrderByWithRelationInput
     genero_participantes_generoTogenero?: generoOrderByWithRelationInput
@@ -25660,6 +25770,11 @@ export namespace Prisma {
     edad?: IntNullableFilter<"participantes"> | number | null
     tipo_participacion?: IntNullableFilter<"participantes"> | number | null
     monto?: DecimalNullableFilter<"participantes"> | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: StringNullableFilter<"participantes"> | string | null
+    contacto_emergencia_nombre?: StringNullableFilter<"participantes"> | string | null
+    contacto_emergencia_telefono?: StringNullableFilter<"participantes"> | string | null
+    medio_difusion?: StringNullableFilter<"participantes"> | string | null
+    consentimiento?: BoolFilter<"participantes"> | boolean
     estado_participantes_estadoToestado?: XOR<EstadoNullableScalarRelationFilter, estadoWhereInput> | null
     evento_participantes_eventoToevento?: XOR<EventoScalarRelationFilter, eventoWhereInput>
     genero_participantes_generoTogenero?: XOR<GeneroNullableScalarRelationFilter, generoWhereInput> | null
@@ -25685,6 +25800,11 @@ export namespace Prisma {
     tipo_participacion?: SortOrderInput | SortOrder
     referencia_bancaria?: SortOrderInput | SortOrder
     monto?: SortOrderInput | SortOrder
+    estado_procedencia?: SortOrderInput | SortOrder
+    contacto_emergencia_nombre?: SortOrderInput | SortOrder
+    contacto_emergencia_telefono?: SortOrderInput | SortOrder
+    medio_difusion?: SortOrderInput | SortOrder
+    consentimiento?: SortOrder
     _count?: participantesCountOrderByAggregateInput
     _avg?: participantesAvgOrderByAggregateInput
     _max?: participantesMaxOrderByAggregateInput
@@ -25714,6 +25834,11 @@ export namespace Prisma {
     tipo_participacion?: IntNullableWithAggregatesFilter<"participantes"> | number | null
     referencia_bancaria?: StringNullableWithAggregatesFilter<"participantes"> | string | null
     monto?: DecimalNullableWithAggregatesFilter<"participantes"> | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: StringNullableWithAggregatesFilter<"participantes"> | string | null
+    contacto_emergencia_nombre?: StringNullableWithAggregatesFilter<"participantes"> | string | null
+    contacto_emergencia_telefono?: StringNullableWithAggregatesFilter<"participantes"> | string | null
+    medio_difusion?: StringNullableWithAggregatesFilter<"participantes"> | string | null
+    consentimiento?: BoolWithAggregatesFilter<"participantes"> | boolean
   }
 
   export type rol_eventoWhereInput = {
@@ -26407,6 +26532,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
@@ -26434,6 +26560,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
@@ -26454,6 +26581,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -26481,6 +26609,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
@@ -26505,6 +26634,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
   }
 
   export type eventoUpdateManyMutationInput = {
@@ -26518,6 +26648,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
   }
 
   export type eventoUncheckedUpdateManyInput = {
@@ -26535,6 +26666,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
   }
 
   export type evento_campoCreateInput = {
@@ -26704,6 +26836,11 @@ export namespace Prisma {
     edad?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
     estado_participantes_estadoToestado?: estadoCreateNestedOneWithoutParticipantes_participantes_estadoToestadoInput
     evento_participantes_eventoToevento: eventoCreateNestedOneWithoutParticipantes_participantes_eventoToeventoInput
     genero_participantes_generoTogenero?: generoCreateNestedOneWithoutParticipantes_participantes_generoTogeneroInput
@@ -26729,6 +26866,11 @@ export namespace Prisma {
     tipo_participacion?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesUpdateInput = {
@@ -26746,6 +26888,11 @@ export namespace Prisma {
     edad?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
     estado_participantes_estadoToestado?: estadoUpdateOneWithoutParticipantes_participantes_estadoToestadoNestedInput
     evento_participantes_eventoToevento?: eventoUpdateOneRequiredWithoutParticipantes_participantes_eventoToeventoNestedInput
     genero_participantes_generoTogenero?: generoUpdateOneWithoutParticipantes_participantes_generoTogeneroNestedInput
@@ -26771,6 +26918,11 @@ export namespace Prisma {
     tipo_participacion?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type participantesCreateManyInput = {
@@ -26792,6 +26944,11 @@ export namespace Prisma {
     tipo_participacion?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesUpdateManyMutationInput = {
@@ -26809,6 +26966,11 @@ export namespace Prisma {
     edad?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type participantesUncheckedUpdateManyInput = {
@@ -26830,6 +26992,11 @@ export namespace Prisma {
     tipo_participacion?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type rol_eventoCreateInput = {
@@ -27657,6 +27824,17 @@ export namespace Prisma {
     id?: SortOrder
   }
 
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
   export type Estado_eventoScalarRelationFilter = {
     is?: estado_eventoWhereInput
     isNot?: estado_eventoWhereInput
@@ -27707,6 +27885,7 @@ export namespace Prisma {
     validacion?: SortOrder
     estado?: SortOrder
     asistencias_minimas?: SortOrder
+    costo?: SortOrder
   }
 
   export type eventoAvgOrderByAggregateInput = {
@@ -27716,6 +27895,7 @@ export namespace Prisma {
     validacion?: SortOrder
     estado?: SortOrder
     asistencias_minimas?: SortOrder
+    costo?: SortOrder
   }
 
   export type eventoMaxOrderByAggregateInput = {
@@ -27733,6 +27913,7 @@ export namespace Prisma {
     validacion?: SortOrder
     estado?: SortOrder
     asistencias_minimas?: SortOrder
+    costo?: SortOrder
   }
 
   export type eventoMinOrderByAggregateInput = {
@@ -27750,6 +27931,7 @@ export namespace Prisma {
     validacion?: SortOrder
     estado?: SortOrder
     asistencias_minimas?: SortOrder
+    costo?: SortOrder
   }
 
   export type eventoSumOrderByAggregateInput = {
@@ -27759,6 +27941,23 @@ export namespace Prisma {
     validacion?: SortOrder
     estado?: SortOrder
     asistencias_minimas?: SortOrder
+    costo?: SortOrder
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
   export type CampoScalarRelationFilter = {
@@ -27888,15 +28087,9 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
-  export type DecimalNullableFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type EstadoNullableScalarRelationFilter = {
@@ -27938,6 +28131,11 @@ export namespace Prisma {
     tipo_participacion?: SortOrder
     referencia_bancaria?: SortOrder
     monto?: SortOrder
+    estado_procedencia?: SortOrder
+    contacto_emergencia_nombre?: SortOrder
+    contacto_emergencia_telefono?: SortOrder
+    medio_difusion?: SortOrder
+    consentimiento?: SortOrder
   }
 
   export type participantesAvgOrderByAggregateInput = {
@@ -27969,6 +28167,11 @@ export namespace Prisma {
     tipo_participacion?: SortOrder
     referencia_bancaria?: SortOrder
     monto?: SortOrder
+    estado_procedencia?: SortOrder
+    contacto_emergencia_nombre?: SortOrder
+    contacto_emergencia_telefono?: SortOrder
+    medio_difusion?: SortOrder
+    consentimiento?: SortOrder
   }
 
   export type participantesMinOrderByAggregateInput = {
@@ -27990,6 +28193,11 @@ export namespace Prisma {
     tipo_participacion?: SortOrder
     referencia_bancaria?: SortOrder
     monto?: SortOrder
+    estado_procedencia?: SortOrder
+    contacto_emergencia_nombre?: SortOrder
+    contacto_emergencia_telefono?: SortOrder
+    medio_difusion?: SortOrder
+    consentimiento?: SortOrder
   }
 
   export type participantesSumOrderByAggregateInput = {
@@ -28016,20 +28224,12 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedDecimalNullableFilter<$PrismaModel>
-    _sum?: NestedDecimalNullableFilter<$PrismaModel>
-    _min?: NestedDecimalNullableFilter<$PrismaModel>
-    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type rol_eventoCountOrderByAggregateInput = {
@@ -28764,6 +28964,14 @@ export namespace Prisma {
     connect?: usuario_eventoWhereUniqueInput | usuario_eventoWhereUniqueInput[]
   }
 
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
   export type actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput = {
     create?: XOR<actividadCreateWithoutEvento_actividad_eventoToeventoInput, actividadUncheckedCreateWithoutEvento_actividad_eventoToeventoInput> | actividadCreateWithoutEvento_actividad_eventoToeventoInput[] | actividadUncheckedCreateWithoutEvento_actividad_eventoToeventoInput[]
     connectOrCreate?: actividadCreateOrConnectWithoutEvento_actividad_eventoToeventoInput | actividadCreateOrConnectWithoutEvento_actividad_eventoToeventoInput[]
@@ -29152,12 +29360,8 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
-  export type NullableDecimalFieldUpdateOperationsInput = {
-    set?: Decimal | DecimalJsLike | number | string | null
-    increment?: Decimal | DecimalJsLike | number | string
-    decrement?: Decimal | DecimalJsLike | number | string
-    multiply?: Decimal | DecimalJsLike | number | string
-    divide?: Decimal | DecimalJsLike | number | string
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type estadoUpdateOneWithoutParticipantes_participantes_estadoToestadoNestedInput = {
@@ -29743,17 +29947,6 @@ export namespace Prisma {
     _max?: NestedBigIntNullableFilter<$PrismaModel>
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type NestedDecimalNullableFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
@@ -29763,20 +29956,6 @@ export namespace Prisma {
     gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -29793,6 +29972,44 @@ export namespace Prisma {
     _sum?: NestedDecimalNullableFilter<$PrismaModel>
     _min?: NestedDecimalNullableFilter<$PrismaModel>
     _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumrol_generalFilter<$PrismaModel = never> = {
@@ -29841,6 +30058,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
     tipo_evento: tipo_eventoCreateNestedOneWithoutEventoInput
@@ -29867,6 +30085,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
     evento_modulo_evento_modulo_eventoToevento?: evento_moduloUncheckedCreateNestedManyWithoutEvento_evento_modulo_eventoToeventoInput
@@ -29952,6 +30171,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
     tipo_evento?: tipo_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -29978,6 +30198,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
     evento_modulo_evento_modulo_eventoToevento?: evento_moduloUncheckedUpdateManyWithoutEvento_evento_modulo_eventoToeventoNestedInput
@@ -30056,6 +30277,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
     tipo_evento: tipo_eventoCreateNestedOneWithoutEventoInput
@@ -30082,6 +30304,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
     evento_modulo_evento_modulo_eventoToevento?: evento_moduloUncheckedCreateNestedManyWithoutEvento_evento_modulo_eventoToeventoInput
@@ -30187,6 +30410,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
     tipo_evento?: tipo_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -30213,6 +30437,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
     evento_modulo_evento_modulo_eventoToevento?: evento_moduloUncheckedUpdateManyWithoutEvento_evento_modulo_eventoToeventoNestedInput
@@ -30320,6 +30545,11 @@ export namespace Prisma {
     edad?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
     evento_participantes_eventoToevento: eventoCreateNestedOneWithoutParticipantes_participantes_eventoToeventoInput
     genero_participantes_generoTogenero?: generoCreateNestedOneWithoutParticipantes_participantes_generoTogeneroInput
     tipo_participante?: tipo_participanteCreateNestedOneWithoutParticipantesInput
@@ -30343,6 +30573,11 @@ export namespace Prisma {
     tipo_participacion?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesCreateOrConnectWithoutEstado_participantes_estadoToestadoInput = {
@@ -30393,6 +30628,11 @@ export namespace Prisma {
     tipo_participacion?: IntNullableFilter<"participantes"> | number | null
     referencia_bancaria?: StringNullableFilter<"participantes"> | string | null
     monto?: DecimalNullableFilter<"participantes"> | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: StringNullableFilter<"participantes"> | string | null
+    contacto_emergencia_nombre?: StringNullableFilter<"participantes"> | string | null
+    contacto_emergencia_telefono?: StringNullableFilter<"participantes"> | string | null
+    medio_difusion?: StringNullableFilter<"participantes"> | string | null
+    consentimiento?: BoolFilter<"participantes"> | boolean
   }
 
   export type actividadCreateWithoutEstado_eventoInput = {
@@ -30442,6 +30682,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     tipo_evento: tipo_eventoCreateNestedOneWithoutEventoInput
@@ -30467,6 +30708,7 @@ export namespace Prisma {
     contacto?: string | null
     validacion: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
@@ -30590,6 +30832,7 @@ export namespace Prisma {
     validacion?: IntFilter<"evento"> | number
     estado?: IntFilter<"evento"> | number
     asistencias_minimas?: IntNullableFilter<"evento"> | number | null
+    costo?: DecimalNullableFilter<"evento"> | Decimal | DecimalJsLike | number | string | null
   }
 
   export type tallerUpsertWithWhereUniqueWithoutEstado_eventoInput = {
@@ -30788,6 +31031,11 @@ export namespace Prisma {
     edad?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
     estado_participantes_estadoToestado?: estadoCreateNestedOneWithoutParticipantes_participantes_estadoToestadoInput
     genero_participantes_generoTogenero?: generoCreateNestedOneWithoutParticipantes_participantes_generoTogeneroInput
     tipo_participante?: tipo_participanteCreateNestedOneWithoutParticipantesInput
@@ -30811,6 +31059,11 @@ export namespace Prisma {
     tipo_participacion?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesCreateOrConnectWithoutEvento_participantes_eventoToeventoInput = {
@@ -31102,6 +31355,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
@@ -31128,6 +31382,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_modulo_evento_modulo_eventoToevento?: evento_moduloUncheckedCreateNestedManyWithoutEvento_evento_modulo_eventoToeventoInput
@@ -31183,6 +31438,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -31209,6 +31465,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_modulo_evento_modulo_eventoToevento?: evento_moduloUncheckedUpdateManyWithoutEvento_evento_modulo_eventoToeventoNestedInput
@@ -31242,6 +31499,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
@@ -31268,6 +31526,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
@@ -31323,6 +31582,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -31349,6 +31609,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
@@ -31372,6 +31633,11 @@ export namespace Prisma {
     edad?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
     estado_participantes_estadoToestado?: estadoCreateNestedOneWithoutParticipantes_participantes_estadoToestadoInput
     evento_participantes_eventoToevento: eventoCreateNestedOneWithoutParticipantes_participantes_eventoToeventoInput
     tipo_participante?: tipo_participanteCreateNestedOneWithoutParticipantesInput
@@ -31395,6 +31661,11 @@ export namespace Prisma {
     tipo_participacion?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesCreateOrConnectWithoutGenero_participantes_generoTogeneroInput = {
@@ -31484,6 +31755,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
@@ -31510,6 +31782,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
@@ -31594,6 +31867,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -31620,6 +31894,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
@@ -31761,6 +32036,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
@@ -31787,6 +32063,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
@@ -31862,6 +32139,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -31888,6 +32166,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
@@ -31907,6 +32186,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
@@ -31932,6 +32212,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
@@ -31982,6 +32263,11 @@ export namespace Prisma {
     edad?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
     estado_participantes_estadoToestado?: estadoCreateNestedOneWithoutParticipantes_participantes_estadoToestadoInput
     evento_participantes_eventoToevento: eventoCreateNestedOneWithoutParticipantes_participantes_eventoToeventoInput
     genero_participantes_generoTogenero?: generoCreateNestedOneWithoutParticipantes_participantes_generoTogeneroInput
@@ -32005,6 +32291,11 @@ export namespace Prisma {
     edad?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesCreateOrConnectWithoutTipo_participanteInput = {
@@ -32044,6 +32335,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
@@ -32069,6 +32361,7 @@ export namespace Prisma {
     contacto?: string | null
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
@@ -32152,6 +32445,7 @@ export namespace Prisma {
     capacidad?: number | null
     contacto?: string | null
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     estado_evento: estado_eventoCreateNestedOneWithoutEventoInput
@@ -32178,6 +32472,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedCreateNestedManyWithoutEvento_actividad_eventoToeventoInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedCreateNestedManyWithoutEvento_asistencia_eventoToeventoInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedCreateNestedManyWithoutEvento_evento_campo_eventoToeventoInput
@@ -32247,6 +32542,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -32273,6 +32569,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
@@ -32397,6 +32694,11 @@ export namespace Prisma {
     tipo_participacion?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesUpdateWithoutEstado_participantes_estadoToestadoInput = {
@@ -32414,6 +32716,11 @@ export namespace Prisma {
     edad?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
     evento_participantes_eventoToevento?: eventoUpdateOneRequiredWithoutParticipantes_participantes_eventoToeventoNestedInput
     genero_participantes_generoTogenero?: generoUpdateOneWithoutParticipantes_participantes_generoTogeneroNestedInput
     tipo_participante?: tipo_participanteUpdateOneWithoutParticipantesNestedInput
@@ -32437,6 +32744,11 @@ export namespace Prisma {
     tipo_participacion?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type participantesUncheckedUpdateManyWithoutEstado_participantes_estadoToestadoInput = {
@@ -32457,6 +32769,11 @@ export namespace Prisma {
     tipo_participacion?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type actividadCreateManyEstado_eventoInput = {
@@ -32485,6 +32802,7 @@ export namespace Prisma {
     contacto?: string | null
     validacion: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
   }
 
   export type tallerCreateManyEstado_eventoInput = {
@@ -32549,6 +32867,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     tipo_evento?: tipo_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -32574,6 +32893,7 @@ export namespace Prisma {
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     validacion?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
@@ -32597,6 +32917,7 @@ export namespace Prisma {
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     validacion?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
   }
 
   export type tallerUpdateWithoutEstado_eventoInput = {
@@ -32688,6 +33009,11 @@ export namespace Prisma {
     tipo_participacion?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type tallerCreateManyEvento_taller_eventoToeventoInput = {
@@ -32816,6 +33142,11 @@ export namespace Prisma {
     edad?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
     estado_participantes_estadoToestado?: estadoUpdateOneWithoutParticipantes_participantes_estadoToestadoNestedInput
     genero_participantes_generoTogenero?: generoUpdateOneWithoutParticipantes_participantes_generoTogeneroNestedInput
     tipo_participante?: tipo_participanteUpdateOneWithoutParticipantesNestedInput
@@ -32839,6 +33170,11 @@ export namespace Prisma {
     tipo_participacion?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type participantesUncheckedUpdateManyWithoutEvento_participantes_eventoToeventoInput = {
@@ -32859,6 +33195,11 @@ export namespace Prisma {
     tipo_participacion?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type tallerUpdateWithoutEvento_taller_eventoToeventoInput = {
@@ -32937,6 +33278,11 @@ export namespace Prisma {
     tipo_participacion?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesUpdateWithoutGenero_participantes_generoTogeneroInput = {
@@ -32954,6 +33300,11 @@ export namespace Prisma {
     edad?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
     estado_participantes_estadoToestado?: estadoUpdateOneWithoutParticipantes_participantes_estadoToestadoNestedInput
     evento_participantes_eventoToevento?: eventoUpdateOneRequiredWithoutParticipantes_participantes_eventoToeventoNestedInput
     tipo_participante?: tipo_participanteUpdateOneWithoutParticipantesNestedInput
@@ -32977,6 +33328,11 @@ export namespace Prisma {
     tipo_participacion?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type participantesUncheckedUpdateManyWithoutGenero_participantes_generoTogeneroInput = {
@@ -32997,6 +33353,11 @@ export namespace Prisma {
     tipo_participacion?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type evento_moduloCreateManyModulo_evento_modulo_moduloTomoduloInput = {
@@ -33088,6 +33449,7 @@ export namespace Prisma {
     validacion: number
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
   }
 
   export type eventoUpdateWithoutTipo_eventoInput = {
@@ -33101,6 +33463,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -33126,6 +33489,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
@@ -33149,6 +33513,7 @@ export namespace Prisma {
     validacion?: IntFieldUpdateOperationsInput | number
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
   }
 
   export type participantesCreateManyTipo_participanteInput = {
@@ -33169,6 +33534,11 @@ export namespace Prisma {
     edad?: number | null
     referencia_bancaria?: string | null
     monto?: Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: string | null
+    contacto_emergencia_nombre?: string | null
+    contacto_emergencia_telefono?: string | null
+    medio_difusion?: string | null
+    consentimiento?: boolean
   }
 
   export type participantesUpdateWithoutTipo_participanteInput = {
@@ -33186,6 +33556,11 @@ export namespace Prisma {
     edad?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
     estado_participantes_estadoToestado?: estadoUpdateOneWithoutParticipantes_participantes_estadoToestadoNestedInput
     evento_participantes_eventoToevento?: eventoUpdateOneRequiredWithoutParticipantes_participantes_eventoToeventoNestedInput
     genero_participantes_generoTogenero?: generoUpdateOneWithoutParticipantes_participantes_generoTogeneroNestedInput
@@ -33209,6 +33584,11 @@ export namespace Prisma {
     edad?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type participantesUncheckedUpdateManyWithoutTipo_participanteInput = {
@@ -33229,6 +33609,11 @@ export namespace Prisma {
     edad?: NullableIntFieldUpdateOperationsInput | number | null
     referencia_bancaria?: NullableStringFieldUpdateOperationsInput | string | null
     monto?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    estado_procedencia?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_nombre?: NullableStringFieldUpdateOperationsInput | string | null
+    contacto_emergencia_telefono?: NullableStringFieldUpdateOperationsInput | string | null
+    medio_difusion?: NullableStringFieldUpdateOperationsInput | string | null
+    consentimiento?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type eventoCreateManyTipo_validacionInput = {
@@ -33245,6 +33630,7 @@ export namespace Prisma {
     contacto?: string | null
     estado: number
     asistencias_minimas?: number | null
+    costo?: Decimal | DecimalJsLike | number | string | null
   }
 
   export type eventoUpdateWithoutTipo_validacionInput = {
@@ -33258,6 +33644,7 @@ export namespace Prisma {
     capacidad?: NullableIntFieldUpdateOperationsInput | number | null
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     estado_evento?: estado_eventoUpdateOneRequiredWithoutEventoNestedInput
@@ -33283,6 +33670,7 @@ export namespace Prisma {
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     actividad_actividad_eventoToevento?: actividadUncheckedUpdateManyWithoutEvento_actividad_eventoToeventoNestedInput
     asistencia_asistencia_eventoToevento?: asistenciaUncheckedUpdateManyWithoutEvento_asistencia_eventoToeventoNestedInput
     evento_campo_evento_campo_eventoToevento?: evento_campoUncheckedUpdateManyWithoutEvento_evento_campo_eventoToeventoNestedInput
@@ -33306,6 +33694,7 @@ export namespace Prisma {
     contacto?: NullableStringFieldUpdateOperationsInput | string | null
     estado?: IntFieldUpdateOperationsInput | number
     asistencias_minimas?: NullableIntFieldUpdateOperationsInput | number | null
+    costo?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
   }
 
   export type usuario_eventoCreateManyUsuario_usuario_evento_usuarioTousuarioInput = {

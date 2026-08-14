@@ -8,9 +8,26 @@ const CODIGO_TIPO: Record<string, number> = {
   'Docente': 3,
 };
 
+
 @Injectable()
 export class InscripcionesService {
   constructor(private prisma: PrismaService) {}
+
+  async buscarPorDatos(eventoId: number, correo: string, control: string) {
+    const participante = await this.prisma.participantes.findFirst({
+      where: {
+        evento: eventoId,
+        correo_electronico: correo,
+        matricula: control,
+      },
+    });
+
+    if (!participante) {
+      throw new NotFoundException('No se encontró un registro con esos datos.');
+    }
+
+    return participante;
+  }
 
   private async siguienteConsecutivoAnual(anio: number): Promise<number> {
     const contador = await this.prisma.contador_referencia.upsert({

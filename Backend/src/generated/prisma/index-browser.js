@@ -176,7 +176,8 @@ exports.Prisma.EventoScalarFieldEnum = {
   contacto: 'contacto',
   validacion: 'validacion',
   estado: 'estado',
-  asistencias_minimas: 'asistencias_minimas'
+  asistencias_minimas: 'asistencias_minimas',
+  costo: 'costo'
 };
 
 exports.Prisma.Evento_campoScalarFieldEnum = {
@@ -219,7 +220,12 @@ exports.Prisma.ParticipantesScalarFieldEnum = {
   edad: 'edad',
   tipo_participacion: 'tipo_participacion',
   referencia_bancaria: 'referencia_bancaria',
-  monto: 'monto'
+  monto: 'monto',
+  estado_procedencia: 'estado_procedencia',
+  contacto_emergencia_nombre: 'contacto_emergencia_nombre',
+  contacto_emergencia_telefono: 'contacto_emergencia_telefono',
+  medio_difusion: 'medio_difusion',
+  consentimiento: 'consentimiento'
 };
 
 exports.Prisma.Rol_eventoScalarFieldEnum = {
