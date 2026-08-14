@@ -10,7 +10,7 @@
       <div class="header-content">
 
         <router-link
-          to="/eventos/1"
+          to="/evento/1"
           class="back-link"
         >
           ← Regresar al evento
@@ -65,11 +65,11 @@
             ✓
           </div>
 
-          <div>
+          <div class="success-content">
 
-            <h3>
+            <h2>
               ¡Registro realizado correctamente!
-            </h3>
+            </h2>
 
             <p>
               Tus datos fueron registrados
@@ -92,6 +92,13 @@
               Guarda este folio. Te servirá para
               consultar posteriormente tu registro.
             </p>
+
+            <button
+              class="new-register-button"
+              @click="nuevoRegistro"
+            >
+              Realizar otro registro
+            </button>
 
           </div>
 
@@ -152,7 +159,7 @@
             </div>
 
 
-            <!-- APELLIDO PATERNO -->
+            <!-- APELLIDOS -->
 
             <div class="form-grid">
 
@@ -173,7 +180,7 @@
               </div>
 
 
-              <!-- APELLIDO MATERNO -->
+                <!-- APELLIDO MATERNO -->
 
               <div class="form-group">
 
@@ -215,45 +222,23 @@
 
             <!-- EDAD -->
 
-            <div class="form-group">
+          <div class="form-group">
 
-              <label>
-                Edad
-                <span>*</span>
-              </label>
+            <label>
+              Edad
+              <span>*</span>
+            </label>
 
-              <select
-                v-model="form.edad"
-                required
-              >
+            <input
+              v-model="form.edad"
+              type="number"
+              min="1"
+              max="120"
+              placeholder="Escribe tu edad"
+              required
+            />
 
-                <option value="">
-                  Selecciona un rango de edad
-                </option>
-
-                <option value="Menos de 18 años">
-                  Menos de 18 años
-                </option>
-
-                <option value="18 a 29 años">
-                  18 a 29 años
-                </option>
-
-                <option value="30 a 39 años">
-                  30 a 39 años
-                </option>
-
-                <option value="40 a 49 años">
-                  40 a 49 años
-                </option>
-
-                <option value="Más de 50 años">
-                  Más de 50 años
-                </option>
-
-              </select>
-
-            </div>
+          </div>
 
 
             <!-- SEXO -->
@@ -352,7 +337,7 @@
             </div>
 
 
-            <!-- TELEFONO -->
+            <!-- TELÉFONO -->
 
             <div class="form-group">
 
@@ -557,7 +542,7 @@
             </div>
 
 
-            <!-- INSTITUCION -->
+            <!-- INSTITUCIÓN -->
 
             <div class="form-group">
 
@@ -600,7 +585,7 @@
             </div>
 
 
-            <!-- OTRA INSTITUCION -->
+            <!-- OTRA INSTITUCIÓN -->
 
             <div
               v-if="form.institucion === 'Otro'"
@@ -736,8 +721,7 @@
 
             <div class="form-grid">
 
-              <!-- NOMBRE -->
-
+            <!-- NOMBRE -->
               <div class="form-group">
 
                 <label>
@@ -755,8 +739,7 @@
               </div>
 
 
-              <!-- CELULAR -->
-
+                <!-- CELULAR -->
               <div class="form-group">
 
                 <label>
@@ -798,8 +781,8 @@
                 </h2>
 
                 <p>
-                  Selecciona la opción que corresponda
-                  a tu participación en el congreso.
+                  Selecciona el tipo de participación
+                  que tendrás en el congreso.
                 </p>
 
               </div>
@@ -823,63 +806,19 @@
                   Selecciona una opción
                 </option>
 
-                <option value="Asistente estudiante de Licenciatura">
-                  Asistente estudiante de Licenciatura
+                <option value="Participante general">
+                  Participante general
                 </option>
 
-                <option value="Asistente estudiante de Posgrado">
-                  Asistente estudiante de Posgrado
+                <option value="Estudiante">
+                  Estudiante
                 </option>
 
                 <option value="Docente">
                   Docente
                 </option>
 
-                <option value="Empresario(a)">
-                  Empresario(a)
-                </option>
-
-                <option value="Público en general">
-                  Público en general
-                </option>
-
-                <option value="Ponente">
-                  Ponente
-                </option>
-
-                <option value="Egresada / Egresado">
-                  Egresada / Egresado
-                </option>
-
-                <option value="Otro">
-                  Otro
-                </option>
-
               </select>
-
-            </div>
-
-
-            <!-- OTRO TIPO -->
-
-            <div
-              v-if="form.tipoParticipacion === 'Otro'"
-              class="form-group"
-            >
-
-              <label>
-                Especifica tu participación
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.otraParticipacion"
-                type="text"
-                placeholder="Especifica"
-                :required="
-                  form.tipoParticipacion === 'Otro'
-                "
-              />
 
             </div>
 
@@ -887,7 +826,7 @@
 
 
           <!-- ===================================
-               COMO SE ENTERÓ
+               CÓMO SE ENTERÓ
           ==================================== -->
 
           <section class="form-section">
@@ -1011,6 +950,11 @@
                   Consentimiento y protección de datos
                 </h2>
 
+                <p>
+                  Lee cuidadosamente la siguiente
+                  información antes de registrarte.
+                </p>
+
               </div>
 
             </div>
@@ -1059,7 +1003,19 @@
 
 
           <!-- ===================================
-               BOTÓN REGISTRAR
+               ERROR
+          ==================================== -->
+
+          <div
+            v-if="error"
+            class="error-message"
+          >
+            ⚠️ {{ error }}
+          </div>
+
+
+          <!-- ===================================
+               BOTÓN
           ==================================== -->
 
           <div class="submit-area">
@@ -1077,6 +1033,9 @@
 
               <span v-if="!loading">
                 Completar registro
+                <span class="arrow">
+                  →
+                </span>
               </span>
 
               <span
@@ -1216,6 +1175,8 @@
           <div class="info-divider"></div>
 
 
+          <!-- INFORMACIÓN IMPORTANTE -->
+
           <div class="important-notice">
 
             <strong>
@@ -1246,140 +1207,368 @@
 import {
   reactive,
   ref
-} from 'vue'
-
-import {
-  useRouter
-} from 'vue-router'
+} from "vue";
 
 
-const router = useRouter()
-
-
-// ========================================
+// ============================================
 // FORMULARIO
-// ========================================
+// ============================================
 
 const form = reactive({
 
-  // Datos personales
+  // -----------------------------
+  // DATOS PERSONALES
+  // -----------------------------
 
-  apellidoPaterno: '',
+  apellidoPaterno: "",
 
-  apellidoMaterno: '',
+  apellidoMaterno: "",
 
-  nombre: '',
+  nombre: "",
 
-  edad: '',
+  edad: "",
 
-  sexo: '',
-
-
-  // Contacto
-
-  email: '',
-
-  telefono: '',
-
-  estado: '',
+  sexo: "",
 
 
-  // Institución
+  // -----------------------------
+  // CONTACTO
+  // -----------------------------
 
-  institucion: '',
+  email: "",
 
-  otraInstitucion: '',
+  telefono: "",
 
-  carrera: '',
-
-  otraCarrera: '',
-
-
-  // Emergencia
-
-  contactoEmergenciaNombre: '',
-
-  contactoEmergenciaTelefono: '',
+  estado: "",
 
 
-  // Participación
+  // -----------------------------
+  // INSTITUCIÓN
+  // -----------------------------
 
-  tipoParticipacion: '',
+  institucion: "",
 
-  otraParticipacion: '',
+  otraInstitucion: "",
 
+  carrera: "",
 
-  // Difusión
-
-  comoSeEntero: '',
-
-  otroMedio: '',
+  otraCarrera: "",
 
 
-  // Consentimiento
+  // -----------------------------
+  // EMERGENCIA
+  // -----------------------------
+
+  contactoEmergenciaNombre: "",
+
+  contactoEmergenciaTelefono: "",
+
+
+  // -----------------------------
+  // PARTICIPACIÓN
+  // -----------------------------
+
+  tipoParticipacion: "",
+
+
+
+  // -----------------------------
+  // DIFUSIÓN
+  // -----------------------------
+
+  comoSeEntero: "",
+
+  otroMedio: "",
+
+
+  // -----------------------------
+  // CONSENTIMIENTO
+  // -----------------------------
 
   consentimiento: false
 
-})
+});
 
 
-// ========================================
+// ============================================
 // ESTADOS
-// ========================================
+// ============================================
 
-const loading = ref(false)
+const loading = ref(false);
 
-const registroExitoso = ref(false)
+const registroExitoso = ref(false);
 
-const folio = ref('')
+const folio = ref("");
+
+const error = ref("");
 
 
-// ========================================
+// ============================================
 // GENERAR FOLIO
-// ========================================
+// ============================================
 
 function generarFolio() {
 
-  const fecha =
-    new Date()
+  const fecha = new Date();
 
-  const año =
-    fecha.getFullYear()
+  const año = fecha.getFullYear();
 
-  const numero =
-    Math.floor(
-      100000 +
-      Math.random() * 900000
-    )
+  const numero = Math.floor(
+    100000 +
+    Math.random() * 900000
+  );
 
-  return `ESCALA-${año}-${numero}`
+  return `ESCALA-${año}-${numero}`;
 
 }
 
 
-// ========================================
+// ============================================
+// VALIDAR DATOS
+// ============================================
+
+function validarFormulario() {
+
+  if (!form.apellidoPaterno.trim()) {
+
+    error.value =
+      "Escribe tu apellido paterno.";
+
+    return false;
+
+  }
+
+
+  if (!form.apellidoMaterno.trim()) {
+
+    error.value =
+      "Escribe tu apellido materno.";
+
+    return false;
+
+  }
+
+
+  if (!form.nombre.trim()) {
+
+    error.value =
+      "Escribe tu nombre.";
+
+    return false;
+
+  }
+
+
+  if (!form.edad) {
+
+    error.value =
+      "Selecciona tu rango de edad.";
+
+    return false;
+
+  }
+
+
+  if (!form.sexo) {
+
+    error.value =
+      "Selecciona tu sexo biológico.";
+
+    return false;
+
+  }
+
+
+  if (!form.email.trim()) {
+
+    error.value =
+      "Escribe tu correo electrónico.";
+
+    return false;
+
+  }
+
+
+  if (!form.telefono.trim()) {
+
+    error.value =
+      "Escribe tu número de teléfono.";
+
+    return false;
+
+  }
+
+
+  if (!form.estado) {
+
+    error.value =
+      "Selecciona tu estado de procedencia.";
+
+    return false;
+
+  }
+
+
+  if (!form.institucion) {
+
+    error.value =
+      "Selecciona tu institución de procedencia.";
+
+    return false;
+
+  }
+
+
+  if (
+    form.institucion === "Otro" &&
+    !form.otraInstitucion.trim()
+  ) {
+
+    error.value =
+      "Especifica tu institución.";
+
+    return false;
+
+  }
+
+
+  if (!form.carrera) {
+
+    error.value =
+      "Selecciona tu carrera o área de especialización.";
+
+    return false;
+
+  }
+
+
+  if (
+    form.carrera === "Otro" &&
+    !form.otraCarrera.trim()
+  ) {
+
+    error.value =
+      "Especifica tu carrera o área.";
+
+    return false;
+
+  }
+
+
+  if (
+    !form.contactoEmergenciaNombre.trim()
+  ) {
+
+    error.value =
+      "Escribe el nombre del contacto de emergencia.";
+
+    return false;
+
+  }
+
+
+  if (
+    !form.contactoEmergenciaTelefono.trim()
+  ) {
+
+    error.value =
+      "Escribe el número del contacto de emergencia.";
+
+    return false;
+
+  }
+
+
+  if (!form.tipoParticipacion) {
+
+    error.value =
+      "Selecciona el tipo de participación.";
+
+    return false;
+
+  }
+
+
+  if (!form.comoSeEntero) {
+
+    error.value =
+      "Selecciona cómo te enteraste del congreso.";
+
+    return false;
+
+  }
+
+
+  if (
+    form.comoSeEntero === "Otro" &&
+    !form.otroMedio.trim()
+  ) {
+
+    error.value =
+      "Especifica cómo te enteraste del congreso.";
+
+    return false;
+
+  }
+
+
+  if (!form.consentimiento) {
+
+    error.value =
+      "Debes aceptar el consentimiento para continuar.";
+
+    return false;
+
+  }
+
+
+  error.value = "";
+
+  return true;
+
+}
+
+
+// ============================================
 // REGISTRAR
-// ========================================
+// ============================================
 
 function registrar() {
 
-  loading.value = true
+  if (!validarFormulario()) {
+
+    window.scrollTo({
+
+      top: 0,
+
+      behavior: "smooth"
+
+    });
+
+    return;
+
+  }
+
+
+  loading.value = true;
+
+  error.value = "";
 
 
   // Generar folio
 
   const nuevoFolio =
-    generarFolio()
+    generarFolio();
 
 
-  // Crear objeto completo
+  // Crear registro
 
   const registro = {
 
     ...form,
 
     evento:
-      'Congreso ESCALA',
+      "Congreso ESCALA",
 
     eventoId:
       1,
@@ -1388,60 +1577,93 @@ function registrar() {
       nuevoFolio,
 
     estadoRegistro:
-      'Registrado',
+      "Registrado",
 
     fechaRegistro:
       new Date().toISOString()
 
-  }
+  };
 
 
   // Guardar temporalmente
 
   localStorage.setItem(
 
-    'registroEscala',
+    "registroEscala",
 
     JSON.stringify(registro)
 
-  )
+  );
 
-
-  // Guardar folio
-
+    // Guardar folio
   localStorage.setItem(
 
-    'folioEscala',
+    "folioEscala",
 
     nuevoFolio
 
-  )
+  );
 
 
-  // Simular registro
+  // Simular proceso de registro
 
   setTimeout(() => {
 
-    loading.value = false
+    loading.value = false;
 
     folio.value =
-      nuevoFolio
+      nuevoFolio;
 
     registroExitoso.value =
-      true
-
-    // Subir automáticamente
-    // al inicio del mensaje
+      true;
 
     window.scrollTo({
 
       top: 0,
 
-      behavior: 'smooth'
+      behavior: "smooth"
 
-    })
+    });
 
-  }, 700)
+  }, 700);
+
+}
+
+
+// ============================================
+// NUEVO REGISTRO
+// ============================================
+
+function nuevoRegistro() {
+
+  Object.keys(form).forEach((key) => {
+
+    if (typeof form[key] === "boolean") {
+
+      form[key] = false;
+
+    } else {
+
+      form[key] = "";
+
+    }
+
+  });
+
+
+  folio.value = "";
+
+  error.value = "";
+
+  registroExitoso.value = false;
+
+  window.scrollTo({
+
+    top: 0,
+
+    behavior: "smooth"
+
+  });
 
 }
 
@@ -1450,24 +1672,20 @@ function registrar() {
 
 <style scoped>
 
-/* ========================================
+/* =========================================
    RESET
-======================================== */
+========================================= */
 
 * {
-
   margin: 0;
-
-  padding: 0;
-
+  padding: 0; 
   box-sizing: border-box;
-
 }
 
 
-/* ========================================
+/* =========================================
    PAGE
-======================================== */
+========================================= */
 
 .registro-page {
 
@@ -1482,12 +1700,14 @@ function registrar() {
     Verdana,
     sans-serif;
 
+  color: #334155;
+
 }
 
 
-/* ========================================
+/* =========================================
    HEADER
-======================================== */
+========================================= */
 
 .registro-header {
 
@@ -1501,14 +1721,14 @@ function registrar() {
   color: white;
 
   padding:
-    35px 20px 85px;
+    35px 20px 80px;
 
 }
 
 
 .header-content {
 
-  max-width: 1200px;
+  max-width: 1150px;
 
   margin: auto;
 
@@ -1558,7 +1778,7 @@ function registrar() {
     rgba(255,255,255,0.25);
 
   padding:
-    7px 15px;
+    7px 14px;
 
   border-radius: 30px;
 
@@ -1577,7 +1797,7 @@ function registrar() {
 
   font-size: 2.5rem;
 
-  font-weight: 800;
+  font-weight: 700;
 
 }
 
@@ -1594,16 +1814,16 @@ function registrar() {
 }
 
 
-/* ========================================
+/* =========================================
    CONTAINER
-======================================== */
+========================================= */
 
 .registro-container {
 
-  max-width: 1200px;
+  max-width: 1150px;
 
   margin:
-    -45px auto 60px;
+    -45px auto 50px;
 
   padding:
     0 20px;
@@ -1611,7 +1831,7 @@ function registrar() {
   display: grid;
 
   grid-template-columns:
-    minmax(0, 1fr) 330px;
+    1fr 330px;
 
   gap: 30px;
 
@@ -1622,9 +1842,9 @@ function registrar() {
 }
 
 
-/* ========================================
+/* =========================================
    CARD
-======================================== */
+========================================= */
 
 .registro-card {
 
@@ -1632,18 +1852,18 @@ function registrar() {
 
   border-radius: 18px;
 
-  padding: 40px;
+  padding: 35px;
 
   box-shadow:
-    0 12px 35px
+    0 10px 30px
     rgba(0,0,0,0.08);
 
 }
 
 
-/* ========================================
+/* =========================================
    FORM SECTION
-======================================== */
+========================================= */
 
 .form-section {
 
@@ -1652,7 +1872,7 @@ function registrar() {
   margin-bottom: 35px;
 
   border-bottom:
-    1px solid #e5eaf0;
+    1px solid #e2e8f0;
 
 }
 
@@ -1661,22 +1881,22 @@ function registrar() {
 
   border-bottom: none;
 
-  margin-bottom: 10px;
+  margin-bottom: 0;
 
 }
 
 
-/* ========================================
+/* =========================================
    SECTION HEADER
-======================================== */
+========================================= */
 
 .section-header {
 
   display: flex;
 
-  align-items: flex-start;
-
   gap: 15px;
+
+  align-items: flex-start;
 
   margin-bottom: 25px;
 
@@ -1685,11 +1905,11 @@ function registrar() {
 
 .section-icon {
 
-  min-width: 48px;
-
   width: 48px;
 
   height: 48px;
+
+  min-width: 48px;
 
   display: flex;
 
@@ -1697,12 +1917,11 @@ function registrar() {
 
   justify-content: center;
 
-  background:
-    #e8f1fb;
+  background: #e8f1fb;
 
-  border-radius: 13px;
+  border-radius: 12px;
 
-  font-size: 21px;
+  font-size: 22px;
 
 }
 
@@ -1713,7 +1932,7 @@ function registrar() {
 
   font-size: 1.35rem;
 
-  font-weight: 750;
+  margin-bottom: 5px;
 
 }
 
@@ -1726,30 +1945,25 @@ function registrar() {
 
   line-height: 1.5;
 
-  margin-top: 4px;
-
 }
 
 
-/* ========================================
-   PRIVACY INTRO
-======================================== */
+/* =========================================
+   PRIVACY
+========================================= */
 
 .privacy-intro {
 
-  background:
-    #f8fafc;
+  background: #f8fafc;
 
   border-left:
     4px solid #0052a3;
 
-  padding:
-    15px 17px;
-
-  border-radius:
-    0 10px 10px 0;
+  padding: 15px 18px;
 
   margin-bottom: 25px;
+
+  border-radius: 0 10px 10px 0;
 
 }
 
@@ -1758,16 +1972,16 @@ function registrar() {
 
   color: #64748b;
 
-  font-size: 0.86rem;
+  font-size: 0.87rem;
 
   line-height: 1.6;
 
 }
 
 
-/* ========================================
+/* =========================================
    FORM GRID
-======================================== */
+========================================= */
 
 .form-grid {
 
@@ -1781,9 +1995,9 @@ function registrar() {
 }
 
 
-/* ========================================
+/* =========================================
    FORM GROUP
-======================================== */
+========================================= */
 
 .form-group {
 
@@ -1792,7 +2006,7 @@ function registrar() {
 }
 
 
-.form-group:last-child {
+.form-grid .form-group {
 
   margin-bottom: 0;
 
@@ -1807,9 +2021,9 @@ function registrar() {
 
   color: #334155;
 
-  font-size: 0.9rem;
+  font-weight: 600;
 
-  font-weight: 650;
+  font-size: 0.9rem;
 
 }
 
@@ -1823,47 +2037,41 @@ function registrar() {
 }
 
 
-/* ========================================
+/* =========================================
    INPUTS
-======================================== */
+========================================= */
 
 .form-group input,
 .form-group select {
 
   width: 100%;
 
-  min-height: 49px;
+  height: 48px;
 
   padding:
-    12px 14px;
+    0 14px;
 
   border:
     1px solid #d7dee8;
 
   border-radius: 10px;
 
-  background:
-    #f8fafc;
-
-  color: #1e293b;
+  background: #f8fafc;
 
   outline: none;
 
-  font-family: inherit;
+  font-size: 0.95rem;
 
-  font-size: 0.93rem;
+  color: #334155;
 
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s,
-    background 0.2s;
+  transition: 0.25s;
 
 }
 
 
 .form-group input::placeholder {
 
-  color: #9ca3af;
+  color: #94a3b8;
 
 }
 
@@ -1871,8 +2079,7 @@ function registrar() {
 .form-group input:focus,
 .form-group select:focus {
 
-  border-color:
-    #0052a3;
+  border-color: #0052a3;
 
   background: white;
 
@@ -1883,89 +2090,63 @@ function registrar() {
 }
 
 
-/* ========================================
+/* =========================================
    RADIO
-======================================== */
+========================================= */
 
 .radio-group {
 
   display: flex;
 
-  flex-wrap: wrap;
+  gap: 25px;
 
-  gap: 12px;
+  flex-wrap: wrap;
 
 }
 
 
 .radio-option {
 
-  display: flex;
+  display: flex !important;
 
   align-items: center;
 
   gap: 8px;
 
-  padding:
-    11px 15px;
-
-  border:
-    1px solid #d7dee8;
-
-  border-radius: 10px;
-
-  background:
-    #f8fafc;
-
   cursor: pointer;
 
-  color: #475569;
+  font-weight: 500 !important;
 
-  font-size: 0.9rem;
-
-  transition: 0.2s;
-
-}
-
-
-.radio-option:hover {
-
-  border-color:
-    #0052a3;
-
-  background:
-    #f1f6fc;
+  margin: 0 !important;
 
 }
 
 
 .radio-option input {
 
-  width: 16px;
+  width: 18px;
 
-  height: 16px;
+  height: 18px;
 
-  accent-color:
-    #003366;
+  accent-color: #0052a3;
 
 }
 
 
-/* ========================================
+/* =========================================
    CONSENT
-======================================== */
+========================================= */
 
 .consent-section {
 
-  margin-bottom: 0;
+  padding-bottom: 10px;
 
 }
 
 
 .consent-box {
 
-  background:
-    #f8fafc;
+  background: #f8fafc;
 
   border:
     1px solid #e2e8f0;
@@ -1974,7 +2155,7 @@ function registrar() {
 
   padding: 20px;
 
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 
 }
 
@@ -1983,9 +2164,9 @@ function registrar() {
 
   color: #64748b;
 
-  font-size: 0.84rem;
+  font-size: 0.85rem;
 
-  line-height: 1.65;
+  line-height: 1.7;
 
   margin-bottom: 12px;
 
@@ -2009,7 +2190,7 @@ function registrar() {
 
   cursor: pointer;
 
-  color: #334155;
+  color: #475569;
 
   font-size: 0.9rem;
 
@@ -2026,10 +2207,7 @@ function registrar() {
 
   margin-top: 2px;
 
-  accent-color:
-    #003366;
-
-  cursor: pointer;
+  accent-color: #0052a3;
 
 }
 
@@ -2041,13 +2219,37 @@ function registrar() {
 }
 
 
-/* ========================================
+/* =========================================
+   ERROR
+========================================= */
+
+.error-message {
+
+  background: #fef2f2;
+
+  border:
+    1px solid #fecaca;
+
+  color: #b91c1c;
+
+  padding: 14px 16px;
+
+  border-radius: 10px;
+
+  margin-bottom: 20px;
+
+  font-size: 0.9rem;
+
+}
+
+
+/* =========================================
    SUBMIT
-======================================== */
+========================================= */
 
 .submit-area {
 
-  margin-top: 30px;
+  margin-top: 25px;
 
 }
 
@@ -2074,7 +2276,7 @@ function registrar() {
 
   width: 100%;
 
-  min-height: 54px;
+  height: 54px;
 
   border: none;
 
@@ -2089,20 +2291,13 @@ function registrar() {
 
   color: white;
 
-  font-family: inherit;
-
   font-size: 1rem;
 
   font-weight: 700;
 
   cursor: pointer;
 
-  transition:
-    0.25s ease;
-
-  box-shadow:
-    0 7px 18px
-    rgba(0,51,102,0.18);
+  transition: 0.25s;
 
 }
 
@@ -2113,8 +2308,8 @@ function registrar() {
     translateY(-2px);
 
   box-shadow:
-    0 10px 25px
-    rgba(0,51,102,0.25);
+    0 8px 20px
+    rgba(0,51,102,0.20);
 
 }
 
@@ -2128,9 +2323,16 @@ function registrar() {
 }
 
 
-/* ========================================
+.arrow {
+
+  margin-left: 8px;
+
+}
+
+
+/* =========================================
    LOADING
-======================================== */
+========================================= */
 
 .loading-content {
 
@@ -2152,16 +2354,15 @@ function registrar() {
   height: 18px;
 
   border:
-    2px solid
+    3px solid
     rgba(255,255,255,0.35);
 
-  border-top-color:
-    white;
+  border-top-color: white;
 
   border-radius: 50%;
 
   animation:
-    spin 0.7s linear infinite;
+    spin 0.8s linear infinite;
 
 }
 
@@ -2170,17 +2371,16 @@ function registrar() {
 
   to {
 
-    transform:
-      rotate(360deg);
+    transform: rotate(360deg);
 
   }
 
 }
 
 
-/* ========================================
+/* =========================================
    EVENT INFO
-======================================== */
+========================================= */
 
 .event-info {
 
@@ -2202,17 +2402,21 @@ function registrar() {
   padding: 28px;
 
   box-shadow:
-    0 12px 35px
+    0 10px 30px
     rgba(0,0,0,0.08);
+
+  position: sticky;
+
+  top: 20px;
 
 }
 
 
 .info-icon {
 
-  width: 58px;
+  width: 55px;
 
-  height: 58px;
+  height: 55px;
 
   display: flex;
 
@@ -2220,14 +2424,13 @@ function registrar() {
 
   justify-content: center;
 
-  background:
-    #e8f1fb;
+  background: #e8f1fb;
 
-  border-radius: 15px;
+  border-radius: 14px;
 
-  font-size: 26px;
+  font-size: 25px;
 
-  margin-bottom: 16px;
+  margin-bottom: 15px;
 
 }
 
@@ -2238,8 +2441,6 @@ function registrar() {
 
   font-size: 1.3rem;
 
-  font-weight: 750;
-
 }
 
 
@@ -2247,9 +2448,9 @@ function registrar() {
 
   color: #64748b;
 
-  font-size: 0.87rem;
+  font-size: 0.88rem;
 
-  line-height: 1.55;
+  line-height: 1.5;
 
   margin:
     7px 0 25px;
@@ -2257,9 +2458,9 @@ function registrar() {
 }
 
 
-/* ========================================
-   INFO ITEMS
-======================================== */
+/* =========================================
+   INFO ITEM
+========================================= */
 
 .info-item {
 
@@ -2281,11 +2482,9 @@ function registrar() {
 
 .info-item strong {
 
-  display: block;
-
   color: #334155;
 
-  font-size: 0.84rem;
+  font-size: 0.85rem;
 
 }
 
@@ -2303,65 +2502,61 @@ function registrar() {
 }
 
 
+/* =========================================
+   DIVIDER
+========================================= */
+
 .info-divider {
 
   height: 1px;
 
-  background:
-    #e5eaf0;
+  background: #e2e8f0;
 
-  margin:
-    20px 0;
+  margin: 10px 0 20px;
 
 }
 
 
-/* ========================================
+/* =========================================
    IMPORTANT NOTICE
-======================================== */
+========================================= */
 
 .important-notice {
 
+  background: #eff6ff;
+
+  border-radius: 10px;
+
   padding: 15px;
-
-  border-radius: 11px;
-
-  background:
-    #eff6ff;
-
-  border:
-    1px solid #dbeafe;
 
 }
 
 
 .important-notice strong {
 
-  display: block;
-
   color: #1d4ed8;
 
   font-size: 0.85rem;
-
-  margin-bottom: 5px;
 
 }
 
 
 .important-notice p {
 
-  color: #475569;
+  color: #64748b;
 
-  font-size: 0.78rem;
+  font-size: 0.8rem;
 
   line-height: 1.5;
+
+  margin-top: 6px;
 
 }
 
 
-/* ========================================
-   SUCCESS MESSAGE
-======================================== */
+/* =========================================
+   SUCCESS
+========================================= */
 
 .success-message {
 
@@ -2371,10 +2566,9 @@ function registrar() {
 
   gap: 20px;
 
-  padding: 25px;
+  padding: 30px;
 
-  background:
-    #f0fdf4;
+  background: #f0fdf4;
 
   border:
     1px solid #bbf7d0;
@@ -2386,11 +2580,11 @@ function registrar() {
 
 .success-icon {
 
-  min-width: 48px;
+  width: 55px;
 
-  width: 48px;
+  height: 55px;
 
-  height: 48px;
+  min-width: 55px;
 
   display: flex;
 
@@ -2398,36 +2592,33 @@ function registrar() {
 
   justify-content: center;
 
-  background:
-    #16a34a;
+  background: #16a34a;
 
   color: white;
 
   border-radius: 50%;
 
-  font-size: 24px;
+  font-size: 28px;
 
-  font-weight: 700;
+  font-weight: bold;
 
 }
 
 
-.success-message h3 {
+.success-content h2 {
 
   color: #166534;
 
-  font-size: 1.25rem;
+  margin-bottom: 8px;
 
-  margin-bottom: 6px;
+  font-size: 1.5rem;
 
 }
 
 
-.success-message p {
+.success-content > p {
 
   color: #4b5563;
-
-  font-size: 0.9rem;
 
   line-height: 1.5;
 
@@ -2436,32 +2627,36 @@ function registrar() {
 
 .folio-box {
 
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 4px;
-
   margin:
-    18px 0;
-
-  padding: 15px;
+    25px 0 15px;
 
   background: white;
 
   border:
-    1px solid #bbf7d0;
+    2px dashed #22c55e;
 
-  border-radius: 10px;
+  border-radius: 12px;
+
+  padding: 20px;
+
+  text-align: center;
 
 }
 
 
 .folio-box span {
 
+  display: block;
+
   color: #64748b;
 
-  font-size: 0.78rem;
+  font-size: 0.8rem;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  margin-bottom: 8px;
 
 }
 
@@ -2470,7 +2665,7 @@ function registrar() {
 
   color: #166534;
 
-  font-size: 1.3rem;
+  font-size: 1.5rem;
 
   letter-spacing: 1px;
 
@@ -2479,16 +2674,47 @@ function registrar() {
 
 .success-note {
 
-  font-size: 0.8rem !important;
+  font-size: 0.85rem;
 
   color: #64748b !important;
 
 }
 
 
-/* ========================================
+.new-register-button {
+
+  margin-top: 20px;
+
+  padding:
+    12px 20px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: #003366;
+
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+}
+
+
+.new-register-button:hover {
+
+  background: #0052a3;
+
+}
+
+
+/* =========================================
    RESPONSIVE
-======================================== */
+========================================= */
 
 @media (max-width: 900px) {
 
@@ -2501,9 +2727,16 @@ function registrar() {
 
   .event-info {
 
-    position: static;
+  position: static;
 
     order: -1;
+
+  }
+
+
+  .info-card {
+
+    position: static;
 
   }
 
@@ -2515,7 +2748,7 @@ function registrar() {
   .registro-header {
 
     padding:
-      25px 20px 75px;
+      25px 20px 70px;
 
   }
 
@@ -2544,16 +2777,18 @@ function registrar() {
   }
 
 
-  .radio-group {
+  .form-grid .form-group {
 
-    flex-direction: column;
+    margin-bottom: 20px;
 
   }
 
 
-  .radio-option {
+  .radio-group {
 
-    width: 100%;
+    flex-direction: column;
+
+    gap: 12px;
 
   }
 
@@ -2561,6 +2796,8 @@ function registrar() {
   .success-message {
 
     flex-direction: column;
+
+    padding: 22px;
 
   }
 

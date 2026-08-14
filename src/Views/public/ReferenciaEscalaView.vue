@@ -13,6 +13,7 @@
         <button
           class="back-button"
           @click="regresar"
+          type="button"
         >
           ← Regresar
         </button>
@@ -52,6 +53,7 @@
 
     <main class="main-container">
 
+
       <!-- =====================================
            FORMULARIO
       ====================================== -->
@@ -86,7 +88,9 @@
         </div>
 
 
-        <!-- NOMBRE -->
+        <!-- =====================================
+             INFORMACIÓN PERSONAL
+        ====================================== -->
 
         <div class="form-section">
 
@@ -95,6 +99,9 @@
           </h3>
 
           <div class="form-grid">
+
+
+            <!-- PRIMER APELLIDO -->
 
             <div class="form-group">
 
@@ -108,10 +115,13 @@
                 type="text"
                 placeholder="Ej. García"
                 maxlength="50"
+                autocomplete="family-name"
               >
 
             </div>
 
+
+            <!-- SEGUNDO APELLIDO -->
 
             <div class="form-group">
 
@@ -124,10 +134,13 @@
                 type="text"
                 placeholder="Ej. López"
                 maxlength="50"
+                autocomplete="additional-name"
               >
 
             </div>
 
+
+            <!-- NOMBRES -->
 
             <div class="form-group full">
 
@@ -141,10 +154,13 @@
                 type="text"
                 placeholder="Ej. María Fernanda"
                 maxlength="80"
+                autocomplete="given-name"
               >
 
             </div>
 
+
+            <!-- EDAD -->
 
             <div class="form-group">
 
@@ -158,11 +174,18 @@
                 type="number"
                 min="1"
                 max="100"
+                step="1"
                 placeholder="Ej. 22"
               >
 
+              <small>
+                Escribe tu edad actual.
+              </small>
+
             </div>
 
+
+            <!-- SEXO -->
 
             <div class="form-group">
 
@@ -194,7 +217,9 @@
         </div>
 
 
-        <!-- DATOS ACADÉMICOS -->
+        <!-- =====================================
+             DATOS ACADÉMICOS
+        ====================================== -->
 
         <div class="form-section">
 
@@ -203,6 +228,9 @@
           </h3>
 
           <div class="form-grid">
+
+
+            <!-- CONTROL -->
 
             <div class="form-group">
 
@@ -224,6 +252,8 @@
             </div>
 
 
+            <!-- TIPO DE PARTICIPACIÓN -->
+
             <div class="form-group">
 
               <label>
@@ -231,28 +261,33 @@
                 <span>*</span>
               </label>
 
-              <select v-model="form.tipoParticipacion">
+              <select
+                v-model="form.tipoParticipacion"
+                required
+              >
 
                 <option value="">
                   Selecciona una opción
                 </option>
 
                 <option value="Participante general">
-                  1. Participante general
+                  Participante general
                 </option>
 
                 <option value="Estudiante">
-                  2. Estudiante
+                  Estudiante
                 </option>
 
                 <option value="Docente">
-                  3. Docente
+                  Docente
                 </option>
 
               </select>
 
             </div>
 
+
+            <!-- INSTITUCIÓN -->
 
             <div class="form-group full">
 
@@ -261,12 +296,36 @@
                 <span>*</span>
               </label>
 
-              <input
+              <select
                 v-model="form.institucion"
-                type="text"
-                placeholder="Ej. Instituto Tecnológico de Ensenada"
-                maxlength="150"
+                required
               >
+
+                <option value="">
+                  Selecciona una institución
+                </option>
+
+                <option value="TecNM, Ensenada">
+                  TecNM, Ensenada
+                </option>
+
+                <option value="TecNM, Tijuana">
+                  TecNM, Tijuana
+                </option>
+
+                <option value="TecNM, Mexicali">
+                  TecNM, Mexicali
+                </option>
+
+                <option value="UABC">
+                  UABC
+                </option>
+
+                <option value="Otro">
+                  Otro
+                </option>
+
+              </select>
 
             </div>
 
@@ -275,7 +334,9 @@
         </div>
 
 
-        <!-- CONTACTO -->
+        <!-- =====================================
+             CONTACTO
+        ====================================== -->
 
         <div class="form-section">
 
@@ -284,6 +345,9 @@
           </h3>
 
           <div class="form-grid">
+
+
+            <!-- CORREO -->
 
             <div class="form-group">
 
@@ -297,10 +361,13 @@
                 type="email"
                 placeholder="ejemplo@instituto.edu.mx"
                 maxlength="120"
+                autocomplete="email"
               >
 
             </div>
 
+
+            <!-- WHATSAPP -->
 
             <div class="form-group">
 
@@ -314,6 +381,7 @@
                 type="tel"
                 placeholder="6461234567"
                 maxlength="15"
+                autocomplete="tel"
               >
 
             </div>
@@ -323,7 +391,9 @@
         </div>
 
 
-        <!-- INFORMACIÓN DEL PAGO -->
+        <!-- =====================================
+             INFORMACIÓN DEL PAGO
+        ====================================== -->
 
         <div class="payment-preview">
 
@@ -350,7 +420,9 @@
         </div>
 
 
-        <!-- ERROR -->
+        <!-- =====================================
+             ERROR
+        ====================================== -->
 
         <div
           v-if="error"
@@ -360,19 +432,37 @@
         </div>
 
 
-        <!-- BOTÓN -->
+        <!-- =====================================
+             BOTÓN GENERAR
+        ====================================== -->
 
         <button
           class="generate-button"
           @click="generarReferencia"
+          :disabled="cargando"
+          type="button"
         >
 
-          <span>
+          <span v-if="!cargando">
             Generar referencia bancaria
           </span>
 
-          <span class="arrow">
+          <span v-else>
+            Generando referencia...
+          </span>
+
+          <span
+            v-if="!cargando"
+            class="arrow"
+          >
             →
+          </span>
+
+          <span
+            v-else
+            class="loading-spinner"
+          >
+            ⏳
           </span>
 
         </button>
@@ -393,6 +483,9 @@
         v-else
         class="reference-section"
       >
+
+
+        <!-- MENSAJE DE ÉXITO -->
 
         <div class="success-message">
 
@@ -415,12 +508,15 @@
         </div>
 
 
-        <!-- HOJA DE REFERENCIA -->
+        <!-- =====================================
+             HOJA DE REFERENCIA
+        ====================================== -->
 
         <div
           id="referencia-imprimir"
           class="reference-paper"
         >
+
 
           <!-- ENCABEZADO -->
 
@@ -452,7 +548,9 @@
           <div class="paper-divider"></div>
 
 
-          <!-- DATOS DE REFERENCIA -->
+          <!-- =====================================
+               REFERENCIA BANCARIA
+          ====================================== -->
 
           <div class="reference-title">
 
@@ -471,7 +569,9 @@
           </div>
 
 
-          <!-- DATOS DEL PARTICIPANTE -->
+          <!-- =====================================
+               DATOS DEL PARTICIPANTE
+          ====================================== -->
 
           <div class="participant-box">
 
@@ -481,7 +581,11 @@
 
             <div class="participant-grid">
 
+
+              <!-- NOMBRE -->
+
               <div>
+
                 <span>
                   Nombre completo
                 </span>
@@ -489,10 +593,14 @@
                 <strong>
                   {{ nombreCompleto }}
                 </strong>
+
               </div>
 
 
+              <!-- CONTROL -->
+
               <div>
+
                 <span>
                   No. de control
                 </span>
@@ -500,10 +608,29 @@
                 <strong>
                   {{ form.control || "0" }}
                 </strong>
+
               </div>
 
 
+              <!-- EDAD -->
+
               <div>
+
+                <span>
+                  Edad
+                </span>
+
+                <strong>
+                  {{ form.edad }} años
+                </strong>
+
+              </div>
+
+
+              <!-- INSTITUCIÓN -->
+
+              <div>
+
                 <span>
                   Institución
                 </span>
@@ -511,10 +638,14 @@
                 <strong>
                   {{ form.institucion }}
                 </strong>
+
               </div>
 
 
+              <!-- PARTICIPACIÓN -->
+
               <div>
+
                 <span>
                   Tipo de participación
                 </span>
@@ -522,10 +653,14 @@
                 <strong>
                   {{ form.tipoParticipacion }}
                 </strong>
+
               </div>
 
 
+              <!-- CORREO -->
+
               <div>
+
                 <span>
                   Correo
                 </span>
@@ -533,10 +668,14 @@
                 <strong>
                   {{ form.correo }}
                 </strong>
+
               </div>
 
 
+              <!-- WHATSAPP -->
+
               <div>
+
                 <span>
                   WhatsApp
                 </span>
@@ -544,6 +683,7 @@
                 <strong>
                   {{ form.whatsapp }}
                 </strong>
+
               </div>
 
             </div>
@@ -551,7 +691,9 @@
           </div>
 
 
-          <!-- PAGO -->
+          <!-- =====================================
+               INFORMACIÓN DE PAGO
+          ====================================== -->
 
           <div class="payment-box">
 
@@ -570,7 +712,9 @@
 
             <div class="bank-data">
 
+
               <div>
+
                 <span>
                   Banco
                 </span>
@@ -578,10 +722,12 @@
                 <strong>
                   Scotiabank
                 </strong>
+
               </div>
 
 
               <div>
+
                 <span>
                   Titular
                 </span>
@@ -589,10 +735,12 @@
                 <strong>
                   Academia Estatal de Ciencias Económico Administrativas
                 </strong>
+
               </div>
 
 
               <div>
+
                 <span>
                   Cuenta
                 </span>
@@ -600,10 +748,12 @@
                 <strong>
                   13003338223
                 </strong>
+
               </div>
 
 
               <div>
+
                 <span>
                   CLABE Interbancaria
                 </span>
@@ -611,6 +761,7 @@
                 <strong>
                   044028130033382234
                 </strong>
+
               </div>
 
 
@@ -631,7 +782,9 @@
           </div>
 
 
-          <!-- INSTRUCCIONES -->
+          <!-- =====================================
+               INSTRUCCIONES
+          ====================================== -->
 
           <div class="instructions">
 
@@ -665,7 +818,9 @@
           </div>
 
 
-          <!-- SITIO -->
+          <!-- =====================================
+               SITIO
+          ====================================== -->
 
           <div class="website-box">
 
@@ -679,6 +834,10 @@
 
           </div>
 
+
+          <!-- =====================================
+               FOOTER
+          ====================================== -->
 
           <div class="paper-footer">
 
@@ -696,13 +855,16 @@
         </div>
 
 
-        <!-- BOTONES -->
+        <!-- =====================================
+             BOTONES
+        ====================================== -->
 
         <div class="reference-actions">
 
           <button
             class="print-button"
             @click="imprimirReferencia"
+            type="button"
           >
             🖨️ Imprimir referencia
           </button>
@@ -711,6 +873,7 @@
           <button
             class="back-form-button"
             @click="volverFormulario"
+            type="button"
           >
             ← Modificar datos
           </button>
@@ -718,7 +881,9 @@
         </div>
 
 
-        <!-- AVISO -->
+        <!-- =====================================
+             AVISO FINAL
+        ====================================== -->
 
         <div class="final-notice">
 
@@ -788,6 +953,8 @@ const referencia = ref("");
 
 const error = ref("");
 
+const cargando = ref(false);
+
 
 // ============================================
 // AÑO
@@ -854,6 +1021,8 @@ const nombreCompleto = computed(() => {
 
 function validarFormulario() {
 
+  // Primer apellido
+
   if (!form.primerApellido.trim()) {
 
     error.value =
@@ -863,6 +1032,8 @@ function validarFormulario() {
 
   }
 
+
+  // Nombre
 
   if (!form.nombres.trim()) {
 
@@ -874,7 +1045,13 @@ function validarFormulario() {
   }
 
 
-  if (!form.edad) {
+  // Edad
+
+  if (
+    form.edad === "" ||
+    form.edad === null ||
+    form.edad === undefined
+  ) {
 
     error.value =
       "Escribe tu edad.";
@@ -883,6 +1060,31 @@ function validarFormulario() {
 
   }
 
+
+  const edad = Number(form.edad);
+
+
+  if (!Number.isInteger(edad)) {
+
+    error.value =
+      "La edad debe ser un número entero.";
+
+    return false;
+
+  }
+
+
+  if (edad < 1 || edad > 100) {
+
+    error.value =
+      "La edad debe estar entre 1 y 100 años.";
+
+    return false;
+
+  }
+
+
+  // Sexo
 
   if (!form.sexo) {
 
@@ -894,12 +1096,16 @@ function validarFormulario() {
   }
 
 
+  // Número de control
+
   if (!form.control.trim()) {
 
     form.control = "0";
 
   }
 
+
+  // Correo
 
   if (!form.correo.trim()) {
 
@@ -911,6 +1117,23 @@ function validarFormulario() {
   }
 
 
+  // Validación básica de correo
+
+  const correoValido =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!correoValido.test(form.correo.trim())) {
+
+    error.value =
+      "Escribe un correo electrónico válido.";
+
+    return false;
+
+  }
+
+
+  // WhatsApp
+
   if (!form.whatsapp.trim()) {
 
     error.value =
@@ -921,15 +1144,19 @@ function validarFormulario() {
   }
 
 
-  if (!form.institucion.trim()) {
+  // Institución
+
+  if (!form.institucion) {
 
     error.value =
-      "Escribe tu institución de procedencia.";
+      "Selecciona una institución de procedencia.";
 
     return false;
 
   }
 
+
+  // Tipo de participación
 
   if (!form.tipoParticipacion) {
 
@@ -952,50 +1179,189 @@ function validarFormulario() {
 // GENERAR REFERENCIA
 // ============================================
 
-const cargando = ref(false);
-
 async function generarReferencia() {
-  if (!validarFormulario()) {
+
+  if (cargando.value) {
+
     return;
+
   }
+
+
+  if (!validarFormulario()) {
+
+    return;
+
+  }
+
 
   cargando.value = true;
+
   error.value = "";
 
+
   try {
-    const response = await fetch("http://localhost:3000/eventos/4/inscripciones", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        primerApellido: form.primerApellido,
-        segundoApellido: form.segundoApellido,
-        nombres: form.nombres,
-        edad: form.edad,
-        sexo: form.sexo,
-        control: form.control,
-        correo: form.correo,
-        whatsapp: form.whatsapp,
-        institucion: form.institucion,
-        tipoParticipacion: form.tipoParticipacion,
-      }),
-    });
+
+    const response = await fetch(
+      "http://localhost:3000/eventos/4/inscripciones",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+
+          primerApellido:
+            form.primerApellido.trim(),
+
+          segundoApellido:
+            form.segundoApellido.trim(),
+
+          nombres:
+            form.nombres.trim(),
+
+          edad:
+            Number(form.edad),
+
+          sexo:
+            form.sexo,
+
+          control:
+            form.control.trim() || "0",
+
+          correo:
+            form.correo.trim(),
+
+          whatsapp:
+            form.whatsapp.trim(),
+
+          institucion:
+            form.institucion,
+
+          tipoParticipacion:
+            form.tipoParticipacion
+
+        })
+
+      }
+    );
+
+
+    // ========================================
+    // ERROR DEL BACKEND
+    // ========================================
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al generar la referencia");
+
+      let errorData = {};
+
+      try {
+
+        errorData =
+          await response.json();
+
+      } catch {
+
+        errorData = {};
+
+      }
+
+
+      throw new Error(
+
+        errorData.message ||
+        errorData.error ||
+        "Error al generar la referencia bancaria."
+
+      );
+
     }
 
-    const data = await response.json();
-    referencia.value = data.referencia_bancaria;
-    referenciaGenerada.value = true;
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // ========================================
+    // RESPUESTA
+    // ========================================
+
+    const data =
+      await response.json();
+
+
+    // ========================================
+    // VALIDAR REFERENCIA
+    // ========================================
+
+    if (!data.referencia_bancaria) {
+
+      throw new Error(
+        "El servidor no devolvió la referencia bancaria."
+      );
+
+    }
+
+
+    const referenciaRecibida =
+      String(data.referencia_bancaria).trim();
+
+
+    // La referencia DEBE tener exactamente
+    // 10 dígitos.
+
+    if (!/^\d{10}$/.test(referenciaRecibida)) {
+
+      throw new Error(
+        "La referencia bancaria recibida no tiene exactamente 10 dígitos."
+      );
+
+    }
+
+
+    // ========================================
+    // GUARDAR REFERENCIA
+    // ========================================
+
+    referencia.value =
+      referenciaRecibida;
+
+
+    referenciaGenerada.value =
+      true;
+
+
+    // ========================================
+    // SUBIR AL INICIO
+    // ========================================
+
+    window.scrollTo({
+
+      top: 0,
+
+      behavior: "smooth"
+
+    });
+
+
   } catch (e) {
-    error.value = e.message || "No se pudo generar la referencia. Intenta de nuevo.";
+
+    console.error(
+      "Error al generar referencia:",
+      e
+    );
+
+
+    error.value =
+      e.message ||
+      "No se pudo generar la referencia. Intenta de nuevo.";
+
   } finally {
+
     cargando.value = false;
+
   }
+
 }
+
 
 // ============================================
 // IMPRIMIR
@@ -1015,6 +1381,8 @@ function imprimirReferencia() {
 function volverFormulario() {
 
   referenciaGenerada.value = false;
+
+  error.value = "";
 
   window.scrollTo({
 
@@ -1574,7 +1942,7 @@ function regresar() {
 }
 
 
-.generate-button:hover {
+.generate-button:hover:not(:disabled) {
 
   transform: translateY(-2px);
 
@@ -1584,9 +1952,25 @@ function regresar() {
 }
 
 
+.generate-button:disabled {
+
+  opacity: .7;
+
+  cursor: not-allowed;
+
+}
+
+
 .arrow {
 
   font-size: 1.3rem;
+
+}
+
+
+.loading-spinner {
+
+  font-size: 1.1rem;
 
 }
 
