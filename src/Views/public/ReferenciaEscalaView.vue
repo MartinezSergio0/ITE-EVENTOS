@@ -952,53 +952,50 @@ function validarFormulario() {
 // GENERAR REFERENCIA
 // ============================================
 
-function generarReferencia() {
+const cargando = ref(false);
 
+async function generarReferencia() {
   if (!validarFormulario()) {
-
     return;
-
   }
 
+  cargando.value = true;
+  error.value = "";
 
-  /*
-   * =========================================
-   * REFERENCIA TEMPORAL
-   * =========================================
-   *
-   * Esta fórmula es solamente para pruebas.
-   *
-   * Posteriormente la sustituiremos por la
-   * fórmula oficial de ESCALA.
-   */
+  try {
+    const response = await fetch("http://localhost:3000/eventos/4/inscripciones", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        primerApellido: form.primerApellido,
+        segundoApellido: form.segundoApellido,
+        nombres: form.nombres,
+        edad: form.edad,
+        sexo: form.sexo,
+        control: form.control,
+        correo: form.correo,
+        whatsapp: form.whatsapp,
+        institucion: form.institucion,
+        tipoParticipacion: form.tipoParticipacion,
+      }),
+    });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al generar la referencia");
+    }
 
-  const consecutivo = Math.floor(
+    const data = await response.json();
+    referencia.value = data.referencia_bancaria;
+    referenciaGenerada.value = true;
 
-    100000 +
-
-    Math.random() * 900000
-
-  );
-
-
-  referencia.value = String(consecutivo)
-    .slice(0, 10);
-
-
-  referenciaGenerada.value = true;
-
-
-  window.scrollTo({
-
-    top: 0,
-
-    behavior: "smooth"
-
-  });
-
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (e) {
+    error.value = e.message || "No se pudo generar la referencia. Intenta de nuevo.";
+  } finally {
+    cargando.value = false;
+  }
 }
-
 
 // ============================================
 // IMPRIMIR
