@@ -14,48 +14,48 @@
     <div class="cards">
 
       <router-link
+        v-for="cat in categorias"
+        :key="cat.id"
         class="card"
-        to="/eventos/academicos"
+        :to="`/eventos/${cat.slug}`"
       >
-        <span>📚</span>
+        <span>{{ cat.icono }}</span>
 
-        <h3>Académicos</h3>
+        <h3>{{ cat.nombre }}</h3>
 
-        <p>
-          Congresos, conferencias, talleres y actividades de formación.
-        </p>
-      </router-link>
-
-      <router-link
-        class="card"
-        to="/eventos/culturales"
-      >
-        <span>🎭</span>
-
-        <h3>Culturales</h3>
-
-        <p>
-          Exposiciones, concursos y actividades artísticas.
-        </p>
-      </router-link>
-
-      <router-link
-        class="card"
-        to="/eventos/deportivos"
-      >
-        <span>🏆</span>
-
-        <h3>Deportivos</h3>
-
-        <p>
-          Torneos, competencias y eventos deportivos.
-        </p>
+        <p>{{ cat.descripcion }}</p>
       </router-link>
 
     </div>
 
   </div>
 </template>
+
+<script setup>
+
+import { ref, onMounted } from "vue";
+
+const categorias = ref([]);
+
+onMounted(async () => {
+
+  try {
+
+    const response = await fetch(
+      "http://localhost:3000/eventos/categorias/listado"
+    );
+
+    if (response.ok) {
+      categorias.value = await response.json();
+    }
+
+  } catch (e) {
+    console.error("Error al cargar categorías:", e);
+  }
+
+});
+
+</script>
 
 <style scoped>
 

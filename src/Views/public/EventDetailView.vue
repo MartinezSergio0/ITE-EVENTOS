@@ -157,7 +157,7 @@
 
             <!-- REFERENCIA BANCARIA -->
             <router-link
-                v-if="event.tienePago && event.id === 1"
+                v-if="event.tienePago && event.id === 4"
                 class="bank-btn"
                 to="/referencia-escala"
             >
@@ -212,341 +212,48 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+    import { ref, watchEffect } from "vue";
+    import { useRoute } from "vue-router";
 
-const route = useRoute();
+    const route = useRoute();
 
-// ID recibido desde la URL
-const eventId = Number(route.params.id);
+    const eventId = Number(route.params.id);
 
-// Base de datos temporal (después vendrá de la API)
-const events = [
+    const event = ref(null);
 
-  // =====================================================
-  // CONGRESO ESCALA
-  // =====================================================
+    watchEffect(async () => {
 
-  {
-    id: 1,
+    try {
 
-    category: "academicos",
+        const response = await fetch(
+        `http://localhost:3000/eventos/${eventId}`
+        );
 
-    title: "Congreso ESCALA",
+        if (!response.ok) {
+        event.value = null;
+        return;
+        }
 
-    shortDescription:
-      "Congreso Internacional de Investigación e Innovación.",
+        event.value = await response.json();
 
-    description:
-      "El Congreso ESCALA reúne estudiantes, docentes e investigadores para compartir conocimientos, resultados de investigación, innovación tecnológica y experiencias académicas mediante conferencias magistrales, talleres, concursos y presentación de proyectos.",
+    } catch (e) {
+        console.error("Error al cargar el evento:", e);
+        event.value = null;
+    }
 
-    banner:
-      "https://images.unsplash.com/photo-1511578314322-379afb476865?w=1600",
+    });
 
-    logo:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6buUnFl0TG8KgXO5GMXJmDsC_rOg23D2Aqmie-g9LvSp85jyZABaZfCY&s=10",
+    function imprimirRecibo() {
+    if (event.value?.reciboBanco) {
+        window.open(event.value.reciboBanco, "_blank");
+    }
+    }
 
-    date: "10 al 12 de Septiembre",
-
-    time: "09:00 a.m.",
-
-    place: "Instituto Tecnológico de Ensenada",
-
-    capacity: "500 participantes",
-
-    cost: "$700 MXN",
-
-    organizer: "Departamento de Sistemas",
-
-    // ==========================
-    // ENLACES DEL SISTEMA
-    // ==========================
-
-    registerRoute: "/registro-escala",
-
-    convocatoria:
-      "https://itevent.mx/documentos/convocatoria-escala.pdf",
-
-    programa:
-      "https://itevent.mx/documentos/programa-escala.pdf",
-
-    reciboBanco:
-      "https://itevent.mx/escala/referencia-bancaria",
-
-    tienePago: true,
-
-    // ==========================
-
-    activities: [
-
-      "Conferencia Magistral",
-
-      "Talleres Especializados",
-
-      "Presentación de Proyectos",
-
-      "Concursos Académicos",
-
-      "Networking",
-
-      "Exposición Tecnológica"
-
-    ],
-
-    schedule: [
-
-      {
-        time: "09:00",
-        activity: "Ceremonia de inauguración"
-      },
-
-      {
-        time: "10:30",
-        activity: "Conferencia Magistral"
-      },
-
-      {
-        time: "13:00",
-        activity: "Talleres"
-      },
-
-      {
-        time: "16:00",
-        activity: "Presentación de proyectos"
-      }
-
-    ],
-
-
-
-  },
-
-  // =====================================================
-  // CONGRESO ARGOS
-  // =====================================================
-
-  {
-
-    id: 2,
-
-    category: "academicos",
-
-    title: "Congreso ARGOS",
-
-    shortDescription:
-      "Encuentro entre estudiantes y empresas.",
-
-    description:
-      "El Congreso ARGOS fortalece la relación entre la industria y los estudiantes mediante conferencias, networking, bolsa de trabajo, talleres y actividades enfocadas al desarrollo profesional.",
-
-    banner:
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1600",
-
-    logo:
-      "https://www.tijuana.tecnm.mx/wp-content/uploads/2025/09/Logotipo-ARGOS-2025-b_page-0001.jpg",
-
-    date: "25 de Octubre",
-
-    time: "08:30 a.m.",
-
-    place: "Centro de Información",
-
-    capacity: "300 participantes",
-
-    cost: "Gratuito",
-
-    organizer: "Instituto Tecnológico de Ensenada",
-
-    // ==========================
-
-    registerRoute: "/registro-argos",
-
-    convocatoria:
-      "https://itevent.mx/documentos/convocatoria-argos.pdf",
-
-    programa:
-      "https://itevent.mx/documentos/programa-argos.pdf",
-
-    reciboBanco: "",
-
-    tienePago: false,
-
-    // ==========================
-
-    activities: [
-
-      "Conferencias",
-
-      "Networking",
-
-      "Bolsa de Trabajo",
-
-      "Visitas Industriales"
-
-    ],
-
-    schedule: [
-
-      {
-        time: "09:00",
-        activity: "Registro"
-      },
-
-      {
-        time: "10:00",
-        activity: "Conferencia Principal"
-      },
-
-      {
-        time: "12:00",
-        activity: "Networking"
-      },
-
-      {
-        time: "14:00",
-        activity: "Bolsa de Trabajo"
-      }
-
-    ],
-
-   
-
-  },
-    // =====================================================
-  // CARRERA ATLÉTICA
-  // =====================================================
-
-  {
-
-    id: 3,
-
-    category: "deportivos",
-
-    title: "Carrera Atlética",
-
-    shortDescription:
-      "Competencia deportiva institucional.",
-
-    description:
-      "Evento deportivo organizado para fomentar la actividad física, la convivencia y el trabajo en equipo entre estudiantes, docentes y personal del Instituto.",
-
-    banner:
-      "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1600",
-
-    logo:
-      "https://cdn-icons-png.flaticon.com/512/857/857455.png",
-
-    date: "15 de Noviembre",
-
-    time: "07:00 a.m.",
-
-    place: "Unidad Deportiva",
-
-    capacity: "1000 participantes",
-
-    cost: "$150 MXN",
-
-    organizer: "Departamento de Actividades Extraescolares",
-
-    // ==========================
-    // ENLACES DEL SISTEMA
-    // ==========================
-
-    registerRoute: "/registro-carrera",
-
-    convocatoria:
-      "https://itevent.mx/documentos/convocatoria-carrera.pdf",
-
-    programa:
-      "https://itevent.mx/documentos/programa-carrera.pdf",
-
-    reciboBanco:
-      "https://itevent.mx/carrera/referencia-bancaria",
-
-    tienePago: true,
-
-    // ==========================
-
-    activities: [
-
-      "Carrera de 5 km",
-
-      "Carrera de 10 km",
-
-      "Premiación",
-
-      "Activación física"
-
-    ],
-
-    schedule: [
-
-      {
-
-        time: "07:00",
-
-        activity: "Registro"
-
-      },
-
-      {
-
-        time: "08:00",
-
-        activity: "Inicio de la carrera"
-
-      },
-
-      {
-
-        time: "10:00",
-
-        activity: "Premiación"
-
-      }
-
-    ],
-
-  }
-
-];
-
-// ====================================
-// BUSCAR EVENTO
-// ====================================
-
-const event = computed(() => {
-
-  return events.find(e => e.id === eventId);
-
-});
-
-// ====================================
-// FUNCIONES
-// ====================================
-
-// Imprimir referencia bancaria
-function imprimirRecibo() {
-
-  if (event.value?.reciboBanco) {
-
-    window.open(event.value.reciboBanco, "_blank");
-
-  }
-
-}
-
-// Descargar programa
-function descargarPrograma() {
-
-  if (event.value?.programa) {
-
-    window.open(event.value.programa, "_blank");
-
-  }
-
-}
-
+    function descargarPrograma() {
+    if (event.value?.programa) {
+        window.open(event.value.programa, "_blank");
+    }
+    }
 </script>
 
 

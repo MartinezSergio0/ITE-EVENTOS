@@ -123,153 +123,52 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+  import { ref, watchEffect } from "vue";
+  import { useRoute } from "vue-router";
 
-const route = useRoute();
+  const route = useRoute();
 
-/* ============================
-   CATEGORÍA DESDE LA URL
-============================ */
+  const category = ref(route.params.tipo || "");
 
-const category = computed(() => route.params.tipo || "");
+  const filteredEvents = ref([]);
 
-/* ============================
-   EVENTOS (TEMPORALES)
-============================ */
+  const categoryTitle = ref("Eventos");
 
-const events = [
-  {
-    id: 1,
-    category: "academicos",
-    title: "Congreso ESCALA",
-    description:
-      "Congreso internacional enfocado en investigación, innovación y desarrollo tecnológico.",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6buUnFl0TG8KgXO5GMXJmDsC_rOg23D2Aqmie-g9LvSp85jyZABaZfCY&s=10",
-    date: "10 al 12 de Septiembre",
-    place: "Instituto Tecnológico de Ensenada",
-    capacity: 500,
-    website: "https://sites.google.com/ite.edu.mx/congresoescala-mx"
-  },
+  const titulos = {
+    academicos: "Eventos Académicos",
+    culturales: "Eventos Culturales",
+    deportivos: "Eventos Deportivos",
+  };
 
-  {
-    id: 2,
-    category: "academicos",
-    title: "Congreso ARGOS",
-    description:
-      "Encuentro académico entre estudiantes y empresas de la industria.",
-    image:
-      "https://www.tijuana.tecnm.mx/wp-content/uploads/2025/09/Logotipo-ARGOS-2025-b_page-0001.jpg",
-    date: "25 de Octubre",
-    place: "Centro de Información",
-    capacity: 300,
-    website: ""
-  },
+  watchEffect(async () => {
 
-  {
-    id: 3,
-    category: "deportivos",
-    title: "Carrera Atlética",
-    description:
-      "Competencia deportiva entre estudiantes de las diferentes carreras.",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6WNts8I2MnQ6jz57TbcDEcyeaVQkyHdEay5HYWeL1wpI1kdTttF-3uvw&s=10",
-    date: "15 de Noviembre",
-    place: "Unidad Deportiva",
-    capacity: 150,
-    website: ""
-  },
+    category.value = route.params.tipo || "";
+    categoryTitle.value = titulos[category.value] || "Eventos";
 
-  {
-    id: 4,
-    category: "deportivos",
-    title: "Torneo de Fútbol",
-    description:
-      "Carrera recreativa para toda la comunidad tecnológica.",
-    image:
-      "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=900",
-    date: "20 de Noviembre",
-    place: "Pista Atlética",
-    capacity: 250,
-    website: ""
-  },
+    if (!category.value) {
+      filteredEvents.value = [];
+      return;
+    }
 
-  {
-    id: 5,
-    category: "culturales",
-    title: "Festival Cultural",
-    description:
-      "Presentaciones artísticas, música, danza y exposiciones.",
-    image:
-      "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=900",
-    date: "3 de Octubre",
-    place: "Auditorio",
-    capacity: 400,
-    website: ""
-  },
+    try {
 
-  {
-    id: 6,
-    category: "culturales",
-    title: "Concurso de Altares",
-    description:
-      "Concurso institucional para preservar las tradiciones mexicanas.",
-    image:
-      "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?w=900",
-    date: "31 de Octubre",
-    place: "Explanada Principal",
-    capacity: 200,
-    website: ""
-  }
-];
+      const response = await fetch(
+        `http://localhost:3000/eventos?categoria=${category.value}`
+      );
 
-/* ============================
-   FILTRAR EVENTOS
-============================ */
+      if (!response.ok) {
+        filteredEvents.value = [];
+        return;
+      }
 
-const filteredEvents = computed(() => {
+      filteredEvents.value = await response.json();
 
-  return events.filter(event =>
+    } catch (e) {
+      console.error("Error al cargar eventos:", e);
+      filteredEvents.value = [];
+    }
 
-    event.category === category.value
-
-  );
-
-});
-
-/* ============================
-   TÍTULO
-============================ */
-
-const categoryTitle = computed(() => {
-
-  switch (category.value) {
-
-    case "academicos":
-      return "Eventos Académicos";
-
-    case "culturales":
-      return "Eventos Culturales";
-
-    case "deportivos":
-      return "Eventos Deportivos";
-
-    default:
-      return "Eventos";
-
-  }
-
-});
-
-/* ============================
-   DEBUG (BORRAR DESPUÉS)
-============================ */
-
-console.log("Ruta:", route.fullPath);
-console.log("Tipo:", category.value);
-console.log("Eventos:", filteredEvents.value);
-
+  });
 </script>
 
 <style scoped>
