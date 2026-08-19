@@ -4,31 +4,31 @@ import { createRouter, createWebHistory } from "vue-router";
 // PÁGINAS PÚBLICAS
 // ==========================================
 
-import HomeView from "../views/public/HomeView.vue";
-import CategoriasView from "../views/public/CategoriasView.vue";
-import EventsByCategoryView from "../views/public/EventsByCategoryView.vue";
-import EventDetailView from "../views/public/EventDetailView.vue";
-import AboutView from "../views/public/AboutView.vue";
+import HomeView from "../Views/public/HomeView.vue";
+import CategoriasView from "../Views/public/CategoriasView.vue";
+import EventsByCategoryView from "../Views/public/EventsByCategoryView.vue";
+import EventDetailView from "../Views/public/EventDetailView.vue";
+import AboutView from "../Views/public/AboutView.vue";
 
-import ReferenciaEscalaView from "../views/public/ReferenciaEscalaView.vue";
-import SubirComprobanteView from "../views/public/SubirComprobanteView.vue";
+import ReferenciaEscalaView from "../Views/public/ReferenciaEscalaView.vue";
+import SubirComprobanteView from "../Views/public/SubirComprobanteView.vue";
 
-import RegistroEscala from "../views/public/RegistroEscala.vue";
-import RegistroArgos from "../views/public/RegistroArgos.vue";
+import RegistroEscala from "../Views/public/RegistroEscala.vue";
+import RegistroArgos from "../Views/public/RegistroArgos.vue";
 
 
 // ==========================================
 // LOGIN
 // ==========================================
 
-import LoginView from "../views/public/LoginView.vue";
+import LoginView from "../Views/public/LoginView.vue";
 
 
 // ==========================================
 // SUPER ADMINISTRADOR
 // ==========================================
 
-import SuperAdminView from "../views/SuperAdmin/SuperAdminView.vue";
+import SuperAdminView from "../Views/SuperAdmin/SuperAdminView.vue";
 
 
 // ==========================================
