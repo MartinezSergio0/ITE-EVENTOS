@@ -214,7 +214,7 @@
 <script setup>
     import { ref, watchEffect } from "vue";
     import { useRoute } from "vue-router";
-    import { API_URL } from "@/config/api";
+    import { API_URL } from "../../config/api";
 
     const route = useRoute();
 

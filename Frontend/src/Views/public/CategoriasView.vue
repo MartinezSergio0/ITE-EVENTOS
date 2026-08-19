@@ -34,7 +34,7 @@
 <script setup>
 
 import { ref, onMounted } from "vue";
-import { API_URL } from "@/config/api";
+import { API_URL } from "../../config/api";
 
 const categorias = ref([]);
 
