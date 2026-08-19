@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import fondo from '../../assets/ite.png'
+import fondo from '../../assets/Ite.png'
 </script>
 
 <style scoped>
