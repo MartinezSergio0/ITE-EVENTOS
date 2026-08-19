@@ -16,7 +16,7 @@ import SubirComprobanteView from "../Views/public/SubirComprobanteView.vue";
 import RegistroEscala from "../Views/public/RegistroEscala.vue";
 import RegistroArgos from "../Views/public/RegistroArgos.vue";
 
-
+.
 // ==========================================
 // LOGIN
 // ==========================================
