@@ -188,7 +188,7 @@
 
             <small>
               La cuota de recuperación del Congreso ESCALA es de
-              <strong>$1,000 MXN</strong>.
+              <strong>${{ montoEsperado }} MXN</strong>.
             </small>
 
           </div>
@@ -421,19 +421,9 @@
 
 
           <div class="amount">
-
-            <span>
-              Cuota de recuperación
-            </span>
-
-            <strong>
-              $1,000
-            </strong>
-
-            <small>
-              MXN
-            </small>
-
+            <span>Cuota de recuperación</span>
+            <strong>${{ montoEsperado }}</strong>
+            <small>MXN</small>
           </div>
 
 
@@ -733,6 +723,7 @@
 
 import {
   computed,
+  onMounted,
   reactive,
   ref
 } from "vue";
@@ -741,6 +732,8 @@ import {
   useRoute,
   useRouter
 } from "vue-router";
+
+import { API_URL } from "@/config/api";
 
 
 /* =========================================
@@ -753,7 +746,7 @@ const router = useRouter();
 
 
 const eventId =
-  route.params.id || 1;
+  route.params.id || 4;
 
 
 /* =========================================
@@ -768,11 +761,18 @@ const form = reactive({
 
   correo: "",
 
-  monto: 1000,
+  monto: 0,
 
   fechaPago: ""
 
 });
+
+
+/* =========================================
+   MONTO ESPERADO (viene del backend)
+========================================= */
+
+const montoEsperado = ref(0);
 
 
 /* =========================================
@@ -792,6 +792,29 @@ const error = ref("");
 const success = ref("");
 
 const mostrarModal = ref(false);
+
+
+/* =========================================
+   CARGAR DATOS DEL EVENTO
+========================================= */
+
+onMounted(async () => {
+
+  try {
+
+    const response = await fetch(`${API_URL}/eventos/${eventId}`);
+
+    if (response.ok) {
+      const data = await response.json();
+      montoEsperado.value = data.costoNumero ?? 0;
+      form.monto = montoEsperado.value;
+    }
+
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
+  }
+
+});
 
 
 /* =========================================
@@ -971,137 +994,56 @@ function validarReferencia() {
 async function enviarComprobante() {
 
   error.value = "";
-
   success.value = "";
 
-
-  /* ===============================
-     REFERENCIA
-  =============================== */
-
   if (!validarReferencia()) {
-
-    error.value =
-      "La referencia bancaria debe contener exactamente 10 dígitos.";
-
+    error.value = "La referencia bancaria debe contener exactamente 10 dígitos.";
     return;
-
   }
 
-
-  /* ===============================
-     MONTO
-  =============================== */
-
-  if (Number(form.monto) !== 1000) {
-
-    error.value =
-      "El monto del comprobante debe ser de $1,000 MXN.";
-
+  if (Number(form.monto) !== montoEsperado.value) {
+    error.value = `El monto del comprobante debe ser de $${montoEsperado.value} MXN.`;
     return;
-
   }
-
-
-  /* ===============================
-     ARCHIVO
-  =============================== */
 
   if (!archivo.value) {
-
-    error.value =
-      "Debes seleccionar tu comprobante de pago.";
-
+    error.value = "Debes seleccionar tu comprobante de pago.";
     return;
-
   }
-
-
-  /* ===============================
-     ENVÍO
-  =============================== */
 
   enviando.value = true;
 
-
   try {
 
-    /*
-     * POR AHORA:
-     *
-     * Guardamos la información localmente.
-     *
-     * Después sustituiremos esta parte
-     * por una petición al backend.
-     */
+    const formData = new FormData();
+    formData.append("referencia", form.referencia);
+    formData.append("correo", form.correo);
+    formData.append("archivo", archivo.value);
 
-
-    const comprobante = {
-
-      referencia:
-        form.referencia,
-
-      nombre:
-        form.nombre,
-
-      correo:
-        form.correo,
-
-      monto:
-        Number(form.monto),
-
-      fechaPago:
-        form.fechaPago,
-
-      archivo:
-        archivo.value.name,
-
-      estado:
-        "pendiente",
-
-      fechaEnvio:
-        new Date().toISOString()
-
-    };
-
-
-    localStorage.setItem(
-
-      `comprobante_${form.referencia}`,
-
-      JSON.stringify(comprobante)
-
+    const response = await fetch(
+      `${API_URL}/eventos/${eventId}/inscripciones/comprobante`,
+      {
+        method: "POST",
+        body: formData,
+      }
     );
 
+    if (!response.ok) {
+      let errorData = {};
+      try { errorData = await response.json(); } catch { errorData = {}; }
+      throw new Error(errorData.message || "No se pudo enviar el comprobante.");
+    }
 
-    /*
-     * Simulamos el envío
-     */
+    const data = await response.json();
 
-    await new Promise(
-      resolve =>
-        setTimeout(resolve, 1200)
-    );
-
-
-    success.value =
-      "Comprobante enviado correctamente.";
-
-
+    success.value = data.mensaje || "Comprobante enviado correctamente.";
     mostrarModal.value = true;
 
-
   } catch (err) {
-
     console.error(err);
-
-    error.value =
-      "No fue posible enviar el comprobante.";
-
+    error.value = err.message || "No fue posible enviar el comprobante.";
   } finally {
-
     enviando.value = false;
-
   }
 
 }
@@ -1114,7 +1056,6 @@ async function enviarComprobante() {
 function irAEstadoPago() {
 
   mostrarModal.value = false;
-
 
   router.push(
     `/estado-pago/${form.referencia}`

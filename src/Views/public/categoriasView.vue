@@ -34,6 +34,7 @@
 <script setup>
 
 import { ref, onMounted } from "vue";
+import { API_URL } from "@/config/api";
 
 const categorias = ref([]);
 
@@ -42,7 +43,7 @@ onMounted(async () => {
   try {
 
     const response = await fetch(
-      "http://localhost:3000/eventos/categorias/listado"
+      `${API_URL}/eventos/categorias/listado`
     );
 
     if (response.ok) {

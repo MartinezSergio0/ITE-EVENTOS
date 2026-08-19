@@ -1,6 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
+import { SubirComprobanteDto } from './dto/subir-comprobante.dto';
+import { createWorker } from 'tesseract.js';
+import { SupabaseService } from '../supabase/supabase.service';
+import sharp from 'sharp';
+import 'multer'; 
+
 
 const CODIGO_TIPO: Record<string, number> = {
   'Participante general': 1,
@@ -10,7 +16,10 @@ const CODIGO_TIPO: Record<string, number> = {
 
 @Injectable()
 export class InscripcionesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private supabase: SupabaseService,
+  ) {}
 
   private async siguienteConsecutivoAnual(anio: number): Promise<number> {
     const contador = await this.prisma.contador_referencia.upsert({
@@ -88,4 +97,106 @@ export class InscripcionesService {
   async buscarPorReferencia(referencia: string) {
     return this.prisma.participantes.findUnique({ where: { referencia_bancaria: referencia } });
   }
+
+async subirComprobante(
+  eventoId: number,
+  dto: SubirComprobanteDto,
+  file: Express.Multer.File,
+) {
+  const participante = await this.prisma.participantes.findFirst({
+    where: {
+      evento: eventoId,
+      referencia_bancaria: dto.referencia,
+      correo_electronico: dto.correo,
+    },
+  });
+
+  if (!participante) {
+    throw new NotFoundException('No se encontró un registro con esa referencia y correo.');
+  }
+
+  const evento = await this.prisma.evento.findUnique({ where: { id: eventoId } });
+
+  let referenciaCoincide = false;
+  let montoCoincide = false;
+  let textoDetectado = '';
+
+  const esImagen = file.mimetype.startsWith('image/');
+
+  if (esImagen) {
+
+    try {
+      const imagenProcesada = await sharp(file.buffer)
+      .grayscale()
+      .normalize()
+      .sharpen()
+      .toBuffer();
+
+      const worker = await createWorker('spa');
+      const { data } = await worker.recognize(imagenProcesada);
+      await worker.terminate();
+
+      textoDetectado = data.text;
+
+      referenciaCoincide = textoDetectado.includes(dto.referencia);
+
+      const montoEsperado = Number(evento?.costo ?? 0);
+      const patronesMonto = [
+        montoEsperado.toFixed(2),
+        montoEsperado.toFixed(0),
+        montoEsperado.toLocaleString('es-MX'),
+      ];
+      montoCoincide = patronesMonto.some((p) => textoDetectado.includes(p));
+
+    } catch (ocrError) {
+      const mensaje = ocrError instanceof Error ? ocrError.message : String(ocrError);
+      console.error('OCR falló, se enviará a revisión manual:', mensaje);
+      referenciaCoincide = false;
+      montoCoincide = false;
+    }
+
+  }
+
+  const extension = file.originalname.split('.').pop();
+  const rutaArchivo = `${eventoId}/${dto.referencia}.${extension}`;
+
+  const { error: uploadError } = await this.supabase.client.storage
+    .from('comprobantes')
+    .upload(rutaArchivo, file.buffer, {
+      contentType: file.mimetype,
+      upsert: true,
+    });
+
+  if (uploadError) {
+    throw new BadRequestException('No se pudo subir el comprobante: ' + uploadError.message);
+  }
+
+  const validadoAutomaticamente = referenciaCoincide && montoCoincide;
+  const nombreEstado = validadoAutomaticamente ? 'Confirmado' : 'En revisión';
+  const estadoFinal = await this.prisma.estado.findFirst({ where: { nombre: nombreEstado } });
+
+  await this.prisma.participantes.update({
+    where: { folio: participante.folio },
+    data: {
+      comprobante_pago: rutaArchivo,
+      estado: estadoFinal?.id,
+    },
+  });
+
+  return {
+    folio: participante.folio,
+    validadoAutomaticamente,
+    mensaje: validadoAutomaticamente
+      ? 'Tu comprobante fue validado automáticamente.'
+      : 'Tu comprobante fue recibido y está en revisión manual.',
+
+    // TEMPORAL — PROBAR OCR Borrar
+    debug: {
+      referenciaCoincide,
+      montoCoincide,
+      montoEsperado: Number(evento?.costo ?? 0),
+      textoCompleto: textoDetectado,
+    },
+  };
+}
 }

@@ -125,6 +125,7 @@
 <script setup>
   import { ref, watchEffect } from "vue";
   import { useRoute } from "vue-router";
+  import { API_URL } from "@/config/api";
 
   const route = useRoute();
 
@@ -153,7 +154,7 @@
     try {
 
       const response = await fetch(
-        `http://localhost:3000/eventos?categoria=${category.value}`
+        `${API_URL}/eventos?categoria=${category.value}`
       );
 
       if (!response.ok) {

@@ -935,6 +935,8 @@ import {
   useRouter
 } from "vue-router";
 
+import { API_URL } from "@/config/api";
+
 
 // ============================================
 // ROUTER
@@ -1200,7 +1202,7 @@ async function buscarReferencia() {
     });
 
     const response = await fetch(
-      `http://localhost:3000/eventos/4/inscripciones/buscar?${params}`
+      `${API_URL}/eventos/4/inscripciones/buscar?${params}`
     );
 
     if (!response.ok) {

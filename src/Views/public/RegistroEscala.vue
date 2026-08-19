@@ -1229,6 +1229,7 @@ import {
   ref
 } from "vue";
 
+import { API_URL } from "@/config/api";
 
 // ============================================
 // FORMULARIO
@@ -1567,7 +1568,7 @@ async function registrar() {
 
   try {
 
-    const response = await fetch("http://localhost:3000/eventos/4/inscripciones", {
+    const response = await fetch(`${API_URL}/eventos/4/inscripciones`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

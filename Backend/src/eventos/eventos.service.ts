@@ -77,6 +77,7 @@ export class EventosService {
         place: e.lugar,
         capacity: e.capacidad ? `${e.capacidad} participantes` : '',
         cost: costo > 0 ? `$${costo} MXN` : 'Gratuito',
+        costoNumero: costo,  
         tienePago: costo > 0,
         registerRoute: this.registerRouteFor(e.id),
         website: e.sitio_web,
