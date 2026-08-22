@@ -626,81 +626,54 @@
 
       <div class="status-modal">
 
-
         <div class="pending-icon">
           ✓
         </div>
 
-
         <span class="pending-badge">
-          COMPROBANTE RECIBIDO
+          {{ validadoAutomaticamente ? "PAGO CONFIRMADO" : "COMPROBANTE RECIBIDO" }}
         </span>
 
-
         <h2>
-          Tu pago está en revisión
+          {{ validadoAutomaticamente ? "¡Tu pago fue confirmado!" : "Tu pago está en revisión" }}
         </h2>
 
-
         <p>
-          Hemos recibido correctamente tu comprobante.
-          El sistema verificará la información de tu pago.
+          {{ validadoAutomaticamente
+            ? "Validamos automáticamente tu comprobante. Tu inscripción ya quedó confirmada."
+            : "Hemos recibido correctamente tu comprobante. El sistema verificará la información de tu pago." }}
         </p>
 
-
         <div class="status-reference">
-
-          <span>
-            Referencia
-          </span>
-
-          <strong>
-            {{ form.referencia }}
-          </strong>
-
+          <span>Referencia</span>
+          <strong>{{ form.referencia }}</strong>
         </div>
 
-
         <div class="status-info">
-
           <div>
             🕐
-            <span>
-              Estado
-            </span>
-
-            <strong>
-              En revisión
-            </strong>
+            <span>Estado</span>
+            <strong>{{ validadoAutomaticamente ? "Confirmado" : "En revisión" }}</strong>
           </div>
-
 
           <div>
             💰
-            <span>
-              Monto
-            </span>
-
-            <strong>
-              ${{ form.monto }} MXN
-            </strong>
+            <span>Monto</span>
+            <strong>${{ form.monto }} MXN</strong>
           </div>
-
         </div>
 
-
-        <div class="modal-warning">
-
+        <div
+          v-if="!validadoAutomaticamente"
+          class="modal-warning"
+        >
           ⚠️
-
           <p>
             No necesitas volver a enviar el comprobante.
             Conserva tu referencia bancaria para consultar
             posteriormente el estado de tu pago.
           </p>
-
         </div>
-
 
         <button
           class="modal-btn"
@@ -709,9 +682,7 @@
           Consultar estado de mi pago
         </button>
 
-
       </div>
-
     </div>
 
   </div>
@@ -792,6 +763,8 @@ const error = ref("");
 const success = ref("");
 
 const mostrarModal = ref(false);
+
+const validadoAutomaticamente = ref(false);
 
 
 /* =========================================
@@ -1036,6 +1009,7 @@ async function enviarComprobante() {
 
     const data = await response.json();
 
+    validadoAutomaticamente.value = data.validadoAutomaticamente || false;
     success.value = data.mensaje || "Comprobante enviado correctamente.";
     mostrarModal.value = true;
 
