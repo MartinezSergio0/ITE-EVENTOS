@@ -2002,29 +2002,33 @@ async function cargarParticipantes() {
   } catch (e) {
     console.error("Error al cargar participantes:", e);
   }
+
 }
+
 async function cargarEvento() {
-    try {
 
-      const response = await fetch(`${API_URL}/eventos/4`);
+  try {
 
-      if (response.ok) {
+    const response = await fetch(`${API_URL}/eventos/4`);
 
-        const data = await response.json();
+    if (response.ok) {
 
-        eventInfo.value = {
-          date: data.date,
-          place: data.place,
-          cost: data.cost,
-          capacity: data.capacity
-        };
+      const data = await response.json();
 
-      }
+      eventInfo.value = {
+        date: data.date,
+        place: data.place,
+        cost: data.cost,
+        capacity: data.capacity
+      };
 
-    } catch (e) {
-      console.error("Error al cargar el evento:", e);
     }
+
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
   }
+
+}
 
 </script>
 
