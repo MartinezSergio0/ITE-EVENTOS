@@ -376,24 +376,22 @@
 
               <div>
                 <span>Fecha</span>
-                <strong>10 al 12 de Septiembre</strong>
+                <strong>{{ eventInfo.date }}</strong>
               </div>
 
               <div>
                 <span>Lugar</span>
-                <strong>
-                  Instituto Tecnológico de Ensenada
-                </strong>
+                <strong>{{ eventInfo.place }}</strong>
               </div>
 
               <div>
                 <span>Cuota</span>
-                <strong>$1,000 MXN</strong>
+                <strong>{{ eventInfo.cost }}</strong>
               </div>
 
               <div>
                 <span>Capacidad</span>
-                <strong>500 participantes</strong>
+                <strong>{{ eventInfo.capacity }}</strong>
               </div>
 
             </div>
@@ -878,7 +876,7 @@
                 </span>
 
                 <strong>
-                  $1,000 MXN
+                  {{ eventInfo.cost }}
                 </strong>
 
               </div>
@@ -1434,6 +1432,16 @@ const router = useRouter();
 
 const sidebarOpen = ref(false);
 
+// =====================================================
+// INFORMACION EVENTO
+// =====================================================
+
+const eventInfo = ref({
+  date: "",
+  place: "",
+  cost: "",
+  capacity: ""
+});
 
 // =====================================================
 // SECCIÓN
@@ -1967,8 +1975,10 @@ onMounted(async () => {
   }
 
   await cargarParticipantes();
+  await cargarEvento();
 
 });
+
 
 async function cargarParticipantes() {
 
@@ -1991,6 +2001,29 @@ async function cargarParticipantes() {
 
   } catch (e) {
     console.error("Error al cargar participantes:", e);
+  }
+
+  async function cargarEvento() {
+    try {
+
+      const response = await fetch(`${API_URL}/eventos/4`);
+
+      if (response.ok) {
+
+        const data = await response.json();
+
+        eventInfo.value = {
+          date: data.date,
+          place: data.place,
+          cost: data.cost,
+          capacity: data.capacity
+        };
+
+      }
+
+    } catch (e) {
+      console.error("Error al cargar el evento:", e);
+    }
   }
 
 }
