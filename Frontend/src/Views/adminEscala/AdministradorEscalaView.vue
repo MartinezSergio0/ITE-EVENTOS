@@ -2002,8 +2002,8 @@ async function cargarParticipantes() {
   } catch (e) {
     console.error("Error al cargar participantes:", e);
   }
-
-  async function cargarEvento() {
+}
+async function cargarEvento() {
     try {
 
       const response = await fetch(`${API_URL}/eventos/4`);
@@ -2025,8 +2025,6 @@ async function cargarParticipantes() {
       console.error("Error al cargar el evento:", e);
     }
   }
-
-}
 
 </script>
 
