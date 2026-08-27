@@ -1418,6 +1418,7 @@ import {
 import {
   useRouter
 } from "vue-router";
+import { API_URL } from "../../config/api";
 
 
 // =====================================================
@@ -1475,93 +1476,7 @@ const certificateTemplate = ref(null);
 // PARTICIPANTES
 // =====================================================
 
-const participants = ref([
-
-  {
-    id: 1,
-    name: "Ana López García",
-    control: "21460234",
-    type: "Estudiante",
-    email: "ana@ite.edu.mx",
-    payment: "approved",
-    attended: true,
-    reference: "2608000001",
-    receiptName: "comprobante_ana_lopez.pdf",
-    receiptDate: "20/08/2026",
-    certificate: false
-  },
-
-  {
-    id: 2,
-    name: "Carlos Hernández",
-    control: "21460321",
-    type: "Estudiante",
-    email: "carlos@ite.edu.mx",
-    payment: "pending",
-    attended: false,
-    reference: "2608000002",
-    receiptName: "comprobante_carlos.pdf",
-    receiptDate: "21/08/2026",
-    certificate: false
-  },
-
-  {
-    id: 3,
-    name: "María Fernanda Ruiz",
-    control: "21460120",
-    type: "Docente",
-    email: "maria@ite.edu.mx",
-    payment: "approved",
-    attended: true,
-    reference: "2608000003",
-    receiptName: "comprobante_maria.pdf",
-    receiptDate: "20/08/2026",
-    certificate: true
-  },
-
-  {
-    id: 4,
-    name: "José Martínez",
-    control: "GENERAL",
-    type: "General",
-    email: "jose@gmail.com",
-    payment: "pending",
-    attended: false,
-    reference: "2608000004",
-    receiptName: "comprobante_jose.jpg",
-    receiptDate: "22/08/2026",
-    certificate: false
-  },
-
-  {
-    id: 5,
-    name: "Laura Sánchez",
-    control: "21460444",
-    type: "Estudiante",
-    email: "laura@ite.edu.mx",
-    payment: "approved",
-    attended: true,
-    reference: "2608000005",
-    receiptName: "comprobante_laura.pdf",
-    receiptDate: "21/08/2026",
-    certificate: true
-  },
-
-  {
-    id: 6,
-    name: "Miguel Torres",
-    control: "21460555",
-    type: "Estudiante",
-    email: "miguel@ite.edu.mx",
-    payment: "rejected",
-    attended: false,
-    reference: "2608000006",
-    receiptName: "comprobante_miguel.pdf",
-    receiptDate: "22/08/2026",
-    certificate: false
-  }
-
-]);
+const participants = ref([]);
 
 
 // =====================================================
@@ -2043,70 +1958,42 @@ function goBack() {
 // CARGAR DATOS
 // =====================================================
 
-onMounted(() => {
+onMounted(async () => {
 
-  const savedTemplate =
-    localStorage.getItem(
-      "escala_certificate_template"
-    );
-
+  const savedTemplate = localStorage.getItem("escala_certificate_template");
 
   if (savedTemplate) {
-
-    certificateTemplate.value =
-      JSON.parse(
-        savedTemplate
-      );
-
+    certificateTemplate.value = JSON.parse(savedTemplate);
   }
 
-
-  const savedParticipants =
-    localStorage.getItem(
-      "escala_participants"
-    );
-
-
-  if (savedParticipants) {
-
-    participants.value =
-      JSON.parse(
-        savedParticipants
-      );
-
-  }
-
+  await cargarParticipantes();
 
 });
 
+async function cargarParticipantes() {
 
-// =====================================================
-// GUARDAR PARTICIPANTES
-// =====================================================
+  try {
 
-watch(
+    const token = localStorage.getItem("token");
 
-  participants,
+    const response = await fetch(`${API_URL}/eventos/4/inscripciones/admin/participantes`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  value => {
+    if (response.status === 401) {
+      router.push("/login");
+      return;
+    }
 
-    localStorage.setItem(
+    if (response.ok) {
+      participants.value = await response.json();
+    }
 
-      "escala_participants",
-
-      JSON.stringify(
-        value
-      )
-
-    );
-
-  },
-
-  {
-    deep: true
+  } catch (e) {
+    console.error("Error al cargar participantes:", e);
   }
 
-);
+}
 
 </script>
 

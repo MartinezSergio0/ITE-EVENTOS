@@ -8,6 +8,7 @@ import sharp from 'sharp';
 import 'multer'; 
 
 
+
 const CODIGO_TIPO: Record<string, number> = {
   'Participante general': 1,
   'Estudiante': 2,
@@ -194,6 +195,8 @@ async subirComprobante(
     data: {
       comprobante_pago: rutaArchivo,
       estado: estadoFinal?.id,
+      metodo_validacion: validadoAutomaticamente ? 'automatico' : null,
+      fecha_comprobante: new Date(),
     },
   });
 
@@ -213,4 +216,42 @@ async subirComprobante(
     },
   };
 }
+  async listarParticipantes(eventoId: number) {
+    const participantes = await this.prisma.participantes.findMany({
+      where: { evento: eventoId },
+      include: {
+        tipo_participante: true,
+        estado_participantes_estadoToestado: true,
+      },
+      orderBy: { participante_num: 'asc' },
+    });
+
+    return participantes.map((p) => this.mapParticipante(p));
+  }
+
+  private mapParticipante(p: any) {
+    const estadoNombre = p.estado_participantes_estadoToestado?.nombre ?? '';
+
+    let payment = 'pending';
+    if (estadoNombre === 'Confirmado') payment = 'approved';
+    else if (estadoNombre === 'Rechazada') payment = 'rejected';
+
+    const receiptName = p.comprobante_pago ? p.comprobante_pago.split('/').pop() : null;
+
+    return {
+      id: p.folio,
+      name: p.nombre,
+      control: p.matricula,
+      type: p.tipo_participante?.nombre ?? '',
+      email: p.correo_electronico,
+      payment,
+      attended: false,
+      reference: p.referencia_bancaria,
+      receiptName,
+      receiptDate: p.fecha_comprobante
+        ? new Date(p.fecha_comprobante).toLocaleDateString('es-MX')
+        : null,
+      certificate: false,
+    };
+  }
 }

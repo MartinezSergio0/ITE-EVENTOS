@@ -153,6 +153,7 @@ model participantes {
   contacto_emergencia_telefono        String?            @db.VarChar(15)
   medio_difusion                      String?            @db.VarChar(100)
   consentimiento                      Boolean            @default(false)
+  fecha_comprobante                   DateTime?          @db.Timestamp(6)
   estado_participantes_estadoToestado estado?            @relation("participantes_estadoToestado", fields: [estado], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_estado")
   evento_participantes_eventoToevento evento             @relation("participantes_eventoToevento", fields: [evento], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_evento")
   genero_participantes_generoTogenero genero?            @relation("participantes_generoTogenero", fields: [genero], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_genero")

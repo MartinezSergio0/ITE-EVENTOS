@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards,UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { InscripcionesService } from './inscripciones.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
 import { SubirComprobanteDto } from './dto/subir-comprobante.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('eventos/:eventoId/inscripciones')
 export class InscripcionesController {
@@ -51,5 +51,10 @@ export class InscripcionesController {
     }
 
     return this.service.subirComprobante(eventoId, dto, file);
+  }
+  @UseGuards(AuthGuard)
+  @Get('admin/participantes')
+  listarParticipantes(@Param('eventoId', ParseIntPipe) eventoId: number) {
+    return this.service.listarParticipantes(eventoId);
   }
 }
