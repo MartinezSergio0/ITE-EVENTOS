@@ -5,9 +5,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { InscripcionesModule } from './inscripciones/inscripciones.module';
 import { EventosModule } from './eventos/eventos.module';
 import { SupabaseModule } from './supabase/supabase.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [PrismaModule, InscripcionesModule, EventosModule, SupabaseModule],
+  imports: [PrismaModule, InscripcionesModule, EventosModule, SupabaseModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

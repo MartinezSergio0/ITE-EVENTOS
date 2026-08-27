@@ -189,6 +189,7 @@
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { API_URL } from "../../config/api";
 
 const router = useRouter()
 
@@ -213,131 +214,50 @@ const errorMessage = ref('')
 // FUNCIÓN LOGIN
 // ========================================
 
-function login() {
+async function login() {
 
-  // Limpiar error anterior
-  errorMessage.value = ''
+  errorMessage.value = '';
 
-  // Validar campos
   if (!email.value || !password.value) {
-
-    errorMessage.value =
-      'Por favor completa todos los campos.'
-
-    return
+    errorMessage.value = 'Por favor completa todos los campos.';
+    return;
   }
 
+  loading.value = true;
 
-  // Activar estado de carga
-  loading.value = true
+  try {
 
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        correo: email.value,
+        password: password.value,
+      }),
+    });
 
-  // Simular pequeño proceso de autenticación
-  setTimeout(() => {
-
-    // ========================================
-    // SUPERADMINISTRADOR
-    // ========================================
-
-    if (
-      email.value === 'superadmin@ite.edu.mx' &&
-      password.value === '1234'
-    ) {
-
-      // Guardar información de sesión
-      localStorage.setItem(
-        'userRole',
-        'superadmin'
-      )
-
-      localStorage.setItem(
-        'userEmail',
-        email.value
-      )
-
-
-      localStorage.setItem(
-        'userName',
-        'Super Administrador'
-      )
-
-
-      // Recordar sesión
-      if (rememberMe.value) {
-
-        localStorage.setItem(
-          'rememberMe',
-          'true'
-        )
-
-      }
-
-
-      // Redireccionar
-      router.push('/superadmin')
-
-      return
+    if (!response.ok) {
+      throw new Error('El correo o la contraseña son incorrectos.');
     }
 
+    const data = await response.json();
 
+    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('userRole', data.usuario.rol);
+    localStorage.setItem('userEmail', data.usuario.correo);
+    localStorage.setItem('userName', data.usuario.nombre);
 
-    // ========================================
-    // ADMINISTRADOR
-    // ========================================
-
-    if (
-      email.value === 'admin@ite.edu.mx' &&
-      password.value === '1234'
-    ) {
-
-      // Guardar información de sesión
-      localStorage.setItem(
-        'userRole',
-        'admin'
-      )
-
-      localStorage.setItem(
-        'userEmail',
-        email.value
-      )
-
-
-      localStorage.setItem(
-        'userName',
-        'Administrador'
-      )
-
-
-      // Recordar sesión
-      if (rememberMe.value) {
-
-        localStorage.setItem(
-          'rememberMe',
-          'true'
-        )
-
-      }
-
-
-      // Redireccionar
-      router.push('/admin/escala')
-
-      return
+    if (rememberMe.value) {
+      localStorage.setItem('rememberMe', 'true');
     }
 
+    router.push('/admin/escala');
 
-
-    // ========================================
-    // CREDENCIALES INCORRECTAS
-    // ========================================
-
-    errorMessage.value =
-      'El correo o la contraseña son incorrectos.'
-
-
-    loading.value = false
-
-  }, 700)
+  } catch (e) {
+    errorMessage.value = e.message || 'No se pudo iniciar sesión.';
+  } finally {
+    loading.value = false;
+  }
 
 }
 

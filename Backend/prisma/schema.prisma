@@ -234,4 +234,5 @@ model usuario_evento {
 enum rol_general {
   Superadministrador
   Usuario
+  Administrador
 }
