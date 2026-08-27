@@ -320,7 +320,7 @@ function login() {
 
 
       // Redireccionar
-      router.push('/admin')
+      router.push('/admin/escala')
 
       return
     }

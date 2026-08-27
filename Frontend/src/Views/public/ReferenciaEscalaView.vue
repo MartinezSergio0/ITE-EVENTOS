@@ -35,7 +35,7 @@
             </h1>
 
             <p>
-              Completa tus datos para generar tu referencia de pago.
+              Consulta tu referencia bancaria utilizando tu folio.
             </p>
 
           </div>
@@ -54,29 +54,32 @@
     <main class="main-container">
 
 
-      <!-- =====================================
+      <!-- =========================================
            FORMULARIO
-      ====================================== -->
+      ========================================== -->
 
       <section
         v-if="!referenciaGenerada"
         class="form-card"
       >
 
+        <!-- ENCABEZADO DEL FORMULARIO -->
+
         <div class="card-header">
 
           <div>
 
             <span class="step">
-              PASO 1 DE 2
+              CONSULTA DE PAGO
             </span>
 
             <h2>
-              Datos del participante
+              Consulta tu referencia bancaria
             </h2>
 
             <p>
-              Ingresa tus datos correctamente para generar tu referencia bancaria.
+              Ingresa únicamente el folio que recibiste al registrarte
+              en el Congreso ESCALA.
             </p>
 
           </div>
@@ -88,312 +91,70 @@
         </div>
 
 
-        <!-- =====================================
-             INFORMACIÓN PERSONAL
-        ====================================== -->
+        <!-- =========================================
+             INFORMACIÓN
+        ========================================== -->
 
-        <div class="form-section">
+        <div class="info-box">
 
-          <h3>
-            👤 Información personal
-          </h3>
+          <div class="info-icon">
+            ℹ️
+          </div>
 
-          <div class="form-grid">
+          <div>
 
+            <strong>
+              ¿Dónde encuentro mi folio?
+            </strong>
 
-            <!-- PRIMER APELLIDO -->
-
-            <div class="form-group">
-
-              <label>
-                Primer apellido
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.primerApellido"
-                type="text"
-                placeholder="Ej. García"
-                maxlength="50"
-                autocomplete="family-name"
-              >
-
-            </div>
-
-
-            <!-- SEGUNDO APELLIDO -->
-
-            <div class="form-group">
-
-              <label>
-                Segundo apellido
-              </label>
-
-              <input
-                v-model="form.segundoApellido"
-                type="text"
-                placeholder="Ej. López"
-                maxlength="50"
-                autocomplete="additional-name"
-              >
-
-            </div>
-
-
-            <!-- NOMBRES -->
-
-            <div class="form-group full">
-
-              <label>
-                Nombre(s)
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.nombres"
-                type="text"
-                placeholder="Ej. María Fernanda"
-                maxlength="80"
-                autocomplete="given-name"
-              >
-
-            </div>
-
-
-            <!-- EDAD -->
-
-            <div class="form-group">
-
-              <label>
-                Edad
-                <span>*</span>
-              </label>
-
-              <input
-                v-model.number="form.edad"
-                type="number"
-                min="1"
-                max="100"
-                step="1"
-                placeholder="Ej. 22"
-              >
-
-              <small>
-                Escribe tu edad actual.
-              </small>
-
-            </div>
-
-
-            <!-- SEXO -->
-
-            <div class="form-group">
-
-              <label>
-                Sexo biológico
-                <span>*</span>
-              </label>
-
-              <select v-model="form.sexo">
-
-                <option value="">
-                  Selecciona una opción
-                </option>
-
-                <option value="Femenino">
-                  Femenino
-                </option>
-
-                <option value="Masculino">
-                  Masculino
-                </option>
-
-              </select>
-
-            </div>
+            <p>
+              El folio es el número que recibiste al completar
+              tu registro al Congreso ESCALA.
+            </p>
 
           </div>
 
         </div>
 
 
-        <!-- =====================================
-             DATOS ACADÉMICOS
-        ====================================== -->
+        <!-- =========================================
+             FORMULARIO
+        ========================================== -->
 
         <div class="form-section">
 
           <h3>
-            🎓 Información académica
+            🔎 Consulta de referencia
           </h3>
 
-          <div class="form-grid">
+          <div class="form-group">
 
+            <label>
+              Folio de registro
+              <span>*</span>
+            </label>
 
-            <!-- CONTROL -->
+            <input
+              v-model="folio"
+              type="text"
+              placeholder="Ej. ESCALA-2026-0001" 
+              maxlength="50"
+              autocomplete="off"
+              @keyup.enter="buscarReferencia"
+            >
 
-            <div class="form-group">
-
-              <label>
-                No. de control
-              </label>
-
-              <input
-                v-model="form.control"
-                type="text"
-                placeholder="Ej. 22760001"
-                maxlength="30"
-              >
-
-              <small>
-                Si no tienes número de control, escribe 0.
-              </small>
-
-            </div>
-
-
-            <!-- TIPO DE PARTICIPACIÓN -->
-
-            <div class="form-group">
-
-              <label>
-                Tipo de participación
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.tipoParticipacion"
-                required
-              >
-
-                <option value="">
-                  Selecciona una opción
-                </option>
-
-                <option value="Participante general">
-                  Participante general
-                </option>
-
-                <option value="Estudiante">
-                  Estudiante
-                </option>
-
-                <option value="Docente">
-                  Docente
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <!-- INSTITUCIÓN -->
-
-            <div class="form-group full">
-
-              <label>
-                Institución de procedencia
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.institucion"
-                required
-              >
-
-                <option value="">
-                  Selecciona una institución
-                </option>
-
-                <option value="TecNM, Ensenada">
-                  TecNM, Ensenada
-                </option>
-
-                <option value="TecNM, Tijuana">
-                  TecNM, Tijuana
-                </option>
-
-                <option value="TecNM, Mexicali">
-                  TecNM, Mexicali
-                </option>
-
-                <option value="UABC">
-                  UABC
-                </option>
-
-                <option value="Otro">
-                  Otro
-                </option>
-
-              </select>
-
-            </div>
+            <small>
+              Escribe el folio exactamente como aparece en tu registro.
+            </small>
 
           </div>
 
         </div>
 
 
-        <!-- =====================================
-             CONTACTO
-        ====================================== -->
-
-        <div class="form-section">
-
-          <h3>
-            📱 Información de contacto
-          </h3>
-
-          <div class="form-grid">
-
-
-            <!-- CORREO -->
-
-            <div class="form-group">
-
-              <label>
-                Correo electrónico institucional
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.correo"
-                type="email"
-                placeholder="ejemplo@instituto.edu.mx"
-                maxlength="120"
-                autocomplete="email"
-              >
-
-            </div>
-
-
-            <!-- WHATSAPP -->
-
-            <div class="form-group">
-
-              <label>
-                WhatsApp
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.whatsapp"
-                type="tel"
-                placeholder="6461234567"
-                maxlength="15"
-                autocomplete="tel"
-              >
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- =====================================
+        <!-- =========================================
              INFORMACIÓN DEL PAGO
-        ====================================== -->
+        ========================================== -->
 
         <div class="payment-preview">
 
@@ -412,7 +173,8 @@
             </strong>
 
             <p>
-              Al finalizar el formulario se generará tu referencia bancaria.
+              Al consultar tu folio se mostrará la referencia
+              bancaria correspondiente a tu registro.
             </p>
 
           </div>
@@ -420,9 +182,9 @@
         </div>
 
 
-        <!-- =====================================
+        <!-- =========================================
              ERROR
-        ====================================== -->
+        ========================================== -->
 
         <div
           v-if="error"
@@ -432,13 +194,13 @@
         </div>
 
 
-        <!-- =====================================
-             BOTÓN GENERAR
-        ====================================== -->
+        <!-- =========================================
+             BOTÓN
+        ========================================== -->
 
         <button
           class="generate-button"
-          @click="buscarReferencia "
+          @click="buscarReferencia"
           :disabled="cargando"
           type="button"
         >
@@ -469,15 +231,15 @@
 
 
         <p class="required-text">
-          * Campos obligatorios
+          * Campo obligatorio
         </p>
 
       </section>
 
 
-      <!-- =====================================
-           REFERENCIA GENERADA
-      ====================================== -->
+      <!-- =========================================
+           REFERENCIA ENCONTRADA
+      ========================================== -->
 
       <section
         v-else
@@ -485,7 +247,9 @@
       >
 
 
-        <!-- MENSAJE DE ÉXITO -->
+        <!-- =========================================
+             MENSAJE DE ÉXITO
+        ========================================== -->
 
         <div class="success-message">
 
@@ -496,7 +260,7 @@
           <div>
 
             <h2>
-              ¡Referencia Encontrada!
+              ¡Referencia encontrada!
             </h2>
 
             <p>
@@ -508,9 +272,9 @@
         </div>
 
 
-        <!-- =====================================
+        <!-- =========================================
              HOJA DE REFERENCIA
-        ====================================== -->
+        ========================================== -->
 
         <div
           id="referencia-imprimir"
@@ -518,7 +282,9 @@
         >
 
 
-          <!-- ENCABEZADO -->
+          <!-- =========================================
+               ENCABEZADO
+          ========================================== -->
 
           <div class="paper-header">
 
@@ -548,9 +314,26 @@
           <div class="paper-divider"></div>
 
 
-          <!-- =====================================
+          <!-- =========================================
+               FOLIO
+          ========================================== -->
+
+          <div class="folio-box">
+
+            <span>
+              FOLIO DE REGISTRO
+            </span>
+
+            <strong>
+              {{ folio }}
+            </strong>
+
+          </div>
+
+
+          <!-- =========================================
                REFERENCIA BANCARIA
-          ====================================== -->
+          ========================================== -->
 
           <div class="reference-title">
 
@@ -563,15 +346,15 @@
             </strong>
 
             <small>
-              10 dígitos
+              Referencia para realizar tu pago
             </small>
 
           </div>
 
 
-          <!-- =====================================
+          <!-- =========================================
                DATOS DEL PARTICIPANTE
-          ====================================== -->
+          ========================================== -->
 
           <div class="participant-box">
 
@@ -591,7 +374,7 @@
                 </span>
 
                 <strong>
-                  {{ nombreCompleto }}
+                  {{ datosParticipante.nombreCompleto || "No disponible" }}
                 </strong>
 
               </div>
@@ -606,22 +389,7 @@
                 </span>
 
                 <strong>
-                  {{ form.control || "0" }}
-                </strong>
-
-              </div>
-
-
-              <!-- EDAD -->
-
-              <div>
-
-                <span>
-                  Edad
-                </span>
-
-                <strong>
-                  {{ form.edad }} años
+                  {{ datosParticipante.control || "0" }}
                 </strong>
 
               </div>
@@ -636,7 +404,7 @@
                 </span>
 
                 <strong>
-                  {{ form.institucion }}
+                  {{ datosParticipante.institucion || "No disponible" }}
                 </strong>
 
               </div>
@@ -651,7 +419,7 @@
                 </span>
 
                 <strong>
-                  {{ form.tipoParticipacion }}
+                  {{ datosParticipante.tipoParticipacion || "No disponible" }}
                 </strong>
 
               </div>
@@ -666,7 +434,7 @@
                 </span>
 
                 <strong>
-                  {{ form.correo }}
+                  {{ datosParticipante.correo || "No disponible" }}
                 </strong>
 
               </div>
@@ -681,7 +449,7 @@
                 </span>
 
                 <strong>
-                  {{ form.whatsapp }}
+                  {{ datosParticipante.whatsapp || "No disponible" }}
                 </strong>
 
               </div>
@@ -691,9 +459,9 @@
           </div>
 
 
-          <!-- =====================================
+          <!-- =========================================
                INFORMACIÓN DE PAGO
-          ====================================== -->
+          ========================================== -->
 
           <div class="payment-box">
 
@@ -713,6 +481,8 @@
             <div class="bank-data">
 
 
+              <!-- BANCO -->
+
               <div>
 
                 <span>
@@ -725,6 +495,8 @@
 
               </div>
 
+
+              <!-- TITULAR -->
 
               <div>
 
@@ -739,6 +511,8 @@
               </div>
 
 
+              <!-- CUENTA -->
+
               <div>
 
                 <span>
@@ -752,6 +526,8 @@
               </div>
 
 
+              <!-- CLABE -->
+
               <div>
 
                 <span>
@@ -764,6 +540,8 @@
 
               </div>
 
+
+              <!-- REFERENCIA -->
 
               <div class="bank-reference">
 
@@ -782,9 +560,9 @@
           </div>
 
 
-          <!-- =====================================
+          <!-- =========================================
                INSTRUCCIONES
-          ====================================== -->
+          ========================================== -->
 
           <div class="instructions">
 
@@ -818,9 +596,9 @@
           </div>
 
 
-          <!-- =====================================
+          <!-- =========================================
                SITIO
-          ====================================== -->
+          ========================================== -->
 
           <div class="website-box">
 
@@ -835,15 +613,15 @@
           </div>
 
 
-          <!-- =====================================
+          <!-- =========================================
                FOOTER
-          ====================================== -->
+          ========================================== -->
 
           <div class="paper-footer">
 
             <p>
-              Este documento corresponde a una referencia de pago
-              para el Congreso ESCALA.
+              Este documento corresponde a una referencia
+              de pago para el Congreso ESCALA.
             </p>
 
             <span>
@@ -855,9 +633,9 @@
         </div>
 
 
-        <!-- =====================================
+        <!-- =========================================
              BOTONES
-        ====================================== -->
+        ========================================== -->
 
         <div class="reference-actions">
 
@@ -869,21 +647,20 @@
             🖨️ Imprimir referencia
           </button>
 
-
           <button
             class="back-form-button"
             @click="volverFormulario"
             type="button"
           >
-            ← Modificar datos
+            ← Consultar otro folio
           </button>
 
         </div>
 
 
-        <!-- =====================================
+        <!-- =========================================
              AVISO FINAL
-        ====================================== -->
+        ========================================== -->
 
         <div class="final-notice">
 
@@ -898,8 +675,8 @@
             </h3>
 
             <p>
-              Deberás enviar tu comprobante de pago para confirmar
-              tu registro al Congreso ESCALA.
+              Deberás enviar tu comprobante de pago para
+              confirmar tu registro al Congreso ESCALA.
             </p>
 
             <a
@@ -926,7 +703,7 @@
 <script setup>
 
 import {
-  computed,
+  
   reactive,
   ref
 } from "vue";
@@ -935,7 +712,9 @@ import {
   useRouter
 } from "vue-router";
 
-import { API_URL } from "../../config/api";
+import {
+  API_URL
+} from "../../config/api";
 
 
 // ============================================
@@ -953,6 +732,8 @@ const referenciaGenerada = ref(false);
 
 const referencia = ref("");
 
+const folio = ref("");
+
 const error = ref("");
 
 const cargando = ref(false);
@@ -966,281 +747,228 @@ const anio = new Date().getFullYear();
 
 
 // ============================================
-// FORMULARIO
+// DATOS DEL PARTICIPANTE
 // ============================================
 
-const form = reactive({
+const datosParticipante = reactive({
 
-  primerApellido: "",
-
-  segundoApellido: "",
-
-  nombres: "",
-
-  edad: "",
-
-  sexo: "",
+  nombreCompleto: "",
 
   control: "",
 
-  correo: "",
-
-  whatsapp: "",
-
   institucion: "",
 
-  tipoParticipacion: ""
+  tipoParticipacion: "",
+
+  correo: "",
+
+  whatsapp: ""
 
 });
 
 
 // ============================================
-// NOMBRE COMPLETO
-// ============================================
-
-const nombreCompleto = computed(() => {
-
-  return [
-
-    form.nombres,
-
-    form.primerApellido,
-
-    form.segundoApellido
-
-  ]
-
-    .filter(Boolean)
-
-    .join(" ");
-
-});
-
-
-// ============================================
-// VALIDAR FORMULARIO
-// ============================================
-
-function validarFormulario() {
-
-  // Primer apellido
-
-  if (!form.primerApellido.trim()) {
-
-    error.value =
-      "Escribe tu primer apellido.";
-
-    return false;
-
-  }
-
-
-  // Nombre
-
-  if (!form.nombres.trim()) {
-
-    error.value =
-      "Escribe tu nombre.";
-
-    return false;
-
-  }
-
-
-  // Edad
-
-  if (
-    form.edad === "" ||
-    form.edad === null ||
-    form.edad === undefined
-  ) {
-
-    error.value =
-      "Escribe tu edad.";
-
-    return false;
-
-  }
-
-
-  const edad = Number(form.edad);
-
-
-  if (!Number.isInteger(edad)) {
-
-    error.value =
-      "La edad debe ser un número entero.";
-
-    return false;
-
-  }
-
-
-  if (edad < 1 || edad > 100) {
-
-    error.value =
-      "La edad debe estar entre 1 y 100 años.";
-
-    return false;
-
-  }
-
-
-  // Sexo
-
-  if (!form.sexo) {
-
-    error.value =
-      "Selecciona tu sexo biológico.";
-
-    return false;
-
-  }
-
-
-  // Número de control
-
-  if (!form.control.trim()) {
-
-    form.control = "0";
-
-  }
-
-
-  // Correo
-
-  if (!form.correo.trim()) {
-
-    error.value =
-      "Escribe tu correo electrónico institucional.";
-
-    return false;
-
-  }
-
-
-  // Validación básica de correo
-
-  const correoValido =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!correoValido.test(form.correo.trim())) {
-
-    error.value =
-      "Escribe un correo electrónico válido.";
-
-    return false;
-
-  }
-
-
-  // WhatsApp
-
-  if (!form.whatsapp.trim()) {
-
-    error.value =
-      "Escribe tu número de WhatsApp.";
-
-    return false;
-
-  }
-
-
-  // Institución
-
-  if (!form.institucion) {
-
-    error.value =
-      "Selecciona una institución de procedencia.";
-
-    return false;
-
-  }
-
-
-  // Tipo de participación
-
-  if (!form.tipoParticipacion) {
-
-    error.value =
-      "Selecciona el tipo de participación.";
-
-    return false;
-
-  }
-
-
-  error.value = "";
-
-  return true;
-
-}
-
-
-// ============================================
-// GENERAR REFERENCIA
+// BUSCAR REFERENCIA POR FOLIO
 // ============================================
 
 async function buscarReferencia() {
+
+  // Evitar múltiples peticiones
 
   if (cargando.value) {
     return;
   }
 
-  if (!validarFormulario()) {
+
+  // Validar folio
+
+  if (!folio.value.trim()) {
+
+    error.value =
+      "Escribe tu folio de registro.";
+
     return;
+
   }
 
+
   cargando.value = true;
+
   error.value = "";
+
 
   try {
 
+    // ========================================
+    // LIMPIAR FOLIO
+    // ========================================
+
+    const folioLimpio =
+      folio.value.trim();
+
+
+    // ========================================
+    // CREAR PARÁMETROS
+    // ========================================
+
     const params = new URLSearchParams({
-      correo: form.correo.trim(),
-      control: form.control.trim() || "0",
+
+      folio: folioLimpio
+
     });
 
+
+    // ========================================
+    // CONSULTAR BACKEND
+    // ========================================
+
     const response = await fetch(
+
       `${API_URL}/eventos/4/inscripciones/buscar?${params}`
+
     );
+
+
+    // ========================================
+    // ERROR DEL BACKEND
+    // ========================================
 
     if (!response.ok) {
 
       let errorData = {};
 
       try {
-        errorData = await response.json();
+
+        errorData =
+          await response.json();
+
       } catch {
+
         errorData = {};
+
       }
 
+
       throw new Error(
+
         errorData.message ||
-        "No se encontró un registro con esos datos. Verifica tu correo y número de control, o regístrate primero."
+
+        "No se encontró una inscripción con ese folio. Verifica que el folio sea correcto."
+
       );
 
     }
 
-    const data = await response.json();
+
+    // ========================================
+    // RESPUESTA
+    // ========================================
+
+    const data =
+      await response.json();
+
+
+    console.log(
+      "Respuesta del backend:",
+      data
+    );
+
+
+    // ========================================
+    // VALIDAR REFERENCIA
+    // ========================================
 
     if (!data.referencia_bancaria) {
-      throw new Error("Tu registro no tiene una referencia bancaria asociada.");
+
+      throw new Error(
+        "El registro encontrado no tiene una referencia bancaria asociada."
+      );
+
     }
 
-    referencia.value = String(data.referencia_bancaria).trim();
+
+    // ========================================
+    // GUARDAR REFERENCIA
+    // ========================================
+
+    referencia.value =
+      String(
+        data.referencia_bancaria
+      ).trim();
+
+
+    // ========================================
+    // GUARDAR DATOS
+    // ========================================
+
+    datosParticipante.nombreCompleto =
+      data.nombre_completo ||
+      data.nombreCompleto ||
+      "";
+
+
+    datosParticipante.control =
+      data.control ||
+      "0";
+
+
+    datosParticipante.institucion =
+      data.institucion ||
+      "";
+
+
+    datosParticipante.tipoParticipacion =
+      data.tipo_participacion ||
+      data.tipoParticipacion ||
+      "";
+
+
+    datosParticipante.correo =
+      data.correo ||
+      "";
+
+
+    datosParticipante.whatsapp =
+      data.whatsapp ||
+      "";
+
+
+    // ========================================
+    // MOSTRAR RESULTADO
+    // ========================================
+
     referenciaGenerada.value = true;
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // ========================================
+    // SUBIR AL INICIO
+    // ========================================
+
+    window.scrollTo({
+
+      top: 0,
+
+      behavior: "smooth"
+
+    });
+
 
   } catch (e) {
 
-    console.error("Error al buscar referencia:", e);
+    console.error(
+      "Error al buscar referencia:",
+      e
+    );
 
-    error.value = e.message || "No se pudo consultar la referencia. Intenta de nuevo.";
+
+    error.value =
+      e.message ||
+      "No se pudo consultar la referencia. Intenta nuevamente.";
 
   } finally {
+
     cargando.value = false;
+
   }
 
 }
@@ -1265,7 +993,25 @@ function volverFormulario() {
 
   referenciaGenerada.value = false;
 
+  referencia.value = "";
+
   error.value = "";
+
+  folio.value = "";
+
+
+  datosParticipante.nombreCompleto = "";
+
+  datosParticipante.control = "";
+
+  datosParticipante.institucion = "";
+
+  datosParticipante.tipoParticipacion = "";
+
+  datosParticipante.correo = "";
+
+  datosParticipante.whatsapp = "";
+
 
   window.scrollTo({
 
@@ -1360,7 +1106,8 @@ function regresar() {
 
   border: none;
 
-  background: rgba(255,255,255,.15);
+  background:
+    rgba(255,255,255,.15);
 
   color: white;
 
@@ -1381,9 +1128,11 @@ function regresar() {
 
 .back-button:hover {
 
-  background: rgba(255,255,255,.25);
+  background:
+    rgba(255,255,255,.25);
 
-  transform: translateX(-3px);
+  transform:
+    translateX(-3px);
 
 }
 
@@ -1488,6 +1237,10 @@ function regresar() {
 }
 
 
+/* ============================================
+   CARD HEADER
+============================================ */
+
 .card-header {
 
   display: flex;
@@ -1550,14 +1303,71 @@ function regresar() {
 
 
 /* ============================================
-   FORM SECTIONS
+   INFO BOX
+============================================ */
+
+.info-box {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  background: #f0f7ff;
+
+  border: 1px solid #cfe4fa;
+
+  border-radius: 14px;
+
+  padding: 20px;
+
+  margin-bottom: 30px;
+
+}
+
+
+.info-icon {
+
+  font-size: 24px;
+
+}
+
+
+.info-box strong {
+
+  display: block;
+
+  color: #003366;
+
+  margin-bottom: 5px;
+
+}
+
+
+.info-box p {
+
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: .9rem;
+
+  line-height: 1.5;
+
+}
+
+
+/* ============================================
+   FORM SECTION
 ============================================ */
 
 .form-section {
 
-  margin-bottom: 35px;
+  margin-bottom: 30px;
 
 }
+
 
 
 .form-section h3 {
@@ -1576,34 +1386,13 @@ function regresar() {
 
 
 /* ============================================
-   GRID
+   FORM GROUP
 ============================================ */
-
-.form-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 22px;
-
-}
-
-
 .form-group {
 
   display: flex;
 
   flex-direction: column;
-
-}
-
-
-.form-group.full {
-
-  grid-column: 1 / -1;
-
 }
 
 
@@ -1627,13 +1416,11 @@ function regresar() {
 }
 
 
-.form-group input,
-
-.form-group select {
+.form-group input {
 
   width: 100%;
 
-  padding: 14px 15px;
+  padding: 16px;
 
   border: 1px solid #d1d5db;
 
@@ -1643,7 +1430,7 @@ function regresar() {
 
   color: #1f2937;
 
-  font-size: .95rem;
+  font-size: 1rem;
 
   outline: none;
 
@@ -1652,9 +1439,7 @@ function regresar() {
 }
 
 
-.form-group input:focus,
-
-.form-group select:focus {
+.form-group input:focus {
 
   border-color: #0055a5;
 
@@ -1670,13 +1455,13 @@ function regresar() {
 
   font-size: .78rem;
 
-  margin-top: 6px;
+  margin-top: 7px;
 
 }
 
 
 /* ============================================
-   PAGO PREVIEW
+   PAYMENT PREVIEW
 ============================================ */
 
 .payment-preview {
@@ -1784,7 +1569,7 @@ function regresar() {
 
 
 /* ============================================
-   GENERATE BUTTON
+   BUTTON
 ============================================ */
 
 .generate-button {
@@ -2046,6 +1831,57 @@ function regresar() {
 
 
 /* ============================================
+   FOLIO
+============================================ */
+
+.folio-box {
+
+  text-align: center;
+
+  background: #fafafa;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  padding: 18px;
+
+  margin-bottom: 20px;
+
+}
+
+
+.folio-box span {
+
+  display: block;
+
+  color: #6b7280;
+
+  font-size: .75rem;
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+}
+
+
+.folio-box strong {
+
+  display: block;
+
+  color: #003366;
+
+  font-size: 1.5rem;
+
+  margin-top: 6px;
+
+  letter-spacing: 2px;
+
+}
+
+
+/* ============================================
    REFERENCE
 ============================================ */
 
@@ -2120,11 +1956,7 @@ function regresar() {
 }
 
 
-.participant-box h3,
-
-.payment-box h3,
-
-.instructions h3 {
+.participant-box h3 {
 
   color: #003366;
 
@@ -2300,6 +2132,17 @@ function regresar() {
   padding: 25px;
 
   margin-bottom: 25px;
+
+}
+
+
+.instructions h3 {
+
+  color: #003366;
+
+  margin-top: 0;
+
+  margin-bottom: 20px;
 
 }
 
@@ -2574,18 +2417,7 @@ function regresar() {
   }
 
 
-  .form-grid {
 
-    grid-template-columns: 1fr;
-
-  }
-
-
-  .form-group.full {
-
-    grid-column: auto;
-
-  }
 
 
   .form-number {
@@ -2644,7 +2476,7 @@ function regresar() {
 
 
   .participant-grid,
-
+  
   .bank-data {
 
     grid-template-columns: 1fr;
@@ -2700,11 +2532,11 @@ function regresar() {
 
 
   .header,
-
+  
   .success-message,
-
+  
   .reference-actions,
-
+  
   .final-notice {
 
     display: none !important;
@@ -2743,13 +2575,14 @@ function regresar() {
   }
 
 
+ 
   .participant-box,
-
+ 
   .payment-box,
-
+ 
   .instructions,
-
-  .reference-title {
+  .reference-title,
+  .folio-box {
 
     break-inside: avoid;
 

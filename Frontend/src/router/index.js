@@ -30,6 +30,14 @@ import LoginView from "../Views/public/LoginView.vue";
 
 import SuperAdminView from "../Views/SuperAdmin/SuperAdminView.vue";
 
+// ==========================================
+// ADMINISTRADOR ESCALA
+// ==========================================
+
+import AdministradorEscalaView from "../Views/adminEscala/AdministradorEscalaView.vue";
+import ParticipantesEscalaView from "../Views/adminEscala/ParticipantesEscalaView.vue";
+import ComprobantesEscalaView from "../Views/adminEscala/ComprobantesEscalaView.vue";
+import ConstanciasEscalaView from "../Views/adminEscala/ConstanciasEscalaView.vue";
 
 // ==========================================
 // RUTAS
@@ -104,7 +112,7 @@ const routes = [
 
 
   // ========================================
-  // SUPER ADMIN
+  // SUPER ADMINISTRADOR
   // ========================================
 
   {
@@ -113,6 +121,64 @@ const routes = [
     component: SuperAdminView
   },
 
+  // ========================================
+  // ADMINISTRADOR ESCALA
+  // ========================================
+
+  {
+    path: "/admin/escala",
+
+    name: "AdministradorEscala",
+
+    component: AdministradorEscalaView,
+
+    // ======================================
+    // RUTAS HIJAS DEL ADMINISTRADOR ESCALA
+    // ======================================
+
+    children: [
+
+      // ------------------------------------
+      // PARTICIPANTES
+      // /admin/escala/participantes
+      // ------------------------------------
+
+      {
+        path: "participantes",
+
+        name: "ParticipantesEscala",
+
+        component: ParticipantesEscalaView
+      },
+
+      // ------------------------------------
+      // COMPROBANTES
+      // /admin/escala/comprobantes
+      // ------------------------------------
+
+      {
+        path: "comprobantes",
+
+        name: "ComprobantesEscala",
+
+        component: ComprobantesEscalaView
+      },
+
+      // ------------------------------------
+      // CONSTANCIAS
+      // /admin/escala/constancias
+      // ------------------------------------
+
+      {
+        path: "constancias",
+
+        name: "ConstanciasEscala",
+
+        component: ConstanciasEscalaView
+      }
+
+    ]
+  },
 
   // ========================================
   // REGISTRO ESCALA
@@ -120,7 +186,9 @@ const routes = [
 
   {
     path: "/registro-escala",
+
     name: "registro-escala",
+
     component: RegistroEscala
   },
 
@@ -131,7 +199,9 @@ const routes = [
 
   {
     path: "/registro-argos",
+
     name: "registro-argos",
+
     component: RegistroArgos
   },
 
@@ -142,22 +212,30 @@ const routes = [
 
   {
     path: "/referencia-escala",
+
     name: "referencia-escala",
+
     component: ReferenciaEscalaView
   },
 
-
+  
   // ========================================
   // SUBIR COMPROBANTE
   // ========================================
 
   {
     path: "/subir-comprobante/:id",
+
     name: "SubirComprobante",
+
     component: SubirComprobanteView
   }
 
 ];
+
+// ==========================================
+// CREAR ROUTER
+// ==========================================
 
 const router = createRouter({
 
@@ -167,5 +245,8 @@ const router = createRouter({
 
 });
 
+// ==========================================
+// EXPORTAR
+// ==========================================
 
 export default router;
