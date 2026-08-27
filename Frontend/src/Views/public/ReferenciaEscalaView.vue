@@ -703,7 +703,7 @@
 <script setup>
 
 import {
-  
+  onMounted,
   reactive,
   ref
 } from "vue";
@@ -715,13 +715,6 @@ import {
 import {
   API_URL
 } from "../../config/api";
-
-import {
-  onMounted,
-  reactive,
-  ref
-} from "vue";
-
 
 // ============================================
 // ROUTER
