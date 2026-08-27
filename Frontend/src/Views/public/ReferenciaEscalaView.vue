@@ -137,7 +137,7 @@
             <input
               v-model="folio"
               type="text"
-              placeholder="Ej. ESCALA-2026-0001" 
+              placeholder="Ej. 00040001" 
               maxlength="50"
               autocomplete="off"
               @keyup.enter="buscarReferencia"
