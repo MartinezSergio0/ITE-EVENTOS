@@ -86,13 +86,27 @@ export class InscripcionesService {
     });
   }
 
-  async buscarPorDatos(eventoId: number, correo: string, control: string) {
-    const participante = await this.prisma.participantes.findFirst({
-      where: { evento: eventoId, correo_electronico: correo, matricula: control },
-    });
-    if (!participante) throw new NotFoundException('No se encontró un registro con esos datos.');
-    return participante;
+  async buscarPorFolio(eventoId: number, folio: string) {
+  const participante = await this.prisma.participantes.findFirst({
+    where: { evento: eventoId, folio },
+    include: { tipo_participante: true },
+  });
+
+  if (!participante) {
+    throw new NotFoundException('No se encontró una inscripción con ese folio.');
   }
+
+  return {
+    folio: participante.folio,
+    referencia_bancaria: participante.referencia_bancaria,
+    nombre_completo: participante.nombre,
+    control: participante.matricula,
+    institucion: participante.institucion,
+    tipo_participacion: participante.tipo_participante?.nombre ?? '',
+    correo: participante.correo_electronico,
+    whatsapp: participante.telefono,
+  };
+}
 
   async buscarPorReferencia(referencia: string) {
     return this.prisma.participantes.findUnique({ where: { referencia_bancaria: referencia } });

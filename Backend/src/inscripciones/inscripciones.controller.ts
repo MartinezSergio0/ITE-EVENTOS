@@ -23,12 +23,11 @@ export class InscripcionesController {
   }
 
   @Get('buscar')
-  buscarPorDatos(
+  buscarPorFolio(
     @Param('eventoId', ParseIntPipe) eventoId: number,
-    @Query('correo') correo: string,
-    @Query('control') control: string,
+    @Query('folio') folio: string,
   ) {
-    return this.service.buscarPorDatos(eventoId, correo, control);
+    return this.service.buscarPorFolio(eventoId, folio);
   }
 
   @Post('comprobante')

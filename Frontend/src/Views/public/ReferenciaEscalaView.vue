@@ -169,7 +169,7 @@
             </span>
 
             <strong>
-              $1,000 MXN
+              ${{ montoEsperado }} MXN
             </strong>
 
             <p>
@@ -472,7 +472,7 @@
               </h3>
 
               <div class="amount">
-                $1,000 MXN
+                ${{ montoEsperado }} MXN
               </div>
 
             </div>
@@ -574,7 +574,7 @@
 
               <li>
                 Realiza el depósito o transferencia por
-                <strong>$1,000 MXN</strong>.
+                <strong>${{ montoEsperado }} MXN</strong>.
               </li>
 
               <li>
@@ -716,6 +716,12 @@ import {
   API_URL
 } from "../../config/api";
 
+import {
+  onMounted,
+  reactive,
+  ref
+} from "vue";
+
 
 // ============================================
 // ROUTER
@@ -738,6 +744,7 @@ const error = ref("");
 
 const cargando = ref(false);
 
+const montoEsperado = ref(0);
 
 // ============================================
 // AÑO
@@ -766,6 +773,25 @@ const datosParticipante = reactive({
 
 });
 
+//
+// CARGAR COSTO
+//
+onMounted(async () => {
+
+  try {
+
+    const response = await fetch(`${API_URL}/eventos/4`);
+
+    if (response.ok) {
+      const data = await response.json();
+      montoEsperado.value = data.costoNumero ?? 0;
+    }
+
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
+  }
+
+});
 
 // ============================================
 // BUSCAR REFERENCIA POR FOLIO
