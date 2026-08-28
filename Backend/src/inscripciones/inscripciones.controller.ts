@@ -1,13 +1,30 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards,UploadedFile, UseInterceptors, BadRequestException, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Patch,
+  Query,
+  UseGuards,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { InscripcionesService } from './inscripciones.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { SubirComprobanteDto } from './dto/subir-comprobante.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('eventos/:eventoId/inscripciones')
 export class InscripcionesController {
   constructor(private readonly service: InscripcionesService) {}
+
+  // =====================================================
+  // PUBLICO — registro y consulta participante
+  // =====================================================
 
   @Post()
   crear(
@@ -17,17 +34,17 @@ export class InscripcionesController {
     return this.service.crear(dto, eventoId);
   }
 
-  @Get('referencia/:referencia')
-  buscarPorReferencia(@Param('referencia') referencia: string) {
-    return this.service.buscarPorReferencia(referencia);
-  }
-
   @Get('buscar')
   buscarPorFolio(
     @Param('eventoId', ParseIntPipe) eventoId: number,
     @Query('folio') folio: string,
   ) {
     return this.service.buscarPorFolio(eventoId, folio);
+  }
+
+  @Get('referencia/:referencia')
+  buscarPorReferencia(@Param('referencia') referencia: string) {
+    return this.service.buscarPorReferencia(referencia);
   }
 
   @Post('comprobante')
@@ -52,6 +69,17 @@ export class InscripcionesController {
 
     return this.service.subirComprobante(eventoId, dto, file);
   }
+
+  // =====================================================
+  // ADMIN — (AuthGuard)
+  // =====================================================
+
+  @UseGuards(AuthGuard)
+  @Get('admin/participantes')
+  listarParticipantes(@Param('eventoId', ParseIntPipe) eventoId: number) {
+    return this.service.listarParticipantes(eventoId);
+  }
+
   @UseGuards(AuthGuard)
   @Patch('admin/:folio/aprobar')
   aprobarPago(
