@@ -196,7 +196,7 @@
               </span>
 
               <strong>
-                $1,000 MXN
+                {{ eventInfo.cost }}
               </strong>
 
             </div>
@@ -225,63 +225,30 @@
 
             <!-- EXISTE COMPROBANTE -->
 
-            <template v-if="participant.receipt">
-
-              <!-- IMAGEN -->
-
-              <img
-                v-if="
-                  participant.receipt.type &&
-                  participant.receipt.type.startsWith('image/')
-                "
-                :src="participant.receipt.data"
-                class="receipt-image"
-                alt="Comprobante de pago"
-              >
-
-
-              <!-- PDF -->
+            <template v-if="participant.receiptUrl">
 
               <iframe
-                v-else-if="
-                  participant.receipt.type === 'application/pdf'
-                "
-                :src="participant.receipt.data"
+                v-if="participant.receiptUrl.includes('.pdf')"
+                :src="participant.receiptUrl"
                 class="receipt-pdf"
                 title="Comprobante PDF"
               ></iframe>
 
-
-              <!-- OTRO ARCHIVO -->
-
-              <div
+              <img
                 v-else
-                class="file-icon"
+                :src="participant.receiptUrl"
+                class="receipt-image"
+                alt="Comprobante de pago"
               >
-                📄
-              </div>
 
             </template>
-
-
-            <!-- NO EXISTE COMPROBANTE -->
 
             <template v-else>
 
               <div class="no-file">
-
-                <span>
-                  📄
-                </span>
-
-                <strong>
-                  No hay archivo
-                </strong>
-
-                <small>
-                  El participante aún no ha subido su comprobante.
-                </small>
-
+                <span>📄</span>
+                <strong>No hay archivo</strong>
+                <small>El participante aún no ha subido su comprobante.</small>
               </div>
 
             </template>
@@ -316,7 +283,7 @@
             <!-- DESCARGAR -->
 
             <button
-              v-if="participant.receipt"
+              v-if="participant.receiptUrl"
               class="view"
               @click="downloadReceipt(participant)"
             >
@@ -529,7 +496,7 @@
           <!-- VER COMPROBANTE -->
 
           <button
-            v-if="participant.receipt"
+            v-if="participant.receiptUrl"
             class="history-button"
             @click="downloadReceipt(participant)"
           >
@@ -573,234 +540,157 @@
 
 <script setup>
 
-import {
-  ref,
-  computed,
-  onMounted
-} from "vue";
+  import { ref, computed, onMounted } from "vue";
+  import { useRouter } from "vue-router";
+  import { API_URL } from "../../config/api";
 
+  const router = useRouter();
 
-/* =========================================
-   STORAGE
-========================================= */
+  const participants = ref([]);
+  const eventInfo = ref({ cost: "" });
 
-const STORAGE_KEY = "escala_participants";
+  async function loadParticipants() {
 
+    try {
 
-/* =========================================
-   PARTICIPANTES
-========================================= */
+      const token = localStorage.getItem("token");
 
-const participants = ref([]);
+      const response = await fetch(`${API_URL}/eventos/4/inscripciones/admin/participantes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
+      if (response.status === 401) {
+        router.push("/login");
+        return;
+      }
 
-/* =========================================
-   CARGAR DATOS
-========================================= */
+      if (response.ok) {
+        participants.value = await response.json();
+      }
 
-function loadParticipants() {
-
-  try {
-
-    const saved =
-      localStorage.getItem(STORAGE_KEY);
-
-    participants.value =
-      saved
-        ? JSON.parse(saved)
-        : [];
-
-  } catch (error) {
-
-    console.error(
-      "Error al cargar participantes:",
-      error
-    );
-
-    participants.value = [];
+    } catch (error) {
+      console.error("Error al cargar participantes:", error);
+      participants.value = [];
+    }
 
   }
 
-}
+  async function loadEvento() {
 
+    try {
 
-/* =========================================
-   COMPROBANTES PENDIENTES
-========================================= */
+      const response = await fetch(`${API_URL}/eventos/4`);
 
-const pending = computed(() => {
+      if (response.ok) {
+        const data = await response.json();
+        eventInfo.value.cost = data.cost;
+      }
 
-  return participants.value.filter(
-    participant =>
-      participant.payment === "pending"
-  );
-
-});
-
-
-/* =========================================
-   APROBADOS
-========================================= */
-
-const approved = computed(() => {
-
-  return participants.value.filter(
-    participant =>
-      participant.payment === "approved"
-  ).length;
-
-});
-
-
-/* =========================================
-   RECHAZADOS
-========================================= */
-
-const rejected = computed(() => {
-
-  return participants.value.filter(
-    participant =>
-      participant.payment === "rejected"
-  ).length;
-
-});
-
-
-/* =========================================
-   HISTORIAL
-========================================= */
-
-const history = computed(() => {
-
-  return participants.value.filter(
-    participant =>
-      participant.payment === "approved" ||
-      participant.payment === "rejected"
-  );
-
-});
-
-
-/* =========================================
-   GUARDAR
-========================================= */
-
-function save() {
-
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(participants.value)
-  );
-
-}
-
-
-/* =========================================
-   APROBAR
-========================================= */
-
-function approve(participant) {
-
-  participant.payment = "approved";
-
-  save();
-
-  alert(
-    `Pago aprobado correctamente para ${participant.name}.`
-  );
-
-}
-
-
-/* =========================================
-   RECHAZAR
-========================================= */
-
-function reject(participant) {
-
-  participant.payment = "rejected";
-
-  save();
-
-  alert(
-    `Comprobante rechazado para ${participant.name}.`
-  );
-
-}
-
-
-/* =========================================
-   DESCARGAR COMPROBANTE
-========================================= */
-
-function downloadReceipt(participant) {
-
-  if (
-    !participant.receipt ||
-    !participant.receipt.data
-  ) {
-
-    alert(
-      "Este participante no tiene un comprobante disponible."
-    );
-
-    return;
+    } catch (error) {
+      console.error("Error al cargar el evento:", error);
+    }
 
   }
 
+  const pending = computed(() => {
+    return participants.value.filter(p => p.payment === "pending" || p.payment === "in_review");
+  });
 
-  const link =
-    document.createElement("a");
+  const approved = computed(() => {
+    return participants.value.filter(p => p.payment === "approved").length;
+  });
 
+  const rejected = computed(() => {
+    return participants.value.filter(p => p.payment === "rejected").length;
+  });
 
-  link.href =
-    participant.receipt.data;
+  const history = computed(() => {
+    return participants.value.filter(p => p.payment === "approved" || p.payment === "rejected");
+  });
 
+  async function approve(participant) {
 
-  link.download =
-    participant.receipt.name ||
-    "comprobante";
+    try {
 
+      const token = localStorage.getItem("token");
 
-  document.body.appendChild(link);
+      const response = await fetch(
+        `${API_URL}/eventos/4/inscripciones/admin/${participant.id}/aprobar`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error("No se pudo aprobar el pago.");
+      }
 
-  link.click();
+      participant.payment = "approved";
 
+      alert(`Pago aprobado correctamente para ${participant.name}.`);
 
-  document.body.removeChild(link);
+    } catch (error) {
+      console.error(error);
+      alert("Ocurrió un error al aprobar el pago.");
+    }
 
-}
+  }
 
+  async function reject(participant) {
 
-/* =========================================
-   INICIALES
-========================================= */
+    try {
 
-function initials(name = "") {
+      const token = localStorage.getItem("token");
 
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(
-      word => word.charAt(0)
-    )
-    .join("")
-    .toUpperCase();
+      const response = await fetch(
+        `${API_URL}/eventos/4/inscripciones/admin/${participant.id}/rechazar`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-}
+      if (!response.ok) {
+        throw new Error("No se pudo rechazar el comprobante.");
+      }
 
+      participant.payment = "rejected";
 
-/* =========================================
-   INICIAR
-========================================= */
+      alert(`Comprobante rechazado para ${participant.name}.`);
 
-onMounted(() => {
+    } catch (error) {
+      console.error(error);
+      alert("Ocurrió un error al rechazar el comprobante.");
+    }
 
-  loadParticipants();
+  }
 
-});
+  function downloadReceipt(participant) {
+
+    if (!participant.receiptUrl) {
+      alert("Este participante no tiene un comprobante disponible.");
+      return;
+    }
+
+    window.open(participant.receiptUrl, "_blank");
+
+  }
+
+  function initials(name = "") {
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(word => word.charAt(0))
+      .join("")
+      .toUpperCase();
+  }
+
+  onMounted(async () => {
+    await loadParticipants();
+    await loadEvento();
+  });
 
 </script>
 

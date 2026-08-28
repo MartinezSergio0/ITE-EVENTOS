@@ -226,17 +226,26 @@ async subirComprobante(
       orderBy: { participante_num: 'asc' },
     });
 
-    return participantes.map((p) => this.mapParticipante(p));
+    return Promise.all(participantes.map((p) => this.mapParticipante(p)));
   }
 
-  private mapParticipante(p: any) {
+  private async mapParticipante(p: any) {
     const estadoNombre = p.estado_participantes_estadoToestado?.nombre ?? '';
 
     let payment = 'pending';
     if (estadoNombre === 'Confirmado') payment = 'approved';
     else if (estadoNombre === 'Rechazada') payment = 'rejected';
+    else if (estadoNombre === 'En revisión') payment = 'in_review';
 
     const receiptName = p.comprobante_pago ? p.comprobante_pago.split('/').pop() : null;
+
+    let receiptUrl = null;
+    if (p.comprobante_pago) {
+      const { data } = await this.supabase.client.storage
+        .from('comprobantes')
+        .createSignedUrl(p.comprobante_pago, 300); // válida 5 minutos
+      receiptUrl = data?.signedUrl ?? null;
+    }
 
     return {
       id: p.folio,
@@ -248,10 +257,41 @@ async subirComprobante(
       attended: false,
       reference: p.referencia_bancaria,
       receiptName,
+      receiptUrl,
       receiptDate: p.fecha_comprobante
         ? new Date(p.fecha_comprobante).toLocaleDateString('es-MX')
         : null,
       certificate: false,
     };
+  }
+  async aprobarPago(eventoId: number, folio: string) {
+    return this.cambiarEstadoPago(eventoId, folio, 'Confirmado');
+  }
+
+  async rechazarPago(eventoId: number, folio: string) {
+    return this.cambiarEstadoPago(eventoId, folio, 'Rechazada');
+  }
+
+  private async cambiarEstadoPago(eventoId: number, folio: string, nombreEstado: string) {
+    const participante = await this.prisma.participantes.findFirst({
+      where: { evento: eventoId, folio },
+    });
+
+    if (!participante) {
+      throw new NotFoundException('Participante no encontrado.');
+    }
+
+    const estado = await this.prisma.estado.findFirst({ where: { nombre: nombreEstado } });
+
+    if (!estado) {
+      throw new NotFoundException(`No existe el estado "${nombreEstado}" en el catálogo.`);
+    }
+
+    await this.prisma.participantes.update({
+      where: { folio },
+      data: { estado: estado.id, metodo_validacion: 'manual' },
+    });
+
+    return { folio, estado: nombreEstado };
   }
 }

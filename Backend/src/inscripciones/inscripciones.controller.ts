@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards,UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards,UploadedFile, UseInterceptors, BadRequestException, Patch } from '@nestjs/common';
 import { InscripcionesService } from './inscripciones.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -53,8 +53,20 @@ export class InscripcionesController {
     return this.service.subirComprobante(eventoId, dto, file);
   }
   @UseGuards(AuthGuard)
-  @Get('admin/participantes')
-  listarParticipantes(@Param('eventoId', ParseIntPipe) eventoId: number) {
-    return this.service.listarParticipantes(eventoId);
+  @Patch('admin/:folio/aprobar')
+  aprobarPago(
+    @Param('eventoId', ParseIntPipe) eventoId: number,
+    @Param('folio') folio: string,
+  ) {
+    return this.service.aprobarPago(eventoId, folio);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('admin/:folio/rechazar')
+  rechazarPago(
+    @Param('eventoId', ParseIntPipe) eventoId: number,
+    @Param('folio') folio: string,
+  ) {
+    return this.service.rechazarPago(eventoId, folio);
   }
 }
