@@ -239,7 +239,7 @@ async subirComprobante(
 
     const receiptName = p.comprobante_pago ? p.comprobante_pago.split('/').pop() : null;
 
-    let receiptUrl = null;
+    let receiptUrl: string |null = null;
     if (p.comprobante_pago) {
       const { data } = await this.supabase.client.storage
         .from('comprobantes')
