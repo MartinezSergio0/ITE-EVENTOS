@@ -1,215 +1,254 @@
 <template>
-  <div class="page">
 
-    <!-- =========================================
-         ENCABEZADO
-    ========================================== -->
+  <!-- =====================================================
+       CONTENEDOR PRINCIPAL
+  ====================================================== -->
 
-    <div class="header">
+  <div class="admin-layout">
 
-      <div>
-        <span class="event-label">
-          CONGRESO ESCALA
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+      class="sidebar"
+      :class="{ open: sidebarOpen }"
+    >
+
+      <!-- LOGO -->
+
+      <div class="sidebar-header">
+
+        <div class="logo">
+          ES
+        </div>
+
+        <div class="logo-info">
+          <strong>ESCALA</strong>
+          <span>Administrador</span>
+        </div>
+
+      </div>
+
+
+      <!-- PERFIL -->
+
+      <div class="profile">
+
+        <div class="profile-avatar">
+          AE
+        </div>
+
+        <div class="profile-info">
+          <strong>Administrador</strong>
+          <span>Congreso ESCALA</span>
+        </div>
+
+      </div>
+
+
+      <!-- MENU -->
+
+      <nav class="menu">
+
+        <span class="menu-label">
+          PRINCIPAL
         </span>
 
-        <h1>
-          Comprobantes de pago
-        </h1>
 
-        <p>
-          Revisa y valida los comprobantes enviados por los participantes.
-        </p>
-      </div>
+        <!-- DASHBOARD -->
 
-      <div class="counter">
-        {{ pending.length }} pendientes
-      </div>
-
-    </div>
+        <button
+          :class="{ active: currentSection === 'dashboard' }"
+          @click="changeSection('dashboard')"
+        >
+          <span class="menu-icon">📊</span>
+          <span>Dashboard</span>
+        </button>
 
 
-    <!-- =========================================
-         TARJETAS DE ESTADOS
-    ========================================== -->
+        <!-- PARTICIPANTES -->
 
-    <div class="status-grid">
-
-      <!-- APROBADOS -->
-      <div class="status-card green">
-
-        <div class="status-icon">
-          ✓
-        </div>
-
-        <div>
-          <small>
-            Aprobados
-          </small>
-
-          <strong>
-            {{ approved }}
-          </strong>
-        </div>
-
-      </div>
-
-
-      <!-- PENDIENTES -->
-      <div class="status-card orange">
-
-        <div class="status-icon">
-          ⏳
-        </div>
-
-        <div>
-          <small>
-            Pendientes
-          </small>
-
-          <strong>
-            {{ pending.length }}
-          </strong>
-        </div>
-
-      </div>
-
-
-      <!-- RECHAZADOS -->
-      <div class="status-card red">
-
-        <div class="status-icon">
-          ✕
-        </div>
-
-        <div>
-          <small>
-            Rechazados
-          </small>
-
-          <strong>
-            {{ rejected }}
-          </strong>
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- =========================================
-         SECCIÓN DE PENDIENTES
-    ========================================== -->
-
-    <section class="pending-section">
-
-      <!-- TÍTULO -->
-
-      <div class="section-header">
-
-        <div>
-
-          <span class="section-label">
-            VALIDACIÓN
-          </span>
-
-          <h2>
-            Comprobantes pendientes
-          </h2>
-
-          <p>
-            Revisa los comprobantes antes de aprobar o rechazar el pago.
-          </p>
-
-        </div>
-
-        <div class="section-number">
-          {{ pending.length }}
-        </div>
-
-      </div>
-
-
-      <!-- =========================================
-           LISTA DE COMPROBANTES
-      ========================================== -->
-
-      <div
-        v-if="pending.length > 0"
-        class="receipt-grid"
-      >
-
-        <div
-          v-for="participant in pending"
-          :key="participant.id"
-          class="receipt-card"
+        <button
+          :class="{ active: currentSection === 'participantes' }"
+          @click="changeSection('participantes')"
         >
 
-          <!-- =====================================
-               DATOS DEL PARTICIPANTE
-          ====================================== -->
+          <span class="menu-icon">
+            👥
+          </span>
 
-          <div class="receipt-header">
+          <span class="menu-text">
+            Participantes
+          </span>
 
-            <div class="avatar">
-              {{ initials(participant.name) }}
+          <b class="menu-count">
+            {{ participants.length }}
+          </b>
+
+        </button>
+
+
+        <!-- COMPROBANTES -->
+
+        <button
+          :class="{ active: currentSection === 'comprobantes' }"
+          @click="changeSection('comprobantes')"
+        >
+
+          <span class="menu-icon">
+            💳
+          </span>
+
+          <span class="menu-text">
+            Comprobantes
+          </span>
+
+          <b
+            v-if="pendingReceipts > 0"
+            class="menu-alert"
+          >
+            {{ pendingReceipts }}
+          </b>
+
+        </button>
+
+
+        <!-- EVENTO -->
+
+        <span class="menu-label event-menu-label">
+          EVENTO
+        </span>
+
+
+        <!-- CONSTANCIAS -->
+
+        <button
+          :class="{ active: currentSection === 'constancias' }"
+          @click="changeSection('constancias')"
+        >
+
+          <span class="menu-icon">
+            🎓
+          </span>
+
+          <span>
+            Constancias
+          </span>
+
+        </button>
+
+      </nav>
+
+
+      <!-- PARTE INFERIOR -->
+
+      <div class="sidebar-bottom">
+
+        <button
+          class="back-button"
+          @click="goBack"
+        >
+          ← Volver al panel
+        </button>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         CONTENIDO
+    ====================================================== -->
+
+    <main class="main-content">
+
+      <!-- BOTÓN MOBILE -->
+
+      <button
+        class="mobile-menu-button"
+        @click="sidebarOpen = !sidebarOpen"
+      >
+        ☰
+      </button>
+
+
+      <div class="page">
+
+        <!-- =========================================
+             ENCABEZADO
+        ========================================== -->
+
+        <div class="header">
+
+          <div>
+
+            <span class="event-label">
+              CONGRESO ESCALA
+            </span>
+
+            <h1>
+              Comprobantes de pago
+            </h1>
+
+            <p>
+              Revisa y valida los comprobantes enviados por los participantes.
+            </p>
+
+          </div>
+
+          <div class="counter">
+            {{ validationList.length }} pendientes
+          </div>
+
+        </div>
+
+
+        <!-- =========================================
+             TARJETAS DE ESTADOS
+        ========================================== -->
+
+        <div class="status-grid">
+
+          <!-- APROBADOS -->
+
+          <div class="status-card green">
+
+            <div class="status-icon">
+              ✓
             </div>
 
-            <div class="participant-info">
+            <div>
+
+              <small>
+                Aprobados
+              </small>
 
               <strong>
-                {{ participant.name }}
+                {{ approved }}
               </strong>
-
-              <span>
-                {{ participant.control || "Sin número de control" }}
-              </span>
 
             </div>
 
           </div>
 
 
-          <!-- =====================================
-               INFORMACIÓN DEL PAGO
-          ====================================== -->
+          <!-- EN REVISIÓN -->
 
-          <div class="data">
+          <div class="status-card blue">
+
+            <div class="status-icon">
+              🔎
+            </div>
 
             <div>
 
-              <span>
-                Referencia
-              </span>
+              <small>
+                En revisión
+              </small>
 
               <strong>
-                {{ participant.reference || "Sin referencia" }}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                Monto
-              </span>
-
-              <strong>
-                {{ eventInfo.cost }}
-              </strong>
-
-            </div>
-
-
-            <div class="email-data">
-
-              <span>
-                Correo
-              </span>
-
-              <strong>
-                {{ participant.email || "Sin correo" }}
+                {{ inReview }}
               </strong>
 
             </div>
@@ -217,480 +256,1002 @@
           </div>
 
 
-          <!-- =====================================
-               ARCHIVO DEL COMPROBANTE
-          ====================================== -->
+          <!-- PENDIENTES -->
 
-          <div class="file-area">
+          <div class="status-card orange">
 
-            <!-- EXISTE COMPROBANTE -->
+            <div class="status-icon">
+              ⏳
+            </div>
 
-            <template v-if="participant.receiptUrl">
+            <div>
 
-              <iframe
-                v-if="participant.receiptUrl.includes('.pdf')"
-                :src="participant.receiptUrl"
-                class="receipt-pdf"
-                title="Comprobante PDF"
-              ></iframe>
+              <small>
+                Pendientes
+              </small>
 
-              <img
-                v-else
-                :src="participant.receiptUrl"
-                class="receipt-image"
-                alt="Comprobante de pago"
-              >
+              <strong>
+                {{ pending.length }}
+              </strong>
 
-            </template>
+            </div>
 
-            <template v-else>
+          </div>
 
-              <div class="no-file">
-                <span>📄</span>
-                <strong>No hay archivo</strong>
-                <small>El participante aún no ha subido su comprobante.</small>
+
+          <!-- RECHAZADOS -->
+
+          <div class="status-card red">
+
+            <div class="status-icon">
+              ✕
+            </div>
+
+            <div>
+
+              <small>
+                Rechazados
+              </small>
+
+              <strong>
+                {{ rejected }}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =========================================
+             SECCIÓN DE VALIDACIÓN
+        ========================================== -->
+
+        <section class="pending-section">
+
+          <div class="section-header">
+
+            <div>
+
+              <span class="section-label">
+                VALIDACIÓN
+              </span>
+
+              <h2>
+                Comprobantes pendientes de validación
+              </h2>
+
+              <p>
+                Revisa los comprobantes antes de aprobar o rechazar el pago.
+              </p>
+
+            </div>
+
+            <div class="section-number">
+              {{ validationList.length }}
+            </div>
+
+          </div>
+
+
+          <!-- =========================================
+               LISTA DE COMPROBANTES
+          ========================================== -->
+
+          <div
+            v-if="validationList.length > 0"
+            class="receipt-grid"
+          >
+
+            <div
+              v-for="participant in validationList"
+              :key="participant.id"
+              class="receipt-card"
+            >
+
+              <!-- DATOS DEL PARTICIPANTE -->
+
+              <div class="receipt-header">
+
+                <div class="avatar">
+                  {{ initials(participant.name) }}
+                </div>
+
+                <div class="participant-info">
+
+                  <strong>
+                    {{ participant.name }}
+                  </strong>
+
+                  <span>
+                    {{ participant.control || "Sin número de control" }}
+                  </span>
+
+                </div>
+
               </div>
 
-            </template>
 
-          </div>
+              <!-- ESTADO DEL PAGO -->
 
+              <div
+                class="receipt-status"
+                :class="participant.payment"
+              >
 
-          <!-- =====================================
-               NOMBRE DEL ARCHIVO
-          ====================================== -->
+                <span v-if="participant.payment === 'pending'">
+                  ⏳
+                </span>
 
-          <div
-            v-if="participant.receipt"
-            class="file-name"
-          >
+                <span v-else-if="participant.payment === 'in_review'">
+                  🔎
+                </span>
 
-            📎
+                <strong>
+                  {{
+                    participant.payment === "pending"
+                      ? "Pendiente"
+                      : "En revisión"
+                  }}
+                </strong>
 
-            <span>
-              {{ participant.receipt.name }}
-            </span>
-
-          </div>
-
-
-          <!-- =====================================
-               BOTONES
-          ====================================== -->
-
-          <div class="actions">
-
-            <!-- DESCARGAR -->
-
-            <button
-              v-if="participant.receiptUrl"
-              class="view"
-              @click="downloadReceipt(participant)"
-            >
-              📥 Descargar comprobante
-            </button>
+              </div>
 
 
-            <!-- APROBAR -->
+              <!-- INFORMACIÓN DEL PAGO -->
 
-            <button
-              class="approve"
-              @click="approve(participant)"
-            >
-              ✓ Aprobar
-            </button>
+              <div class="data">
 
+                <div>
 
-            <!-- RECHAZAR -->
+                  <span>
+                    Referencia
+                  </span>
 
-            <button
-              class="reject"
-              @click="reject(participant)"
-            >
-              ✕ Rechazar
-            </button>
+                  <strong>
+                    {{ participant.reference || "Sin referencia" }}
+                  </strong>
 
-          </div>
-
-        </div>
-
-      </div>
+                </div>
 
 
-      <!-- =========================================
-           NO HAY PENDIENTES
-      ========================================== -->
+                <div>
 
-      <div
-        v-else
-        class="empty"
-      >
+                  <span>
+                    Monto
+                  </span>
 
-        <div class="empty-icon">
-          ✓
-        </div>
+                  <strong>
+                    {{ eventInfo.cost }}
+                  </strong>
 
-        <h2>
-          No hay comprobantes pendientes
-        </h2>
-
-        <p>
-          Todos los comprobantes han sido revisados.
-        </p>
-
-      </div>
-
-    </section>
+                </div>
 
 
+                <div class="email-data">
 
-    <!-- =========================================
-         SEPARACIÓN GRANDE ENTRE SECCIONES
-    ========================================== -->
+                  <span>
+                    Correo
+                  </span>
 
-    <div class="history-separator">
+                  <strong>
+                    {{ participant.email || "Sin correo" }}
+                  </strong>
 
-      <div class="separator-line"></div>
+                </div>
 
-      <div class="separator-icon">
-        ↓
-      </div>
-
-      <div class="separator-line"></div>
-
-    </div>
+              </div>
 
 
+              <!-- ARCHIVO DEL COMPROBANTE -->
 
-    <!-- =========================================
-         HISTORIAL
-    ========================================== -->
+              <div class="file-area">
 
-    <section class="history-section">
+                <!-- EXISTE COMPROBANTE -->
 
-      <!-- TÍTULO DEL HISTORIAL -->
+                <template v-if="participant.receiptUrl">
 
-      <div class="section-header">
+                  <iframe
+                    v-if="participant.receiptUrl.includes('.pdf')"
+                    :src="participant.receiptUrl"
+                    class="receipt-pdf"
+                    title="Comprobante PDF"
+                  ></iframe>
 
-        <div>
+                  <img
+                    v-else
+                    :src="participant.receiptUrl"
+                    class="receipt-image"
+                    alt="Comprobante de pago"
+                  >
 
-          <span class="section-label history-label">
-            HISTORIAL
-          </span>
-
-          <h2>
-            Historial de comprobantes
-          </h2>
-
-          <p>
-            Aquí aparecen los comprobantes que ya fueron aprobados o rechazados.
-          </p>
-
-        </div>
-
-        <div class="history-counter">
-          {{ history.length }} registros
-        </div>
-
-      </div>
+                </template>
 
 
-      <!-- =========================================
-           HISTORIAL CON REGISTROS
-      ========================================== -->
+                <!-- NO EXISTE COMPROBANTE -->
 
-      <div
-        v-if="history.length > 0"
-        class="history-list"
-      >
+                <template v-else>
 
-        <div
-          v-for="participant in history"
-          :key="'history-' + participant.id"
-          class="history-card"
-        >
+                  <div class="no-file">
 
-          <!-- PARTICIPANTE -->
+                    <span>
+                      📄
+                    </span>
 
-          <div class="history-person">
+                    <strong>
+                      No hay archivo
+                    </strong>
 
-            <div class="avatar">
-              {{ initials(participant.name) }}
+                    <small>
+                      El participante aún no ha subido su comprobante.
+                    </small>
+
+                  </div>
+
+                </template>
+
+              </div>
+
+
+              <!-- NOMBRE DEL ARCHIVO -->
+
+              <div
+                v-if="participant.receipt"
+                class="file-name"
+              >
+
+                📎
+
+                <span>
+                  {{ participant.receipt.name }}
+                </span>
+
+              </div>
+
+
+              <!-- BOTONES -->
+
+              <div class="actions">
+
+                <!-- DESCARGAR -->
+
+                <button
+                  v-if="participant.receiptUrl"
+                  class="view"
+                  @click="downloadReceipt(participant)"
+                >
+                  📥 Ver comprobante
+                </button>
+
+
+                <!-- APROBAR -->
+
+                <button
+                  class="approve"
+                  @click="approve(participant)"
+                >
+                  ✓ Aprobar
+                </button>
+
+
+                <!-- RECHAZAR -->
+
+                <button
+                  class="reject"
+                  @click="reject(participant)"
+                >
+                  ✕ Rechazar
+                </button>
+
+              </div>
+
             </div>
 
-            <div class="history-person-info">
+          </div>
 
-              <strong>
-                {{ participant.name }}
-              </strong>
 
-              <span>
-                {{ participant.control || "Sin número de control" }}
+          <!-- NO HAY PENDIENTES -->
+
+          <div
+            v-else
+            class="empty"
+          >
+
+            <div class="empty-icon">
+              ✓
+            </div>
+
+            <h2>
+              No hay comprobantes pendientes de validación
+            </h2>
+
+            <p>
+              Todos los comprobantes han sido revisados.
+            </p>
+
+          </div>
+
+        </section>
+
+
+
+        <!-- =========================================
+             SEPARACIÓN
+        ========================================== -->
+
+        <div class="history-separator">
+
+          <div class="separator-line"></div>
+
+          <div class="separator-icon">
+            ↓
+          </div>
+
+          <div class="separator-line"></div>
+
+        </div>
+
+
+
+        <!-- =========================================
+             HISTORIAL
+        ========================================== -->
+
+        <section class="history-section">
+
+          <div class="section-header">
+
+            <div>
+
+              <span class="section-label history-label">
+                HISTORIAL
               </span>
 
+              <h2>
+                Historial de comprobantes
+              </h2>
+
+              <p>
+                Aquí aparecen los comprobantes que ya fueron aprobados o rechazados.
+              </p>
+
+            </div>
+
+            <div class="history-counter">
+              {{ history.length }} registros
             </div>
 
           </div>
 
 
-          <!-- REFERENCIA -->
-
-          <div class="history-data">
-
-            <small>
-              Referencia
-            </small>
-
-            <strong>
-              {{ participant.reference || "Sin referencia" }}
-            </strong>
-
-          </div>
-
-
-          <!-- CORREO -->
-
-          <div class="history-data">
-
-            <small>
-              Correo
-            </small>
-
-            <strong>
-              {{ participant.email || "Sin correo" }}
-            </strong>
-
-          </div>
-
-
-          <!-- ESTADO -->
+          <!-- HISTORIAL CON REGISTROS -->
 
           <div
-            class="payment-status"
-            :class="participant.payment"
+            v-if="history.length > 0"
+            class="history-list"
           >
 
-            <span
-              v-if="participant.payment === 'approved'"
+            <div
+              v-for="participant in history"
+              :key="'history-' + participant.id"
+              class="history-card"
             >
-              ✓
-            </span>
 
-            <span
-              v-else
-            >
-              ✕
-            </span>
+              <!-- PARTICIPANTE -->
 
-            <strong>
-              {{
-                participant.payment === "approved"
-                  ? "Aprobado"
-                  : "Rechazado"
-              }}
-            </strong>
+              <div class="history-person">
+
+                <div class="avatar">
+                  {{ initials(participant.name) }}
+                </div>
+
+                <div class="history-person-info">
+
+                  <strong>
+                    {{ participant.name }}
+                  </strong>
+
+                  <span>
+                    {{ participant.control || "Sin número de control" }}
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <!-- REFERENCIA -->
+
+              <div class="history-data">
+
+                <small>
+                  Referencia
+                </small>
+
+                <strong>
+                  {{ participant.reference || "Sin referencia" }}
+                </strong>
+
+              </div>
+
+
+              <!-- CORREO -->
+
+              <div class="history-data">
+
+                <small>
+                  Correo
+                </small>
+
+                <strong>
+                  {{ participant.email || "Sin correo" }}
+                </strong>
+
+              </div>
+
+
+              <!-- ESTADO -->
+
+              <div
+                class="payment-status"
+                :class="participant.payment"
+              >
+
+                <span v-if="participant.payment === 'approved'">
+                  ✓
+                </span>
+
+                <span v-else>
+                  ✕
+                </span>
+
+                <strong>
+                  {{
+                    participant.payment === "approved"
+                      ? "Aprobado"
+                      : "Rechazado"
+                  }}
+                </strong>
+
+              </div>
+
+
+              <!-- VER COMPROBANTE -->
+
+              <button
+                v-if="participant.receiptUrl"
+                class="history-button"
+                @click="downloadReceipt(participant)"
+              >
+                📥 Ver comprobante
+              </button>
+
+            </div>
 
           </div>
 
 
-          <!-- VER COMPROBANTE -->
+          <!-- HISTORIAL VACÍO -->
 
-          <button
-            v-if="participant.receiptUrl"
-            class="history-button"
-            @click="downloadReceipt(participant)"
+          <div
+            v-else
+            class="history-empty"
           >
-            📥 Ver comprobante
-          </button>
 
-        </div>
+            <div>
+              🗂️
+            </div>
 
-      </div>
+            <h3>
+              No hay registros en el historial
+            </h3>
 
+            <p>
+              Los comprobantes aprobados o rechazados aparecerán aquí.
+            </p>
 
-      <!-- =========================================
-           HISTORIAL VACÍO
-      ========================================== -->
+          </div>
 
-      <div
-        v-else
-        class="history-empty"
-      >
-
-        <div>
-          🗂️
-        </div>
-
-        <h3>
-          No hay registros en el historial
-        </h3>
-
-        <p>
-          Los comprobantes aprobados o rechazados aparecerán aquí.
-        </p>
+        </section>
 
       </div>
 
-    </section>
+    </main>
 
   </div>
-</template>
 
+</template>
 
 
 <script setup>
 
-  import { ref, computed, onMounted } from "vue";
-  import { useRouter } from "vue-router";
-  import { API_URL } from "../../config/api";
+import {
+  ref,
+  computed,
+  onMounted
+} from "vue";
 
-  const router = useRouter();
+import {
+  useRouter,
+  useRoute
+} from "vue-router";
 
-  const participants = ref([]);
-  const eventInfo = ref({ cost: "" });
 
-  async function loadParticipants() {
+/* =========================================
+   ROUTER
+========================================= */
 
-    try {
+const router = useRouter();
+const route = useRoute();
 
-      const token = localStorage.getItem("token");
 
-      const response = await fetch(`${API_URL}/eventos/4/inscripciones/admin/participantes`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+/* =========================================
+   SIDEBAR
+========================================= */
 
-      if (response.status === 401) {
-        router.push("/login");
-        return;
+const sidebarOpen = ref(false);
+
+
+/* =========================================
+   RUTAS DEL MENU
+========================================= */
+
+const routes = {
+
+  dashboard:
+    "/admin/escala",
+
+  participantes:
+    "/admin/escala/participantes",
+
+  comprobantes:
+    "/admin/escala/comprobantes",
+
+  constancias:
+    "/admin/escala/constancias"
+
+};
+
+
+/* =========================================
+   SECCIÓN ACTUAL
+========================================= */
+
+const currentSection = computed(() => {
+
+  const currentPath = route.path;
+
+  if (currentPath === routes.dashboard) {
+    return "dashboard";
+  }
+
+  if (currentPath === routes.participantes) {
+    return "participantes";
+  }
+
+  if (currentPath === routes.comprobantes) {
+    return "comprobantes";
+  }
+
+  if (currentPath === routes.constancias) {
+    return "constancias";
+  }
+
+  return "comprobantes";
+
+});
+
+
+/* =========================================
+   CAMBIAR SECCIÓN
+========================================= */
+
+function changeSection(section) {
+
+  if (!routes[section]) {
+    return;
+  }
+
+  sidebarOpen.value = false;
+
+  router.push(routes[section]);
+
+}
+
+
+/* =========================================
+   VOLVER AL PANEL
+========================================= */
+
+function goBack() {
+
+  router.push("/admin");
+
+}
+
+
+/* =========================================
+   DATOS
+========================================= */
+
+const participants = ref([]);
+
+
+/* =========================================
+   INFORMACIÓN DEL EVENTO
+========================================= */
+
+const eventInfo = ref({
+
+  cost: "$700 MXN"
+
+});
+
+
+/* =========================================
+   CARGAR PARTICIPANTES
+========================================= */
+
+/*
+  IMPORTANTE:
+
+  Por ahora usamos información falsa para
+  probar únicamente el FRONTEND.
+
+  Cuando el backend esté listo, esta función
+  se puede volver a conectar a la API.
+*/
+
+function loadParticipants() {
+
+  participants.value = [
+
+    /* =====================================
+       PENDIENTE
+       NO HA SUBIDO COMPROBANTE
+    ====================================== */
+
+    {
+      id: 1,
+      name: "Ana López García",
+      control: "22400001",
+      email: "ana.lopez@gmail.com",
+      reference: "",
+      payment: "pending",
+      receiptUrl: null,
+      receipt: null
+    },
+
+    {
+      id: 2,
+      name: "Carlos Martínez Pérez",
+      control: "22400002",
+      email: "carlos.martinez@gmail.com",
+      reference: "",
+      payment: "pending",
+      receiptUrl: null,
+      receipt: null
+    },
+
+
+    /* =====================================
+       EN REVISIÓN
+       YA SUBIÓ COMPROBANTE
+    ====================================== */
+
+    {
+      id: 3,
+      name: "María Fernanda Torres",
+      control: "22400003",
+      email: "maria.torres@gmail.com",
+      reference: "ESC-2026-00125",
+      payment: "in_review",
+
+      receiptUrl:
+        "https://placehold.co/800x600/png?text=Comprobante+Maria+Torres",
+
+      receipt: {
+        name: "comprobante_maria_torres.png"
       }
+    },
 
-      if (response.ok) {
-        participants.value = await response.json();
+    {
+      id: 4,
+      name: "José Hernández Ramírez",
+      control: "22400004",
+      email: "jose.hernandez@gmail.com",
+      reference: "ESC-2026-00126",
+      payment: "in_review",
+
+      receiptUrl:
+        "https://placehold.co/800x600/png?text=Comprobante+Jose+Hernandez",
+
+      receipt: {
+        name: "comprobante_jose_hernandez.png"
       }
+    },
 
-    } catch (error) {
-      console.error("Error al cargar participantes:", error);
-      participants.value = [];
+    {
+      id: 5,
+      name: "Sofía Rodríguez Sánchez",
+      control: "22400005",
+      email: "sofia.rodriguez@gmail.com",
+      reference: "ESC-2026-00127",
+      payment: "in_review",
+
+      receiptUrl:
+        "https://placehold.co/800x600/png?text=Comprobante+Sofia+Rodriguez",
+
+      receipt: {
+        name: "comprobante_sofia_rodriguez.png"
+      }
+    },
+
+
+    /* =====================================
+       APROBADOS
+    ====================================== */
+
+    {
+      id: 6,
+      name: "Luis Alberto González",
+      control: "22400006",
+      email: "luis.gonzalez@gmail.com",
+      reference: "ESC-2026-00098",
+      payment: "approved",
+
+      receiptUrl:
+        "https://placehold.co/800x600/png?text=Pago+Aprobado",
+
+      receipt: {
+        name: "comprobante_luis_gonzalez.png"
+      }
+    },
+
+    {
+      id: 7,
+      name: "Valeria Jiménez Cruz",
+      control: "22400007",
+      email: "valeria.jimenez@gmail.com",
+      reference: "ESC-2026-00099",
+      payment: "approved",
+
+      receiptUrl:
+        "https://placehold.co/800x600/png?text=Pago+Aprobado",
+
+      receipt: {
+        name: "comprobante_valeria_jimenez.png"
+      }
+    },
+
+
+    /* =====================================
+       RECHAZADOS
+    ====================================== */
+
+    {
+      id: 8,
+      name: "Diego Ramírez Flores",
+      control: "22400008",
+      email: "diego.ramirez@gmail.com",
+      reference: "ESC-2026-00075",
+      payment: "rejected",
+
+      receiptUrl:
+        "https://placehold.co/800x600/png?text=Pago+Rechazado",
+
+      receipt: {
+        name: "comprobante_diego_ramirez.png"
+      }
+    },
+
+    {
+      id: 9,
+      name: "Andrea Morales Ruiz",
+      control: "22400009",
+      email: "andrea.morales@gmail.com",
+      reference: "ESC-2026-00076",
+      payment: "rejected",
+
+      receiptUrl:
+        "https://placehold.co/800x600/png?text=Pago+Rechazado",
+
+      receipt: {
+        name: "comprobante_andrea_morales.png"
+      }
     }
 
+  ];
+
+}
+
+
+/* =========================================
+   PENDIENTES
+   NO HA SUBIDO COMPROBANTE
+========================================= */
+
+const pending = computed(() => {
+
+  return participants.value.filter(
+    p => p.payment === "pending"
+  );
+
+});
+
+
+/* =========================================
+   PENDIENTES PARA SIDEBAR
+========================================= */
+
+const pendingReceipts = computed(() => {
+
+  return pending.value.length;
+
+});
+
+
+/* =========================================
+   EN REVISIÓN
+========================================= */
+
+const inReviewParticipants = computed(() => {
+
+  return participants.value.filter(
+    p => p.payment === "in_review"
+  );
+
+});
+
+
+const inReview = computed(() => {
+
+  return inReviewParticipants.value.length;
+
+});
+
+
+/* =========================================
+   LISTA PARA VALIDACIÓN
+========================================= */
+
+const validationList = computed(() => {
+
+  return participants.value.filter(
+    p =>
+      p.payment === "pending" ||
+      p.payment === "in_review"
+  );
+
+});
+
+
+/* =========================================
+   APROBADOS
+========================================= */
+
+const approved = computed(() => {
+
+  return participants.value.filter(
+    p => p.payment === "approved"
+  ).length;
+
+});
+
+
+/* =========================================
+   RECHAZADOS
+========================================= */
+
+const rejected = computed(() => {
+
+  return participants.value.filter(
+    p => p.payment === "rejected"
+  ).length;
+
+});
+
+
+/* =========================================
+   HISTORIAL
+========================================= */
+
+const history = computed(() => {
+
+  return participants.value.filter(
+    p =>
+      p.payment === "approved" ||
+      p.payment === "rejected"
+  );
+
+});
+
+
+/* =========================================
+   APROBAR
+========================================= */
+
+function approve(participant) {
+
+  participant.payment = "approved";
+
+  alert(
+    `Pago aprobado correctamente para ${participant.name}.`
+  );
+
+}
+
+
+/* =========================================
+   RECHAZAR
+========================================= */
+
+function reject(participant) {
+
+  participant.payment = "rejected";
+
+  alert(
+    `Comprobante rechazado para ${participant.name}.`
+  );
+
+}
+
+
+/* =========================================
+   DESCARGAR / VER COMPROBANTE
+========================================= */
+
+function downloadReceipt(participant) {
+
+  if (!participant.receiptUrl) {
+
+    alert(
+      "Este participante no tiene un comprobante disponible."
+    );
+
+    return;
+
   }
 
-  async function loadEvento() {
 
-    try {
+  window.open(
+    participant.receiptUrl,
+    "_blank"
+  );
 
-      const response = await fetch(`${API_URL}/eventos/4`);
+}
 
-      if (response.ok) {
-        const data = await response.json();
-        eventInfo.value.cost = data.cost;
-      }
 
-    } catch (error) {
-      console.error("Error al cargar el evento:", error);
-    }
+/* =========================================
+   INICIALES
+========================================= */
 
-  }
+function initials(name = "") {
 
-  const pending = computed(() => {
-    return participants.value.filter(p => p.payment === "pending" || p.payment === "in_review");
-  });
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word =>
+      word.charAt(0)
+    )
+    .join("")
+    .toUpperCase();
 
-  const approved = computed(() => {
-    return participants.value.filter(p => p.payment === "approved").length;
-  });
+}
 
-  const rejected = computed(() => {
-    return participants.value.filter(p => p.payment === "rejected").length;
-  });
 
-  const history = computed(() => {
-    return participants.value.filter(p => p.payment === "approved" || p.payment === "rejected");
-  });
+/* =========================================
+   INICIO
+========================================= */
 
-  async function approve(participant) {
+onMounted(() => {
 
-    try {
+  loadParticipants();
 
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        `${API_URL}/eventos/4/inscripciones/admin/${participant.id}/aprobar`,
-        {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("No se pudo aprobar el pago.");
-      }
-
-      participant.payment = "approved";
-
-      alert(`Pago aprobado correctamente para ${participant.name}.`);
-
-    } catch (error) {
-      console.error(error);
-      alert("Ocurrió un error al aprobar el pago.");
-    }
-
-  }
-
-  async function reject(participant) {
-
-    try {
-
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        `${API_URL}/eventos/4/inscripciones/admin/${participant.id}/rechazar`,
-        {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("No se pudo rechazar el comprobante.");
-      }
-
-      participant.payment = "rejected";
-
-      alert(`Comprobante rechazado para ${participant.name}.`);
-
-    } catch (error) {
-      console.error(error);
-      alert("Ocurrió un error al rechazar el comprobante.");
-    }
-
-  }
-
-  function downloadReceipt(participant) {
-
-    if (!participant.receiptUrl) {
-      alert("Este participante no tiene un comprobante disponible.");
-      return;
-    }
-
-    window.open(participant.receiptUrl, "_blank");
-
-  }
-
-  function initials(name = "") {
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(word => word.charAt(0))
-      .join("")
-      .toUpperCase();
-  }
-
-  onMounted(async () => {
-    await loadParticipants();
-    await loadEvento();
-  });
+});
 
 </script>
 
@@ -698,9 +1259,446 @@
 
 <style scoped>
 
-/* =========================================
-   PÁGINA
-========================================= */
+/* =====================================================
+   LAYOUT GENERAL
+===================================================== */
+
+.admin-layout {
+
+  display: flex;
+
+  min-height: 100vh;
+
+  background: #f4f7fb;
+
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar {
+
+  width: 245px;
+
+  min-width: 245px;
+
+  height: 100vh;
+
+  position: fixed;
+
+  left: 0;
+
+  top: 0;
+
+  z-index: 1000;
+
+  display: flex;
+
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border-right: 1px solid #e7edf2;
+
+  box-shadow:
+    5px 0 20px rgba(0, 0, 0, .04);
+
+}
+
+
+/* =====================================================
+   HEADER DEL SIDEBAR
+===================================================== */
+
+.sidebar-header {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 24px 20px;
+
+  border-bottom: 1px solid #edf2f6;
+
+}
+
+
+.logo {
+
+  width: 42px;
+
+  height: 42px;
+
+  border-radius: 12px;
+
+  background: #0066b3;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-weight: 800;
+
+  font-size: 14px;
+
+  box-shadow:
+    0 5px 15px rgba(0, 102, 179, .20);
+
+}
+
+
+.logo-info {
+
+  display: flex;
+
+  flex-direction: column;
+
+}
+
+
+.logo-info strong {
+
+  color: #003366;
+
+  font-size: 15px;
+
+  letter-spacing: 1px;
+
+}
+
+
+.logo-info span {
+
+  color: #90a4ae;
+
+  font-size: 10px;
+
+  margin-top: 2px;
+
+}
+
+
+/* =====================================================
+   PERFIL
+===================================================== */
+
+.profile {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 20px;
+
+  margin: 10px;
+
+  background: #f5f9fc;
+
+  border-radius: 12px;
+
+}
+
+
+.profile-avatar {
+
+  width: 38px;
+
+  height: 38px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #e3f2fd;
+
+  color: #0066b3;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+}
+
+
+.profile-info {
+
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+
+}
+
+
+.profile-info strong {
+
+  color: #263238;
+
+  font-size: 12px;
+
+}
+
+
+.profile-info span {
+
+  color: #90a4ae;
+
+  font-size: 9px;
+
+  margin-top: 3px;
+
+}
+
+
+/* =====================================================
+   MENU
+===================================================== */
+
+.menu {
+
+  display: flex;
+
+  flex-direction: column;
+
+  padding: 10px;
+
+  gap: 5px;
+
+}
+
+
+.menu-label {
+
+  color: #90a4ae;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+
+  padding: 12px 12px 7px;
+
+}
+
+
+.event-menu-label {
+
+  margin-top: 12px;
+
+}
+
+
+.menu button {
+
+  width: 100%;
+
+  border: none;
+
+  background: transparent;
+
+  color: #607d8b;
+
+  padding: 12px;
+
+  border-radius: 9px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  transition: .2s;
+
+}
+
+
+.menu button:hover {
+
+  background: #f1f7fb;
+
+  color: #0066b3;
+
+}
+
+
+.menu button.active {
+
+  background: #e3f2fd;
+
+  color: #0066b3;
+
+  font-weight: 700;
+
+}
+
+
+.menu-icon {
+
+  width: 20px;
+
+  text-align: center;
+
+  font-size: 15px;
+
+}
+
+
+.menu-text {
+
+  flex: 1;
+
+}
+
+
+.menu-count {
+
+  min-width: 22px;
+
+  height: 22px;
+
+  padding: 0 5px;
+
+  border-radius: 20px;
+
+  background: #edf2f6;
+
+  color: #607d8b;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 9px;
+
+}
+
+
+.menu button.active .menu-count {
+
+  background: white;
+
+  color: #0066b3;
+
+}
+
+
+.menu-alert {
+
+  min-width: 22px;
+
+  height: 22px;
+
+  padding: 0 5px;
+
+  border-radius: 20px;
+
+  background: #fff3e0;
+
+  color: #ef6c00;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 9px;
+
+}
+
+
+/* =====================================================
+   PARTE INFERIOR
+===================================================== */
+
+.sidebar-bottom {
+
+  margin-top: auto;
+
+  padding: 15px;
+
+  border-top: 1px solid #edf2f6;
+
+}
+
+
+.back-button {
+
+  width: 100%;
+
+  border: none;
+
+  background: #f5f7fa;
+
+  color: #607d8b;
+
+  padding: 11px;
+
+  border-radius: 9px;
+
+  cursor: pointer;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  transition: .2s;
+
+}
+
+
+.back-button:hover {
+
+  background: #e3f2fd;
+
+  color: #0066b3;
+
+}
+
+
+/* =====================================================
+   CONTENIDO
+===================================================== */
+
+.main-content {
+
+  width: calc(100% - 245px);
+
+  margin-left: 245px;
+
+  min-height: 100vh;
+
+}
+
 
 .page {
 
@@ -708,15 +1706,26 @@
 
   background: #f4f7fb;
 
-  min-height: calc(100vh - 80px);
+  min-height: 100vh;
+
+}
+
+
+/* =====================================================
+   BOTÓN MOBILE
+===================================================== */
+
+.mobile-menu-button {
+
+  display: none;
 
 }
 
 
 
-/* =========================================
+/* =====================================================
    ENCABEZADO
-========================================= */
+===================================================== */
 
 .header {
 
@@ -783,17 +1792,16 @@
 }
 
 
-
-/* =========================================
+/* =====================================================
    ESTADOS
-========================================= */
+===================================================== */
 
 .status-grid {
 
   display: grid;
 
   grid-template-columns:
-    repeat(3, 1fr);
+    repeat(4, 1fr);
 
   gap: 20px;
 
@@ -892,10 +1900,18 @@
 }
 
 
+.blue .status-icon {
 
-/* =========================================
+  background: #e3f2fd;
+
+  color: #1565c0;
+
+}
+
+
+/* =====================================================
    SECCIÓN
-========================================= */
+===================================================== */
 
 .pending-section {
 
@@ -986,10 +2002,9 @@
 }
 
 
-
-/* =========================================
+/* =====================================================
    COMPROBANTES
-========================================= */
+===================================================== */
 
 .receipt-grid {
 
@@ -1000,12 +2015,7 @@
 
   gap: 20px;
 
-  /*
-    ESPACIO GRANDE ENTRE LOS
-    COMPROBANTES Y EL SEPARADOR
-  */
-
-  margin-bottom: 300px;
+  margin-bottom: 100px;
 
 }
 
@@ -1024,10 +2034,9 @@
 }
 
 
-
-/* =========================================
+/* =====================================================
    PARTICIPANTE
-========================================= */
+===================================================== */
 
 .receipt-header {
 
@@ -1037,7 +2046,7 @@
 
   align-items: center;
 
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 
 }
 
@@ -1098,10 +2107,52 @@
 }
 
 
+/* =====================================================
+   ESTADO
+===================================================== */
 
-/* =========================================
+.receipt-status {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  margin-bottom: 15px;
+
+}
+
+
+.receipt-status.pending {
+
+  background: #fff3e0;
+
+  color: #ef6c00;
+
+}
+
+
+.receipt-status.in_review {
+
+  background: #e3f2fd;
+
+  color: #1565c0;
+
+}
+
+
+/* =====================================================
    DATOS
-========================================= */
+===================================================== */
 
 .data {
 
@@ -1159,10 +2210,9 @@
 }
 
 
-
-/* =========================================
-   ÁREA DEL ARCHIVO
-========================================= */
+/* =====================================================
+   ARCHIVO
+===================================================== */
 
 .file-area {
 
@@ -1202,12 +2252,6 @@
 
   border: none;
 
-}
-
-
-.file-icon {
-
-  font-size: 55px;
 
 }
 
@@ -1252,10 +2296,9 @@
 }
 
 
-
-/* =========================================
+/* =====================================================
    NOMBRE DEL ARCHIVO
-========================================= */
+===================================================== */
 
 .file-name {
 
@@ -1280,10 +2323,9 @@
 }
 
 
-
-/* =========================================
+/* =====================================================
    BOTONES
-========================================= */
+===================================================== */
 
 .actions {
 
@@ -1352,10 +2394,9 @@
 }
 
 
-
-/* =========================================
+/* =====================================================
    VACÍO
-========================================= */
+===================================================== */
 
 .empty {
 
@@ -1400,10 +2441,9 @@
 }
 
 
-
-/* =========================================
-   SEPARADOR GRANDE
-========================================= */
+/* =====================================================
+   SEPARADOR
+===================================================== */
 
 .history-separator {
 
@@ -1413,19 +2453,9 @@
 
   gap: 15px;
 
-  /*
-    ESPACIO SUPERIOR
-    DESPUÉS DE LOS COMPROBANTES
-  */
-
   margin-top: 40px;
 
-  /*
-    ESPACIO INFERIOR
-    ANTES DEL HISTORIAL
-  */
-
-  margin-bottom: 500px;
+  margin-bottom: 80px;
 
 }
 
@@ -1466,10 +2496,9 @@
 }
 
 
-
-/* =========================================
+/* =====================================================
    HISTORIAL
-========================================= */
+===================================================== */
 
 .history-section {
 
@@ -1496,11 +2525,6 @@
 
 }
 
-
-
-/* =========================================
-   LISTA DEL HISTORIAL
-========================================= */
 
 .history-list {
 
@@ -1606,10 +2630,9 @@
 }
 
 
-
-/* =========================================
-   ESTADO DEL PAGO
-========================================= */
+/* =====================================================
+   ESTADO HISTORIAL
+===================================================== */
 
 .payment-status {
 
@@ -1655,10 +2678,9 @@
 }
 
 
-
-/* =========================================
-   BOTÓN DEL HISTORIAL
-========================================= */
+/* =====================================================
+   BOTÓN HISTORIAL
+===================================================== */
 
 .history-button {
 
@@ -1688,10 +2710,9 @@
 }
 
 
-
-/* =========================================
+/* =====================================================
    HISTORIAL VACÍO
-========================================= */
+===================================================== */
 
 .history-empty {
 
@@ -1737,12 +2758,19 @@
 }
 
 
-
-/* =========================================
-   RESPONSIVE
-========================================= */
+/* =====================================================
+   RESPONSIVE TABLET
+===================================================== */
 
 @media (max-width: 1200px) {
+
+  .status-grid {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+  }
+
 
   .receipt-grid {
 
@@ -1762,11 +2790,78 @@
 }
 
 
+/* =====================================================
+   RESPONSIVE MOBILE
+===================================================== */
+
 @media (max-width: 750px) {
+
+  .sidebar {
+
+    transform: translateX(-100%);
+
+    transition: transform .25s ease;
+
+  }
+
+
+  .sidebar.open {
+
+    transform: translateX(0);
+
+  }
+
+
+  .main-content {
+
+    width: 100%;
+
+    margin-left: 0;
+
+  }
+
+
+  .mobile-menu-button {
+
+    display: flex;
+
+    position: fixed;
+
+    top: 15px;
+
+    left: 15px;
+
+    z-index: 900;
+
+    width: 42px;
+
+    height: 42px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: white;
+
+    color: #0066b3;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 20px;
+
+    box-shadow:
+      0 4px 15px rgba(0, 0, 0, .10);
+
+    cursor: pointer;
+
+  }
+
 
   .page {
 
-    padding: 20px 15px;
+    padding: 75px 15px 20px;
 
   }
 
@@ -1784,20 +2879,16 @@
 
   .status-grid {
 
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
   }
 
 
   .receipt-grid {
 
-    grid-template-columns: 1fr;
-
-    /*
-      En celular reducimos un poco
-      el espacio para no hacer
-      demasiado larga la página.
-    */
+    grid-template-columns:
+      1fr;
 
     margin-bottom: 70px;
 
@@ -1831,7 +2922,8 @@
 
   .history-card {
 
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
   }
 
@@ -1852,3 +2944,4 @@
 }
 
 </style>
+

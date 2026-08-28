@@ -77,10 +77,10 @@
           Comprobantes
 
           <b
-            v-if="pendingReceipts > 0"
+            v-if="reviewPendingCount > 0"
             class="menu-alert"
           >
-            {{ pendingReceipts }}
+            {{ reviewPendingCount }}
           </b>
         </button>
 
@@ -252,8 +252,8 @@
             </div>
 
             <div>
-              <span>Por revisar</span>
-              <strong>{{ pendingReceipts }}</strong>
+              <span>En revisión</span>
+              <strong>{{ reviewPendingCount }}</strong>
               <small>Comprobantes</small>
             </div>
 
@@ -277,11 +277,61 @@
         </div>
 
 
+        <!-- RESUMEN DE LOS 4 ESTADOS -->
+
+        <div class="payment-summary">
+
+          <div class="payment-summary-title">
+            <div>
+              <h3>Estados de pago</h3>
+              <p>Resumen de los pagos de los participantes.</p>
+            </div>
+          </div>
+
+          <div class="payment-status-grid">
+
+            <div class="status-summary approved-summary">
+              <span class="status-dot"></span>
+              <div>
+                <strong>{{ approvedPayments }}</strong>
+                <span>Aprobados</span>
+              </div>
+            </div>
+
+            <div class="status-summary review-summary">
+              <span class="status-dot"></span>
+              <div>
+                <strong>{{ reviewPendingCount }}</strong>
+                <span>En revisión</span>
+              </div>
+            </div>
+
+            <div class="status-summary pending-summary">
+              <span class="status-dot"></span>
+              <div>
+                <strong>{{ noReceiptCount }}</strong>
+                <span>Pendientes</span>
+              </div>
+            </div>
+
+            <div class="status-summary rejected-summary">
+              <span class="status-dot"></span>
+              <div>
+                <strong>{{ rejectedPayments }}</strong>
+                <span>Rechazados</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+
         <!-- GRID -->
 
         <div class="dashboard-grid">
 
-          <!-- COMPROBANTES -->
+          <!-- COMPROBANTES EN REVISIÓN -->
 
           <div class="card">
 
@@ -289,11 +339,11 @@
 
               <div>
                 <h3>
-                  Comprobantes pendientes
+                  Comprobantes en revisión
                 </h3>
 
                 <p>
-                  Requieren revisión
+                  Requieren revisión del administrador
                 </p>
               </div>
 
@@ -307,12 +357,12 @@
 
 
             <div
-              v-if="pendingParticipants.length"
+              v-if="reviewPendingParticipants.length"
               class="pending-list"
             >
 
               <div
-                v-for="participant in pendingParticipants.slice(0, 5)"
+                v-for="participant in reviewPendingParticipants.slice(0, 5)"
                 :key="participant.id"
                 class="pending"
               >
@@ -334,7 +384,7 @@
                 </div>
 
                 <span class="pending-badge">
-                  Pendiente
+                  En revisión
                 </span>
 
               </div>
@@ -347,7 +397,7 @@
               class="empty"
             >
               ✓
-              <p>No hay comprobantes pendientes.</p>
+              <p>No hay comprobantes en revisión.</p>
             </div>
 
           </div>
@@ -489,7 +539,7 @@
 
                     <span
                       class="payment"
-                      :class="participant.payment"
+                      :class="paymentClass(participant.payment)"
                     >
                       {{ paymentText(participant.payment) }}
                     </span>
@@ -568,6 +618,10 @@
 
             <option value="approved">
               Aprobados
+            </option>
+
+            <option value="review">
+              En revisión
             </option>
 
             <option value="pending">
@@ -670,7 +724,7 @@
 
                     <span
                       class="payment"
-                      :class="participant.payment"
+                      :class="paymentClass(participant.payment)"
                     >
                       {{ paymentText(participant.payment) }}
                     </span>
@@ -758,20 +812,20 @@
           <div class="receipt-counter">
 
             <strong>
-              {{ pendingReceipts }}
+              {{ reviewPendingCount }}
             </strong>
 
-            pendientes
+            en revisión
 
           </div>
 
         </div>
 
 
-        <!-- SIN COMPROBANTES -->
+        <!-- SIN COMPROBANTES EN REVISIÓN -->
 
         <div
-          v-if="pendingParticipants.length === 0"
+          v-if="reviewPendingParticipants.length === 0"
           class="no-receipts"
         >
 
@@ -790,7 +844,7 @@
         </div>
 
 
-        <!-- COMPROBANTES -->
+        <!-- COMPROBANTES EN REVISIÓN -->
 
         <div
           v-else
@@ -798,7 +852,7 @@
         >
 
           <article
-            v-for="participant in pendingParticipants"
+            v-for="participant in reviewPendingParticipants"
             :key="participant.id"
             class="receipt-card"
           >
@@ -823,6 +877,14 @@
 
               </div>
 
+            </div>
+
+
+            <!-- ESTADO -->
+
+            <div class="receipt-status review-status">
+              <span class="status-dot"></span>
+              En revisión
             </div>
 
 
@@ -863,7 +925,7 @@
                 </span>
 
                 <strong>
-                  {{ participant.reference }}
+                  {{ participant.reference || 'Sin referencia' }}
                 </strong>
 
               </div>
@@ -889,7 +951,7 @@
                 </span>
 
                 <strong>
-                  {{ participant.receiptDate }}
+                  {{ participant.receiptDate || 'No disponible' }}
                 </strong>
 
               </div>
@@ -971,18 +1033,18 @@
                   </td>
 
                   <td>
-                    {{ participant.receiptName }}
+                    {{ participant.receiptName || 'Sin comprobante' }}
                   </td>
 
                   <td>
-                    {{ participant.reference }}
+                    {{ participant.reference || 'Sin referencia' }}
                   </td>
 
                   <td>
 
                     <span
                       class="payment"
-                      :class="participant.payment"
+                      :class="paymentClass(participant.payment)"
                     >
                       {{ paymentText(participant.payment) }}
                     </span>
@@ -1001,6 +1063,109 @@
                     class="empty-table"
                   >
                     Todavía no hay comprobantes revisados.
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+
+        <!-- PARTICIPANTES SIN COMPROBANTE -->
+
+        <div class="card no-receipt-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <h3>
+                Participantes sin comprobante
+              </h3>
+
+              <p>
+                Participantes que todavía no han subido su comprobante.
+              </p>
+
+            </div>
+
+            <span class="pending-count-badge">
+              {{ noReceiptCount }}
+            </span>
+
+          </div>
+
+
+          <div class="table-container">
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Participante</th>
+                  <th>Control</th>
+                  <th>Correo</th>
+                  <th>Estado</th>
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                <tr
+                  v-for="participant in noReceiptParticipants"
+                  :key="participant.id"
+                >
+
+                  <td>
+                    <div class="table-user">
+
+                      <div class="avatar">
+                        {{ getInitials(participant.name) }}
+                      </div>
+
+                      <strong>
+                        {{ participant.name }}
+                      </strong>
+
+                    </div>
+                  </td>
+
+                  <td>
+                    {{ participant.control }}
+                  </td>
+
+                  <td>
+                    {{ participant.email }}
+                  </td>
+
+                  <td>
+
+                    <span class="payment pending">
+                      Pendiente
+                    </span>
+
+                  </td>
+
+                </tr>
+
+
+                <tr
+                  v-if="noReceiptParticipants.length === 0"
+                >
+
+                  <td
+                    colspan="4"
+                    class="empty-table"
+                  >
+                    Todos los participantes ya han enviado comprobante.
                   </td>
 
                 </tr>
@@ -1303,14 +1468,19 @@
           <div>
             <span>Referencia</span>
             <strong>
-              {{ selectedParticipant.reference }}
+              {{ selectedParticipant.reference || 'Sin referencia' }}
             </strong>
           </div>
 
           <div>
             <span>Pago</span>
             <strong>
-              {{ paymentText(selectedParticipant.payment) }}
+              <span
+                class="payment"
+                :class="paymentClass(selectedParticipant.payment)"
+              >
+                {{ paymentText(selectedParticipant.payment) }}
+              </span>
             </strong>
           </div>
 
@@ -1409,13 +1579,13 @@
 import {
   ref,
   computed,
-  onMounted,
-  watch
+  onMounted
 } from "vue";
 
 import {
   useRouter
 } from "vue-router";
+
 import { API_URL } from "../../config/api";
 
 
@@ -1432,6 +1602,7 @@ const router = useRouter();
 
 const sidebarOpen = ref(false);
 
+
 // =====================================================
 // INFORMACION EVENTO
 // =====================================================
@@ -1443,12 +1614,12 @@ const eventInfo = ref({
   capacity: ""
 });
 
+
 // =====================================================
 // SECCIÓN
 // =====================================================
 
-// IMPORTANTE:
-// Comprobantes será la pantalla inicial
+
 
 const currentSection = ref("dashboard");
 
@@ -1495,25 +1666,59 @@ const approvedPayments = computed(() => {
 
   return participants.value.filter(
     participant =>
-      participant.payment === "approved"
+      normalizePaymentStatus(participant) === "approved"
   ).length;
 
 });
 
 
-const pendingParticipants = computed(() => {
+const reviewPendingParticipants = computed(() => {
 
   return participants.value.filter(
     participant =>
-      participant.payment === "pending"
+      normalizePaymentStatus(participant) === "review"
   );
+
+});
+
+
+const reviewPendingCount = computed(() => {
+
+  return reviewPendingParticipants.value.length;
+
+});
+
+
+const noReceiptParticipants = computed(() => {
+
+  return participants.value.filter(
+    participant =>
+      normalizePaymentStatus(participant) === "pending"
+  );
+
+});
+
+
+const noReceiptCount = computed(() => {
+
+  return noReceiptParticipants.value.length;
+
+});
+
+
+const rejectedPayments = computed(() => {
+
+  return participants.value.filter(
+    participant =>
+      normalizePaymentStatus(participant) === "rejected"
+  ).length;
 
 });
 
 
 const pendingReceipts = computed(() => {
 
-  return pendingParticipants.value.length;
+  return reviewPendingCount.value;
 
 });
 
@@ -1521,8 +1726,17 @@ const pendingReceipts = computed(() => {
 const reviewedParticipants = computed(() => {
 
   return participants.value.filter(
-    participant =>
-      participant.payment !== "pending"
+    participant => {
+
+      const status =
+        normalizePaymentStatus(participant);
+
+      return (
+        status === "approved" ||
+        status === "rejected"
+      );
+
+    }
   );
 
 });
@@ -1539,6 +1753,82 @@ const generatedCertificates = computed(() => {
 
 
 // =====================================================
+// NORMALIZAR ESTADO
+//
+// IMPORTANTE:
+// Esto permite que si el backend todavía manda
+// "pending" para participantes con comprobante,
+// el FRONT los pueda mostrar como "En revisión"
+// cuando exista un comprobante.
+//
+// Si no existe comprobante, se muestra "Pendiente".
+// =====================================================
+
+function normalizePaymentStatus(participant) {
+
+  const rawStatus =
+    String(
+      participant.payment ||
+      participant.paymentStatus ||
+      ""
+    )
+      .toLowerCase()
+      .trim();
+
+
+  // Estados que ya vienen claros
+
+  if (rawStatus === "approved") {
+    return "approved";
+  }
+
+  if (rawStatus === "rejected") {
+    return "rejected";
+  }
+
+  if (
+    rawStatus === "review" ||
+    rawStatus === "under_review" ||
+    rawStatus === "en_revision" ||
+    rawStatus === "en revisión"
+  ) {
+    return "review";
+  }
+
+
+  // Si no hay comprobante, es PENDIENTE
+
+  const hasReceipt =
+    Boolean(
+      participant.receiptName ||
+      participant.receipt ||
+      participant.receiptUrl ||
+      participant.comprobante ||
+      participant.comprobanteUrl ||
+      participant.file
+    );
+
+
+  // Si el backend manda pending pero ya existe
+  // comprobante, visualmente será EN REVISIÓN.
+
+  if (
+    rawStatus === "pending" &&
+    hasReceipt
+  ) {
+    return "review";
+  }
+
+
+  // Si no hay comprobante:
+  // PENDIENTE
+
+  return "pending";
+
+}
+
+
+// =====================================================
 // FILTRAR PARTICIPANTES
 // =====================================================
 
@@ -1549,40 +1839,35 @@ const filteredParticipants = computed(() => {
     const text =
       search.value.toLowerCase().trim();
 
+
+    const name =
+      String(participant.name || "").toLowerCase();
+
+    const control =
+      String(participant.control || "").toLowerCase();
+
+    const email =
+      String(participant.email || "").toLowerCase();
+
+
     const matchesSearch =
-      participant.name
-        .toLowerCase()
-        .includes(text)
+      name.includes(text) ||
+      control.includes(text) ||
+      email.includes(text);
 
-      ||
 
-      participant.control
-        .toLowerCase()
-        .includes(text)
-
-      ||
-
-      participant.email
-        .toLowerCase()
-        .includes(text);
+    const normalizedStatus =
+      normalizePaymentStatus(participant);
 
 
     const matchesPayment =
-      paymentFilter.value === "all"
-
-      ||
-
-      participant.payment ===
-        paymentFilter.value;
+      paymentFilter.value === "all" ||
+      normalizedStatus === paymentFilter.value;
 
 
     const matchesType =
-      typeFilter.value === "all"
-
-      ||
-
-      participant.type ===
-        typeFilter.value;
+      typeFilter.value === "all" ||
+      participant.type === typeFilter.value;
 
 
     return (
@@ -1670,18 +1955,17 @@ function changeSection(section) {
 
 function getInitials(name) {
 
-  return name
+  return String(name || "")
 
-    .split(" ")
-
+  .split(" ")
     .filter(Boolean)
-
+    
     .slice(0, 2)
-
+    
     .map(word =>
       word.charAt(0)
     )
-
+    
     .join("")
 
     .toUpperCase();
@@ -1695,19 +1979,50 @@ function getInitials(name) {
 
 function paymentText(status) {
 
-  if (status === "approved") {
+  const normalizedStatus =
+    typeof status === "object"
+      ? normalizePaymentStatus(status)
+      : status;
+
+
+  if (normalizedStatus === "approved") {
     return "Aprobado";
   }
 
-  if (status === "pending") {
+
+  if (normalizedStatus === "review") {
+    return "En revisión";
+  }
+
+
+  if (normalizedStatus === "pending") {
     return "Pendiente";
   }
 
-  if (status === "rejected") {
+
+  if (normalizedStatus === "rejected") {
     return "Rechazado";
   }
 
-  return status;
+
+  return "Pendiente";
+
+}
+
+
+// =====================================================
+// CLASE PAGO
+// =====================================================
+
+function paymentClass(status) {
+
+  const normalizedStatus =
+    typeof status === "object"
+      ? normalizePaymentStatus(status)
+      : status;
+
+
+  return normalizedStatus;
 
 }
 
@@ -1837,7 +2152,7 @@ function canGenerateCertificate(participant) {
 
     certificateTemplate.value &&
 
-    participant.payment ===
+    normalizePaymentStatus(participant) ===
       "approved" &&
 
     participant.attended ===
@@ -1938,7 +2253,7 @@ ESCALA-${participant.id}-${participant.control}
 
 
   link.download =
-    `Constancia_${participant.name.replaceAll(" ", "_")}.txt`;
+    `Constancia_${String(participant.name || "participante").replaceAll(" ", "_")}.txt`;
 
 
   link.click();
@@ -1968,64 +2283,124 @@ function goBack() {
 
 onMounted(async () => {
 
-  const savedTemplate = localStorage.getItem("escala_certificate_template");
+  const savedTemplate =
+    localStorage.getItem(
+      "escala_certificate_template"
+    );
+
 
   if (savedTemplate) {
-    certificateTemplate.value = JSON.parse(savedTemplate);
+
+    certificateTemplate.value =
+      JSON.parse(savedTemplate);
+
   }
 
+
   await cargarParticipantes();
+
   await cargarEvento();
 
 });
 
 
+// =====================================================
+// CARGAR PARTICIPANTES
+// =====================================================
+
 async function cargarParticipantes() {
 
   try {
 
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("token");
 
-    const response = await fetch(`${API_URL}/eventos/4/inscripciones/admin/participantes`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+
+    const response =
+      await fetch(
+        `${API_URL}/eventos/4/inscripciones/admin/participantes`,
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          },
+        }
+      );
+
 
     if (response.status === 401) {
+
       router.push("/login");
+
       return;
+
     }
 
+
     if (response.ok) {
-      participants.value = await response.json();
+
+      participants.value =
+        await response.json();
+
     }
 
   } catch (e) {
-    console.error("Error al cargar participantes:", e);
+
+    console.error(
+      "Error al cargar participantes:",
+      e
+    );
+
   }
 
 }
+
+
+// =====================================================
+// CARGAR EVENTO
+// =====================================================
 
 async function cargarEvento() {
 
   try {
 
-    const response = await fetch(`${API_URL}/eventos/4`);
+    const response =
+      await fetch(
+        `${API_URL}/eventos/4`
+      );
+
 
     if (response.ok) {
 
-      const data = await response.json();
+      const data =
+        await response.json();
+
 
       eventInfo.value = {
-        date: data.date,
-        place: data.place,
-        cost: data.cost,
-        capacity: data.capacity
+
+        date:
+          data.date,
+
+        place:
+          data.place,
+
+        cost:
+          data.cost,
+
+        capacity:
+          data.capacity
+
       };
 
     }
 
   } catch (e) {
-    console.error("Error al cargar el evento:", e);
+
+    console.error(
+      "Error al cargar el evento:",
+      e
+    );
+
   }
 
 }
@@ -2755,6 +3130,158 @@ async function cargarEvento() {
 
 
 /* =====================================================
+   RESUMEN DE ESTADOS
+===================================================== */
+
+.payment-summary {
+
+  background: white;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 5px 20px
+    rgba(0,0,0,.05);
+
+  margin-bottom: 25px;
+
+  overflow: hidden;
+
+}
+
+
+.payment-summary-title {
+
+  padding: 20px 24px;
+
+  border-bottom:
+    1px solid #edf0f3;
+
+}
+
+
+.payment-summary-title h3 {
+
+  margin: 0 0 4px;
+
+  color: #003366;
+
+  font-size: 16px;
+
+}
+
+
+.payment-summary-title p {
+
+  margin: 0;
+
+  color: #90a4ae;
+
+  font-size: 11px;
+
+}
+
+
+.payment-status-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 1px;
+
+  background: #edf0f3;
+
+}
+
+
+.status-summary {
+
+  background: white;
+
+  padding: 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+}
+
+
+.status-summary > div {
+
+  display: flex;
+
+  flex-direction: column;
+
+}
+
+
+.status-summary strong {
+
+  font-size: 22px;
+
+  color: #263238;
+
+}
+
+
+.status-summary span:not(.status-dot) {
+
+  color: #78909c;
+
+  font-size: 10px;
+
+}
+
+
+.status-dot {
+
+  width: 11px;
+
+  height: 11px;
+
+  border-radius: 50%;
+
+  display: inline-block;
+
+  flex-shrink: 0;
+
+}
+
+
+.approved-summary .status-dot {
+
+  background: #43a047;
+
+}
+
+
+.review-summary .status-dot {
+
+  background: #fb8c00;
+
+}
+
+
+.pending-summary .status-dot {
+
+  background: #78909c;
+
+}
+
+
+.rejected-summary .status-dot {
+
+  background: #e53935;
+
+}
+
+
+/* =====================================================
    DASHBOARD GRID
 ===================================================== */
 
@@ -2847,7 +3374,7 @@ async function cargarEvento() {
 
 
 /* =====================================================
-   PENDING
+   PENDING / REVISION
 ===================================================== */
 
 .pending-list {
@@ -3082,6 +3609,10 @@ td {
 }
 
 
+/* =====================================================
+   ESTADOS DE PAGO
+===================================================== */
+
 .payment {
 
   padding: 5px 9px;
@@ -3091,6 +3622,8 @@ td {
   font-size: 9px;
 
   font-weight: 600;
+
+  white-space: nowrap;
 
 }
 
@@ -3104,11 +3637,20 @@ td {
 }
 
 
-.payment.pending {
+.payment.review {
 
   background: #fff3e0;
 
   color: #ef6c00;
+
+}
+
+
+.payment.pending {
+
+  background: #eceff1;
+
+  color: #546e7a;
 
 }
 
@@ -3121,6 +3663,10 @@ td {
 
 }
 
+
+/* =====================================================
+   ASISTENCIA
+===================================================== */
 
 .attendance {
 
@@ -3328,6 +3874,51 @@ td {
 
 
 /* =====================================================
+   ESTADO DEL COMPROBANTE
+===================================================== */
+
+.receipt-status {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 10px;
+
+  border-radius: 15px;
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  margin-bottom: 12px;
+
+}
+
+
+.review-status {
+
+  background: #fff3e0;
+
+  color: #ef6c00;
+
+}
+
+
+.receipt-status .status-dot {
+
+  width: 7px;
+
+  height: 7px;
+
+  background: #fb8c00;
+
+}
+
+
+/* =====================================================
    FILE PREVIEW
 ===================================================== */
 
@@ -3497,6 +4088,44 @@ td {
   background: #ffebee;
 
   color: #c62828;
+
+}
+
+
+/* =====================================================
+   PENDIENTES SIN COMPROBANTE
+===================================================== */
+
+.no-receipt-card {
+
+  margin-top: 20px;
+
+}
+
+
+.pending-count-badge {
+
+  min-width: 30px;
+
+  height: 30px;
+
+  padding: 0 8px;
+
+  border-radius: 50%;
+
+  background: #eceff1;
+
+  color: #546e7a;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 11px;
+
+  font-weight: 700;
 
 }
 
@@ -4061,7 +4690,16 @@ td {
 
   }
 
+
   .receipt-grid {
+
+    grid-template-columns:
+      repeat(2,1fr);
+
+  }
+
+
+  .payment-status-grid {
 
     grid-template-columns:
       repeat(2,1fr);
@@ -4219,6 +4857,14 @@ td {
 
   }
 
+
+  .payment-status-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
 }
 
 </style>
+

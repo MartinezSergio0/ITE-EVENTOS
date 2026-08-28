@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+
 // ==========================================
 // PÁGINAS PÚBLICAS
 // ==========================================
@@ -12,6 +13,7 @@ import AboutView from "../Views/public/AboutView.vue";
 
 import ReferenciaEscalaView from "../Views/public/ReferenciaEscalaView.vue";
 import SubirComprobanteView from "../Views/public/SubirComprobanteView.vue";
+import EstadoPagoView from "../Views/public/EstadoPagoView.vue";
 
 import RegistroEscala from "../Views/public/RegistroEscala.vue";
 import RegistroArgos from "../Views/public/RegistroArgos.vue";
@@ -30,14 +32,23 @@ import LoginView from "../Views/public/LoginView.vue";
 
 import SuperAdminView from "../Views/SuperAdmin/SuperAdminView.vue";
 
+
 // ==========================================
 // ADMINISTRADOR ESCALA
 // ==========================================
 
-import AdministradorEscalaView from "../Views/adminEscala/AdministradorEscalaView.vue";
-import ParticipantesEscalaView from "../Views/adminEscala/ParticipantesEscalaView.vue";
-import ComprobantesEscalaView from "../Views/adminEscala/ComprobantesEscalaView.vue";
-import ConstanciasEscalaView from "../Views/adminEscala/ConstanciasEscalaView.vue";
+import AdministradorEscalaView
+  from "../Views/adminEscala/AdministradorEscalaView.vue";
+
+import ParticipantesEscalaView
+  from "../Views/adminEscala/ParticipantesEscalaView.vue";
+
+import ComprobantesEscalaView
+  from "../Views/adminEscala/ComprobantesEscalaView.vue";
+
+import ConstanciasEscalaView
+  from "../Views/adminEscala/ConstanciasEscalaView.vue";
+
 
 // ==========================================
 // RUTAS
@@ -121,6 +132,7 @@ const routes = [
     component: SuperAdminView
   },
 
+
   // ========================================
   // ADMINISTRADOR ESCALA
   // ========================================
@@ -133,7 +145,7 @@ const routes = [
     component: AdministradorEscalaView,
 
     // ======================================
-    // RUTAS HIJAS DEL ADMINISTRADOR ESCALA
+    // RUTAS HIJAS
     // ======================================
 
     children: [
@@ -151,6 +163,7 @@ const routes = [
         component: ParticipantesEscalaView
       },
 
+
       // ------------------------------------
       // COMPROBANTES
       // /admin/escala/comprobantes
@@ -163,6 +176,7 @@ const routes = [
 
         component: ComprobantesEscalaView
       },
+
 
       // ------------------------------------
       // CONSTANCIAS
@@ -178,7 +192,9 @@ const routes = [
       }
 
     ]
+
   },
+
 
   // ========================================
   // REGISTRO ESCALA
@@ -218,7 +234,7 @@ const routes = [
     component: ReferenciaEscalaView
   },
 
-  
+
   // ========================================
   // SUBIR COMPROBANTE
   // ========================================
@@ -229,9 +245,44 @@ const routes = [
     name: "SubirComprobante",
 
     component: SubirComprobanteView
+  },
+
+
+  // ========================================
+  // CONSULTAR ESTADO DEL PAGO
+  // ========================================
+
+  {
+    path: "/estado-pago",
+
+    name: "EstadoPago",
+
+    component: EstadoPagoView
+  },
+
+
+  // ========================================
+  // CONSULTAR ESTADO DEL PAGO CON FOLIO
+  // ========================================
+  //
+  // Ejemplo:
+  // /estado-pago/2612000001
+  //
+  // El componente recibe:
+  // route.params.folio
+  //
+  // ========================================
+
+  {
+    path: "/estado-pago/:folio",
+
+    name: "EstadoPagoFolio",
+
+    component: EstadoPagoView
   }
 
 ];
+
 
 // ==========================================
 // CREAR ROUTER
@@ -244,6 +295,7 @@ const router = createRouter({
   routes
 
 });
+
 
 // ==========================================
 // EXPORTAR
