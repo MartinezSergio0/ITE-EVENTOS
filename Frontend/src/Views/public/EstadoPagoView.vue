@@ -318,7 +318,7 @@
               </span>
 
               <strong>
-                ${{ resultado.monto || montoEsperado }} MXN
+                ${{ montoEsperado || resultado.monto   }} MXN
               </strong>
 
             </div>
