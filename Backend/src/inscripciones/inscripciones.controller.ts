@@ -70,6 +70,14 @@ export class InscripcionesController {
     return this.service.subirComprobante(eventoId, dto, file);
   }
 
+  @Get('folio')
+  buscarPorCorreo(
+    @Param('eventoId', ParseIntPipe) eventoId: number,
+    @Query('correo') correo: string,
+  ) {
+    return this.service.buscarPorCorreo(eventoId, correo);
+  }
+
   // =====================================================
   // ADMIN — (AuthGuard)
   // =====================================================

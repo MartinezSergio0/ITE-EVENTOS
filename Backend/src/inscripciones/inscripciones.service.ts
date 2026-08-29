@@ -87,6 +87,32 @@ export class InscripcionesService {
     });
   }
 
+  async buscarPorCorreo(eventoId: number, correo: string) {
+    const participante = await this.prisma.participantes.findFirst({
+      where: {
+        evento: eventoId,
+        correo_electronico: { equals: correo, mode: 'insensitive' },
+      },
+      include: { evento_participantes_eventoToevento: true },
+    });
+
+    if (!participante) {
+      throw new NotFoundException(
+        'No encontramos ningún registro asociado a este correo electrónico.',
+      );
+    }
+
+    return {
+      folio: participante.folio,
+      nombre: participante.nombre,
+      correo: participante.correo_electronico,
+      evento: participante.evento_participantes_eventoToevento.nombre,
+      fechaRegistro: participante.fecha_registro
+        ? new Date(participante.fecha_registro).toLocaleDateString('es-MX')
+        : null,
+    };
+  }
+
   async buscarPorFolio(eventoId: number, folio: string) {
   const participante = await this.prisma.participantes.findFirst({
     where: { evento: eventoId, folio },

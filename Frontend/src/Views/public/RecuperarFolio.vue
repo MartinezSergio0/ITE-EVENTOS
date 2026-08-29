@@ -493,6 +493,7 @@ import {
   ref
 } from "vue";
 
+import { API_URL } from "../../config/api";
 
 // ==========================================
 // VARIABLES
@@ -513,203 +514,53 @@ const consultando = ref(false);
 
 async function consultarFolio() {
 
-  // Limpiar mensajes anteriores
-
   error.value = "";
-
   resultado.value = null;
 
-
-  // Limpiar correo
-
-  correo.value = String(correo.value)
-    .trim()
-    .toLowerCase();
-
-
-  // ==========================================
-  // VALIDAR CORREO
-  // ==========================================
+  correo.value = String(correo.value).trim().toLowerCase();
 
   if (!correo.value) {
-
-    error.value =
-      "Ingresa tu correo electrónico.";
-
+    error.value = "Ingresa tu correo electrónico.";
     return;
-
   }
-
-
-  // ==========================================
-  // ESTADO DE CONSULTA
-  // ==========================================
 
   consultando.value = true;
 
+  try {
 
-  // ==========================================
-  // SIMULAR RESPUESTA DEL BACKEND
-  // ==========================================
+    const params = new URLSearchParams({ correo: correo.value });
 
-  await new Promise(resolve =>
-    setTimeout(resolve, 1000)
-  );
+    const response = await fetch(
+      `${API_URL}/eventos/4/inscripciones/folio?${params}`
+    );
 
+    if (!response.ok) {
 
-  // ==========================================
-  // DATOS SIMULADOS
-  // ==========================================
+      let errorData = {};
+      try { errorData = await response.json(); } catch { errorData = {}; }
 
-  const registrosSimulados = {
-
-    // ----------------------------------------
-    // REGISTRO 1
-    // ----------------------------------------
-
-    "yuliana@ejemplo.com": {
-
-      folio:
-        "ESCALA-2026-0001",
-
-      nombre:
-        "Yuliana Suhey Carrera Brito",
-
-      correo:
-        "yuliana@ejemplo.com",
-
-      evento:
-        "Congreso ESCALA",
-
-      fechaRegistro:
-        "27/08/2026"
-
-    },
-
-
-    // ----------------------------------------
-    // REGISTRO 2
-    // ----------------------------------------
-
-    "juan.perez@ejemplo.com": {
-
-      folio:
-        "ESCALA-2026-0002",
-
-      nombre:
-        "Juan Pérez López",
-
-      correo:
-        "juan.perez@ejemplo.com",
-
-      evento:
-        "Congreso ESCALA",
-
-      fechaRegistro:
-        "26/08/2026"
-
-    },
-
-
-    // ----------------------------------------
-    // REGISTRO 3
-    // ----------------------------------------
-
-    "maria.gonzalez@ejemplo.com": {
-
-      folio:
-        "ESCALA-2026-0003",
-
-      nombre:
-        "María González Hernández",
-
-      correo:
-        "maria.gonzalez@ejemplo.com",
-
-      evento:
-        "Congreso ESCALA",
-
-      fechaRegistro:
-        "25/08/2026"
-
-    },
-
-
-    // ----------------------------------------
-    // REGISTRO 4
-    // ----------------------------------------
-
-    "ana.lopez@ejemplo.com": {
-
-      folio:
-        "ESCALA-2026-0004",
-
-      nombre:
-        "Ana López Martínez",
-
-      correo:
-        "ana.lopez@ejemplo.com",
-
-      evento:
-        "Congreso ESCALA",
-
-      fechaRegistro:
-        "24/08/2026"
+      throw new Error(
+        errorData.message ||
+        "No encontramos ningún registro asociado a este correo electrónico. Verifica que hayas utilizado el mismo correo con el que realizaste tu inscripción."
+      );
 
     }
 
-  };
+    const data = await response.json();
 
+    resultado.value = {
+      folio: data.folio,
+      nombre: data.nombre,
+      correo: data.correo,
+      evento: data.evento,
+      fechaRegistro: data.fechaRegistro,
+    };
 
-  // ==========================================
-  // BUSCAR REGISTRO
-  // ==========================================
-
-  const registro =
-    registrosSimulados[correo.value];
-
-
-  // ==========================================
-  // CORREO NO ENCONTRADO
-  // ==========================================
-
-  if (!registro) {
-
+  } catch (e) {
+    error.value = e.message || "No se pudo consultar tu folio.";
+  } finally {
     consultando.value = false;
-
-    error.value =
-      "No encontramos ningún registro asociado a este correo electrónico. Verifica que hayas utilizado el mismo correo con el que realizaste tu inscripción.";
-
-    return;
-
   }
-
-
-  // ==========================================
-  // MOSTRAR RESULTADO
-  // ==========================================
-
-  resultado.value = {
-
-    folio:
-      registro.folio,
-
-    nombre:
-      registro.nombre,
-
-    correo:
-      registro.correo,
-
-    evento:
-      registro.evento,
-
-    fechaRegistro:
-      registro.fechaRegistro
-
-  };
-
-
-  consultando.value = false;
 
 }
 

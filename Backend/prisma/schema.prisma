@@ -155,6 +155,7 @@ model participantes {
   consentimiento                      Boolean            @default(false)
   fecha_comprobante                   DateTime?          @db.Timestamp(6)
   metodo_validacion                   String?            @db.VarChar(20)
+  fecha_registro                      DateTime?          @default(now()) @db.Timestamp(6)
   estado_participantes_estadoToestado estado?            @relation("participantes_estadoToestado", fields: [estado], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_estado")
   evento_participantes_eventoToevento evento             @relation("participantes_eventoToevento", fields: [evento], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_evento")
   genero_participantes_generoTogenero genero?            @relation("participantes_generoTogenero", fields: [genero], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_genero")
