@@ -686,16 +686,22 @@ const textoEstado = computed(() => {
 // CARGAR FOLIO DESDE LA URL
 // ==========================================
 
-onMounted(() => {
+onMounted(async () => {
+
+  try {
+    const response = await fetch(`${API_URL}/eventos/4`);
+    if (response.ok) {
+      const data = await response.json();
+      montoEsperado.value = data.costoNumero ?? 0;
+    }
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
+  }
 
   const folioUrl = route.params.folio;
-
   if (folioUrl) {
-
     folio.value = String(folioUrl);
-
     consultarPago();
-
   }
 
 });
