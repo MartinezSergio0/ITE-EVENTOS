@@ -110,8 +110,32 @@ export class InscripcionesService {
 }
 
   async buscarPorReferencia(referencia: string) {
-    return this.prisma.participantes.findUnique({ where: { referencia_bancaria: referencia } });
-  }
+    const participante = await this.prisma.participantes.findUnique({
+      where: { referencia_bancaria: referencia },
+      include: { estado_participantes_estadoToestado: true },
+    });
+
+    if (!participante) {
+      throw new NotFoundException('No se encontró ningún pago asociado a este folio.');
+    }
+
+    const estadoNombre = participante.estado_participantes_estadoToestado?.nombre ?? '';
+
+    let estado = 'en_revision';
+    if (estadoNombre === 'Confirmado') estado = 'aprobado';
+    else if (estadoNombre === 'Rechazada') estado = 'rechazado';
+
+    return {
+      referencia: participante.referencia_bancaria,
+      nombre: participante.nombre,
+      correo: participante.correo_electronico,
+      monto: participante.monto ? Number(participante.monto) : null,
+      fechaPago: participante.fecha_comprobante
+        ? new Date(participante.fecha_comprobante).toLocaleDateString('es-MX')
+        : null,
+      estado,
+    };
+}
 
 async subirComprobante(
   eventoId: number,

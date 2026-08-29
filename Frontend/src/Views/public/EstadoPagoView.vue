@@ -628,6 +628,8 @@ import {
   useRoute
 } from "vue-router";
 
+import { API_URL } from "../../config/api";
+
 
 // ==========================================
 // ROUTE
@@ -753,215 +755,63 @@ async function consultarPago() {
 
 
   // ==========================================
-  // SIMULAR TIEMPO DE RESPUESTA
-  // DEL BACKEND
+  // CONSULTAR BACKEND
   // ==========================================
 
-  await new Promise(resolve =>
-    setTimeout(resolve, 1000)
-  );
+  try {
 
+    const response = await fetch(
+      `${API_URL}/eventos/4/inscripciones/referencia/${folio.value}`
+    );
 
-  // ==========================================
-  // DATOS SIMULADOS
-  // ==========================================
+    if (!response.ok) {
 
-  const pagosSimulados = {
-
-    // ----------------------------------------
-    // EN REVISIÓN
-    // ----------------------------------------
-
-    "2612000001": {
-
-      referencia: "2612000001",
-
-      nombre:
-        "Yuliana Suhey Carrera Brito",
-
-      correo:
-        "yuliana@ejemplo.com",
-
-      monto: 700,
-
-      fechaPago:
-        "27/08/2026",
-
-      estado:
-        "en_revision"
-
-    },
-
-
-    // ----------------------------------------
-    // APROBADO
-    // ----------------------------------------
-
-    "2612000002": {
-
-      referencia: "2612000002",
-
-      nombre:
-        "Juan Pérez López",
-
-      correo:
-        "juan.perez@ejemplo.com",
-
-      monto: 700,
-
-      fechaPago:
-        "26/08/2026",
-
-      estado:
-        "aprobado"
-
-    },
-
-
-    // ----------------------------------------
-    // RECHAZADO
-    // ----------------------------------------
-
-    "2612000003": {
-
-      referencia: "2612000003",
-
-      nombre:
-        "María González Hernández",
-
-      correo:
-        "maria.gonzalez@ejemplo.com",
-
-      monto: 700,
-
-      fechaPago:
-        "25/08/2026",
-
-      estado:
-        "rechazado"
+      throw new Error(
+        "No se encontró ningún pago asociado a este folio."
+      );
 
     }
 
-  };
+    const data = await response.json();
 
 
-  // ==========================================
-  // BUSCAR FOLIO
-  // ==========================================
+    // ==========================================
+    // MOSTRAR RESULTADO
+    // ==========================================
 
-  const pago =
-    pagosSimulados[folio.value];
+    resultado.value = {
 
+      referencia:
+        data.referencia,
 
-  // ==========================================
-  // FOLIO NO EXISTE
-  // ==========================================
+      nombre:
+        data.nombre,
 
-  if (!pago) {
+      correo:
+        data.correo,
+
+      monto:
+        data.monto,
+
+      fechaPago:
+        data.fechaPago,
+
+      estado:
+        data.estado
+
+    };
+
+  } catch (e) {
+
+    error.value =
+      e.message ||
+      "No se pudo consultar el estado del pago.";
+
+  } finally {
 
     consultando.value = false;
 
-    error.value =
-      "No se encontró ningún pago asociado a este folio.";
-
-    return;
-
   }
-
-
-  // ==========================================
-  // MOSTRAR RESULTADO
-  // ==========================================
-
-  resultado.value = {
-
-    referencia:
-      pago.referencia,
-
-    nombre:
-      pago.nombre,
-
-    correo:
-      pago.correo,
-
-    monto:
-      pago.monto,
-
-    fechaPago:
-      pago.fechaPago,
-
-    estado:
-      normalizarEstado(
-        pago.estado
-      )
-
-  };
-
-
-  consultando.value = false;
-
-}
-
-
-// ==========================================
-// NORMALIZAR ESTADO
-// ==========================================
-
-function normalizarEstado(estado) {
-
-  if (!estado) {
-
-    return "en_revision";
-
-  }
-
-
-  const valor =
-    String(estado)
-      .toLowerCase()
-      .trim();
-
-
-  // APROBADO
-
-  if (
-    valor === "aprobado" ||
-    valor === "approved"
-  ) {
-
-    return "aprobado";
-
-  }
-
-
-  // RECHAZADO
-
-  if (
-    valor === "rechazado" ||
-    valor === "rejected"
-  ) {
-
-    return "rechazado";
-
-  }
-
-
-  // EN REVISIÓN
-
-  if (
-    valor === "en_revision" ||
-    valor === "en revisión" ||
-    valor === "revision" ||
-    valor === "pendiente" ||
-    valor === "pending"
-  ) {
-
-    return "en_revision";
-
-  }
-
-
-  return "en_revision";
 
 }
 
@@ -981,7 +831,6 @@ function nuevaConsulta() {
 }
 
 </script>
-
 
 <style scoped>
 
