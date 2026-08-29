@@ -1,4 +1,6 @@
+```vue
 <template>
+
     <div
         v-if="event"
         class="event-detail"
@@ -7,6 +9,7 @@
         <!-- =====================================
              BOTÓN REGRESAR
         ====================================== -->
+
         <router-link
             :to="`/eventos/${event.category.toLowerCase()}`"
             class="back-btn"
@@ -18,6 +21,7 @@
         <!-- =====================================
              HERO
         ====================================== -->
+
         <section class="hero">
 
             <img
@@ -58,18 +62,21 @@
         <!-- =====================================
              CONTENIDO
         ====================================== -->
+
         <section class="container">
 
 
             <!-- =====================================
                  INFORMACIÓN
             ====================================== -->
+
             <div class="left">
 
 
                 <!-- =====================================
                      DESCRIPCIÓN
                 ====================================== -->
+
                 <div class="card">
 
                     <h2>
@@ -86,6 +93,7 @@
                 <!-- =====================================
                      ACTIVIDADES
                 ====================================== -->
+
                 <div class="card">
 
                     <h2>
@@ -109,6 +117,7 @@
                 <!-- =====================================
                      CRONOGRAMA
                 ====================================== -->
+
                 <div class="card">
 
                     <h2>
@@ -120,6 +129,7 @@
                         <thead>
 
                             <tr>
+
                                 <th>
                                     Hora
                                 </th>
@@ -127,6 +137,7 @@
                                 <th>
                                     Actividad
                                 </th>
+
                             </tr>
 
                         </thead>
@@ -158,6 +169,7 @@
                 <!-- =====================================
                      PONENTES
                 ====================================== -->
+
                 <div
                     v-if="event.speakers && event.speakers.length"
                     class="card"
@@ -194,19 +206,21 @@
 
                 </div>
 
-
+    
             </div>
 
 
             <!-- =====================================
                  SIDEBAR
             ====================================== -->
+
             <aside class="sidebar">
 
 
                 <!-- =====================================
                      INFORMACIÓN GENERAL
                 ====================================== -->
+
                 <div class="info-card">
 
                     <h3>
@@ -214,33 +228,63 @@
                     </h3>
 
                     <p>
+
                         📅
-                        <strong>Fecha:</strong>
+
+                        <strong>
+                            Fecha:
+                        </strong>
+
                         {{ event.date }}
+
                     </p>
 
                     <p>
+
                         🕘
-                        <strong>Hora:</strong>
+
+                        <strong>
+                            Hora:
+                        </strong>
+
                         {{ event.time }}
+
                     </p>
 
                     <p>
+
                         📍
-                        <strong>Lugar:</strong>
+
+                        <strong>
+                            Lugar:
+                        </strong>
+
                         {{ event.place }}
+
                     </p>
 
                     <p>
+
                         👥
-                        <strong>Cupo:</strong>
+
+                        <strong>
+                            Cupo:
+                        </strong>
+
                         {{ event.capacity }}
+
                     </p>
 
                     <p>
+
                         💲
-                        <strong>Costo:</strong>
+
+                        <strong>
+                            Costo:
+                        </strong>
+
                         {{ event.cost }}
+
                     </p>
 
                 </div>
@@ -249,6 +293,7 @@
                 <!-- =====================================
                      REGISTRO
                 ====================================== -->
+
                 <router-link
                     class="register-btn"
                     :to="event.registerRoute"
@@ -260,6 +305,7 @@
                 <!-- =====================================
                      REFERENCIA BANCARIA
                 ====================================== -->
+
                 <router-link
                     v-if="event.tienePago && event.id === 4"
                     class="bank-btn"
@@ -272,6 +318,7 @@
                 <!-- =====================================
                      SUBIR COMPROBANTE
                 ====================================== -->
+
                 <router-link
                     v-if="event.tienePago"
                     class="secondary"
@@ -284,6 +331,7 @@
                 <!-- =====================================
                      ESTADO DEL PAGO
                 ====================================== -->
+
                 <router-link
                     v-if="event.tienePago"
                     class="secondary payment-status-btn"
@@ -294,8 +342,21 @@
 
 
                 <!-- =====================================
+                     RECUPERAR FOLIO
+                ====================================== -->
+
+                <router-link
+                    class="secondary recover-folio-btn"
+                    to="/consultar-folio"
+                >
+                    🔎 Recuperar mi folio
+                </router-link>
+
+
+                <!-- =====================================
                      CONSTANCIA
                 ====================================== -->
+
                 <router-link
                     class="secondary"
                     :to="'/constancia/' + event.id"
@@ -314,6 +375,7 @@
     <!-- =====================================
          EVENTO NO ENCONTRADO
     ====================================== -->
+
     <div
         v-else
         class="not-found"
@@ -375,6 +437,7 @@ watchEffect(async () => {
             event.value = null;
 
             return;
+
         }
 
         event.value = await response.json();
@@ -438,9 +501,13 @@ function descargarPrograma() {
 ===================================== */
 
 * {
+
     margin: 0;
+
     padding: 0;
+
     box-sizing: border-box;
+
 }
 
 
@@ -1026,6 +1093,7 @@ tbody tr:hover {
 
 }
 
+
 /* =====================================
    BOTONES SECUNDARIOS
 ===================================== */
@@ -1093,6 +1161,33 @@ tbody tr:hover {
     background: #0055aa;
 
     color: white;
+
+}
+
+
+/* =====================================
+   RECUPERAR FOLIO
+===================================== */
+
+.recover-folio-btn {
+
+    background: #fff7e6;
+
+    color: #b26a00;
+
+    border:
+        1px solid #f3d49a;
+
+}
+
+
+.recover-folio-btn:hover {
+
+    background: #b26a00;
+
+    color: white;
+
+    border-color: #b26a00;
 
 }
 
@@ -1179,6 +1274,7 @@ tbody tr:hover {
 
     }
 
+
     .sidebar {
 
         position: relative;
@@ -1186,6 +1282,7 @@ tbody tr:hover {
         top: 0;
 
     }
+
 
     .overlay {
 
@@ -1199,6 +1296,7 @@ tbody tr:hover {
 
     }
 
+
     .logo {
 
         width: 140px;
@@ -1206,6 +1304,7 @@ tbody tr:hover {
         height: 140px;
 
     }
+
 
     .overlay h1 {
 
@@ -1225,11 +1324,13 @@ tbody tr:hover {
 
     }
 
+
     .overlay {
 
         padding: 30px 20px;
 
     }
+
 
     .overlay h1 {
 
@@ -1237,11 +1338,13 @@ tbody tr:hover {
 
     }
 
+
     .overlay p {
 
         font-size: 1rem;
 
     }
+
 
     .container {
 
@@ -1249,11 +1352,13 @@ tbody tr:hover {
 
     }
 
+
     .card {
 
         padding: 22px;
 
     }
+
 
     .back-btn {
 
@@ -1266,6 +1371,7 @@ tbody tr:hover {
         font-size: .9rem;
 
     }
+
 
     .speakers {
 
