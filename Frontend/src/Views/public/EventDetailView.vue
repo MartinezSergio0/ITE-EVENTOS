@@ -1,260 +1,433 @@
 <template>
-
-<div
-    v-if="event"
-    class="event-detail"
->
-
-    <!-- BOTÓN REGRESAR -->
-    <router-link
-        :to="`/eventos/${event.category.toLowerCase()}`"
-        class="back-btn"
+    <div
+        v-if="event"
+        class="event-detail"
     >
-        ← Regresar
-    </router-link>
 
-    <!-- HERO -->
-    <section class="hero">
-
-        <img
-            class="banner"
-            :src="event.banner"
-            :alt="event.title"
+        <!-- =====================================
+             BOTÓN REGRESAR
+        ====================================== -->
+        <router-link
+            :to="`/eventos/${event.category.toLowerCase()}`"
+            class="back-btn"
         >
+            ← Regresar
+        </router-link>
 
-        <div class="overlay">
+
+        <!-- =====================================
+             HERO
+        ====================================== -->
+        <section class="hero">
 
             <img
-                class="logo"
-                :src="event.logo"
+                class="banner"
+                :src="event.banner"
                 :alt="event.title"
             >
 
-            <div>
+            <div class="overlay">
 
-                <span class="badge">
-                    {{ event.category }}
-                </span>
+                <img
+                    class="logo"
+                    :src="event.logo"
+                    :alt="event.title"
+                >
 
-                <h1>
-                    {{ event.title }}
-                </h1>
+                <div>
 
-                <p>
-                    {{ event.shortDescription }}
-                </p>
+                    <span class="badge">
+                        {{ event.category }}
+                    </span>
 
-            </div>
+                    <h1>
+                        {{ event.title }}
+                    </h1>
 
-        </div>
+                    <p>
+                        {{ event.shortDescription }}
+                    </p>
 
-    </section>
-
-    <!-- CONTENIDO -->
-    <section class="container">
-
-        <!-- INFORMACIÓN -->
-        <div class="left">
-
-            <!-- DESCRIPCIÓN -->
-            <div class="card">
-
-                <h2>Descripción</h2>
-
-                <p>
-                    {{ event.description }}
-                </p>
+                </div>
 
             </div>
 
-            <!-- ACTIVIDADES -->
-            <div class="card">
+        </section>
 
-                <h2>Actividades</h2>
 
-                <ul>
+        <!-- =====================================
+             CONTENIDO
+        ====================================== -->
+        <section class="container">
 
-                    <li
-                        v-for="activity in event.activities"
-                        :key="activity"
-                    >
-                        {{ activity }}
-                    </li>
 
-                </ul>
+            <!-- =====================================
+                 INFORMACIÓN
+            ====================================== -->
+            <div class="left">
 
-            </div>
 
-            <!-- CRONOGRAMA -->
-            <div class="card">
+                <!-- =====================================
+                     DESCRIPCIÓN
+                ====================================== -->
+                <div class="card">
 
-                <h2>Cronograma</h2>
+                    <h2>
+                        Descripción
+                    </h2>
 
-                <table>
+                    <p>
+                        {{ event.description }}
+                    </p>
 
-                    <thead>
+                </div>
 
-                        <tr>
 
-                            <th>Hora</th>
+                <!-- =====================================
+                     ACTIVIDADES
+                ====================================== -->
+                <div class="card">
 
-                            <th>Actividad</th>
+                    <h2>
+                        Actividades
+                    </h2>
 
-                        </tr>
+                    <ul>
 
-                    </thead>
+                        <li
+                            v-for="activity in event.activities"
+                            :key="activity"
+                        >
+                            {{ activity }}
+                        </li>
 
-                    <tbody>
+                    </ul>
 
-                        <tr
-                            v-for="item in event.schedule"
-                            :key="item.time"
+                </div>
+
+
+                <!-- =====================================
+                     CRONOGRAMA
+                ====================================== -->
+                <div class="card">
+
+                    <h2>
+                        Cronograma
+                    </h2>
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>
+                                    Hora
+                                </th>
+
+                                <th>
+                                    Actividad
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr
+                                v-for="item in event.schedule"
+                                :key="item.time"
+                            >
+
+                                <td>
+                                    {{ item.time }}
+                                </td>
+
+                                <td>
+                                    {{ item.activity }}
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- =====================================
+                     PONENTES
+                ====================================== -->
+                <div
+                    v-if="event.speakers && event.speakers.length"
+                    class="card"
+                >
+
+                    <h2>
+                        Ponentes
+                    </h2>
+
+                    <div class="speakers">
+
+                        <div
+                            v-for="speaker in event.speakers"
+                            :key="speaker.name"
+                            class="speaker"
                         >
 
-                            <td>{{ item.time }}</td>
+                            <img
+                                :src="speaker.image"
+                                :alt="speaker.name"
+                            >
 
-                            <td>{{ item.activity }}</td>
+                            <h4>
+                                {{ speaker.name }}
+                            </h4>
 
-                        </tr>
+                            <p>
+                                {{ speaker.description }}
+                            </p>
 
-                    </tbody>
+                        </div>
 
-                </table>
+                    </div>
+
+                </div>
+
 
             </div>
 
-            <!-- PONENTES -->
-            
 
-        </div>
-
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-
-            <div class="info-card">
-
-                <h3>Información General</h3>
-
-                <p>📅 <strong>Fecha:</strong> {{ event.date }}</p>
-
-                <p>🕘 <strong>Hora:</strong> {{ event.time }}</p>
-
-                <p>📍 <strong>Lugar:</strong> {{ event.place }}</p>
-
-                <p>👥 <strong>Cupo:</strong> {{ event.capacity }}</p>
-
-                <p>💲 <strong>Costo:</strong> {{ event.cost }}</p>
-
-            </div>
-
-            <!-- REGISTRO -->
-            <router-link
-                class="register-btn"
-                :to="event.registerRoute"
-            >
-                📝 Registrarse
-            </router-link>
-
-            <!-- REFERENCIA BANCARIA -->
-            <router-link
-                v-if="event.tienePago && event.id === 4"
-                class="bank-btn"
-                to="/referencia-escala"
-            >
-                🏦 Imprimir referencia bancaria
-            </router-link>
-
-            <!-- SUBIR COMPROBANTE -->
-            <router-link
-                v-if="event.tienePago"
-                class="secondary"
-                :to="'/subir-comprobante/' + event.id"
-            >
-                📤 Subir comprobante de pago
-            </router-link>
-
-            <!-- CONSTANCIA -->
-            <router-link
-                class="secondary"
-                :to="'/constancia/' + event.id"
-            >
-                🎓 Consultar constancia
-            </router-link>
+            <!-- =====================================
+                 SIDEBAR
+            ====================================== -->
+            <aside class="sidebar">
 
 
-        </aside>
+                <!-- =====================================
+                     INFORMACIÓN GENERAL
+                ====================================== -->
+                <div class="info-card">
 
-    </section>
+                    <h3>
+                        Información General
+                    </h3>
 
-</div>
+                    <p>
+                        📅
+                        <strong>Fecha:</strong>
+                        {{ event.date }}
+                    </p>
 
-<!-- EVENTO NO ENCONTRADO -->
-<div
-    v-else
-    class="not-found"
->
+                    <p>
+                        🕘
+                        <strong>Hora:</strong>
+                        {{ event.time }}
+                    </p>
 
-    <h1>Evento no encontrado</h1>
+                    <p>
+                        📍
+                        <strong>Lugar:</strong>
+                        {{ event.place }}
+                    </p>
 
-    <p>
-        El evento que intentas consultar no existe o fue eliminado.
-    </p>
+                    <p>
+                        👥
+                        <strong>Cupo:</strong>
+                        {{ event.capacity }}
+                    </p>
 
-    <router-link
-        to="/eventos/categoria"
-        class="back-home"
+                    <p>
+                        💲
+                        <strong>Costo:</strong>
+                        {{ event.cost }}
+                    </p>
+
+                </div>
+
+
+                <!-- =====================================
+                     REGISTRO
+                ====================================== -->
+                <router-link
+                    class="register-btn"
+                    :to="event.registerRoute"
+                >
+                    📝 Registrarse
+                </router-link>
+
+
+                <!-- =====================================
+                     REFERENCIA BANCARIA
+                ====================================== -->
+                <router-link
+                    v-if="event.tienePago && event.id === 4"
+                    class="bank-btn"
+                    to="/referencia-escala"
+                >
+                    🏦 Imprimir referencia bancaria
+                </router-link>
+
+
+                <!-- =====================================
+                     SUBIR COMPROBANTE
+                ====================================== -->
+                <router-link
+                    v-if="event.tienePago"
+                    class="secondary"
+                    :to="'/subir-comprobante/' + event.id"
+                >
+                    📤 Subir comprobante de pago
+                </router-link>
+
+
+                <!-- =====================================
+                     ESTADO DEL PAGO
+                ====================================== -->
+                <router-link
+                    v-if="event.tienePago"
+                    class="secondary payment-status-btn"
+                    to="/estado-pago"
+                >
+                    💳 Consultar estado del pago
+                </router-link>
+
+
+                <!-- =====================================
+                     CONSTANCIA
+                ====================================== -->
+                <router-link
+                    class="secondary"
+                    :to="'/constancia/' + event.id"
+                >
+                    🎓 Consultar constancia
+                </router-link>
+
+
+            </aside>
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================
+         EVENTO NO ENCONTRADO
+    ====================================== -->
+    <div
+        v-else
+        class="not-found"
     >
-        Volver a categorías
-    </router-link>
 
-</div>
+        <h1>
+            Evento no encontrado
+        </h1>
+
+        <p>
+            El evento que intentas consultar no existe o fue eliminado.
+        </p>
+
+        <router-link
+            to="/eventos/categoria"
+            class="back-home"
+        >
+            Volver a categorías
+        </router-link>
+
+    </div>
 
 </template>
 
+
 <script setup>
-    import { ref, watchEffect } from "vue";
-    import { useRoute } from "vue-router";
-    import { API_URL } from "../../config/api";
 
-    const route = useRoute();
+import {
+    ref,
+    watchEffect
+} from "vue";
 
-    const eventId = Number(route.params.id);
+import {
+    useRoute
+} from "vue-router";
 
-    const event = ref(null);
+import {
+    API_URL
+} from "../../config/api";
 
-    watchEffect(async () => {
+
+const route = useRoute();
+
+const eventId = Number(route.params.id);
+
+const event = ref(null);
+
+
+watchEffect(async () => {
 
     try {
 
         const response = await fetch(
-        `${API_URL}/eventos/${eventId}`
+            `${API_URL}/eventos/${eventId}`
         );
 
         if (!response.ok) {
-        event.value = null;
-        return;
+
+            event.value = null;
+
+            return;
         }
 
         event.value = await response.json();
 
     } catch (e) {
-        console.error("Error al cargar el evento:", e);
+
+        console.error(
+            "Error al cargar el evento:",
+            e
+        );
+
         event.value = null;
+
     }
 
-    });
+});
 
-    function imprimirRecibo() {
+
+/* =====================================
+   IMPRIMIR RECIBO
+===================================== */
+
+function imprimirRecibo() {
+
     if (event.value?.reciboBanco) {
-        window.open(event.value.reciboBanco, "_blank");
-    }
+
+        window.open(
+            event.value.reciboBanco,
+            "_blank"
+        );
+
     }
 
-    function descargarPrograma() {
+}
+
+
+/* =====================================
+   DESCARGAR PROGRAMA
+===================================== */
+
+function descargarPrograma() {
+
     if (event.value?.programa) {
-        window.open(event.value.programa, "_blank");
+
+        window.open(
+            event.value.programa,
+            "_blank"
+        );
+
     }
-    }
+
+}
+
 </script>
 
 
@@ -264,682 +437,841 @@
    RESET
 ===================================== */
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.event-detail{
-    min-height:100vh;
-    background:#f4f7fb;
-    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+
+.event-detail {
+
+    min-height: 100vh;
+
+    background: #f4f7fb;
+
+    font-family:
+        'Segoe UI',
+        Tahoma,
+        Geneva,
+        Verdana,
+        sans-serif;
+
 }
+
 
 /* =====================================
    BOTÓN REGRESAR
 ===================================== */
 
-.back-btn{
+.back-btn {
 
-    position:fixed;
+    position: fixed;
 
-    top:20px;
+    top: 20px;
 
-    left:20px;
+    left: 20px;
 
-    z-index:999;
+    z-index: 999;
 
-    background:#003366;
+    background: #003366;
 
-    color:#fff;
+    color: #fff;
 
-    text-decoration:none;
+    text-decoration: none;
 
-    padding:12px 22px;
+    padding: 12px 22px;
 
-    border-radius:12px;
+    border-radius: 12px;
 
-    font-weight:600;
+    font-weight: 600;
 
-    transition:.3s;
+    transition: .3s;
 
-    box-shadow:0 8px 20px rgba(0,0,0,.20);
+    box-shadow:
+        0 8px 20px
+        rgba(0, 0, 0, .20);
+
+}
+
+
+
+.back-btn:hover {
+
+    background: #0055aa;
+
+    transform:
+        translateY(-3px);
 
 }
 
-.back-btn:hover{
-
-    background:#0055aa;
-
-    transform:translateY(-3px);
-
-}
 
 /* =====================================
    HERO
 ===================================== */
 
-.hero{
+.hero {
 
-    position:relative;
+    position: relative;
 
-    height:520px;
+    height: 520px;
 
-    overflow:hidden;
-
-}
-
-.banner{
-
-    width:100%;
-
-    height:100%;
-
-    object-fit:cover;
-
-    filter:brightness(.40);
+    overflow: hidden;
 
 }
 
-.overlay{
 
-    position:absolute;
 
-    inset:0;
+.banner {
 
-    display:flex;
+    width: 100%;
 
-    align-items:center;
+    height: 100%;
 
-    gap:45px;
+    object-fit: cover;
 
-    max-width:1400px;
-
-    margin:auto;
-
-    padding:0 40px;
-
-    color:white;
+    filter: brightness(.40);
 
 }
 
-.logo{
 
-    width:170px;
+.overlay {
 
-    height:170px;
+    position: absolute;
 
-    background:white;
+    inset: 0;
 
-    border-radius:20px;
+    display: flex;
 
-    object-fit:contain;
+    align-items: center;
 
-    padding:18px;
+    gap: 45px;
 
-    box-shadow:0 15px 35px rgba(0,0,0,.35);
+    max-width: 1400px;
 
-}
+    margin: auto;
 
-.badge{
+    padding: 0 40px;
 
-    display:inline-block;
-
-    background:#0055aa;
-
-    color:white;
-
-    padding:8px 20px;
-
-    border-radius:30px;
-
-    font-weight:bold;
-
-    margin-bottom:20px;
+    color: white;
 
 }
 
-.overlay h1{
 
-    font-size:3rem;
+.logo {
 
-    margin-bottom:18px;
+    width: 170px;
+
+    height: 170px;
+
+    background: white;
+
+    border-radius: 20px;
+
+    object-fit: contain;
+
+    padding: 18px;
+
+    box-shadow:
+        0 15px 35px
+        rgba(0, 0, 0, .35);
 
 }
 
-.overlay p{
 
-    max-width:700px;
+.badge {
 
-    font-size:1.15rem;
+    display: inline-block;
 
-    line-height:1.8;
+    background: #0055aa;
+
+    color: white;
+
+    padding: 8px 20px;
+
+    border-radius: 30px;
+
+    font-weight: bold;
+
+    margin-bottom: 20px;
 
 }
+
+
+.overlay h1 {
+
+    font-size: 3rem;
+
+    margin-bottom: 18px;
+
+}
+
+
+.overlay p {
+
+    max-width: 700px;
+
+    font-size: 1.15rem;
+
+    line-height: 1.8;
+
+}
+
 
 /* =====================================
    CONTENEDOR
 ===================================== */
 
-.container{
+.container {
 
-    max-width:1400px;
+    max-width: 1400px;
 
-    margin:auto;
+    margin: auto;
 
-    display:grid;
+    display: grid;
 
-    grid-template-columns:2fr 1fr;
+    grid-template-columns: 2fr 1fr;
 
-    gap:35px;
+    gap: 35px;
 
-    padding:50px 30px;
+    padding: 50px 30px;
 
 }
+
 
 /* =====================================
    CARDS
 ===================================== */
 
-.card{
+.card {
 
-    background:white;
+    background: white;
 
-    border-radius:18px;
+    border-radius: 18px;
 
-    padding:30px;
+    padding: 30px;
 
-    margin-bottom:30px;
+    margin-bottom: 30px;
 
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-
-}
-
-.card h2{
-
-    color:#003366;
-
-    margin-bottom:18px;
-
-    font-size:1.6rem;
+    box-shadow:
+        0 10px 25px
+        rgba(0, 0, 0, .08);
 
 }
 
-.card p{
 
-    color:#555;
 
-    line-height:1.9;
+.card h2 {
 
-}
+    color: #003366;
 
-.card ul{
+    margin-bottom: 18px;
 
-    padding-left:20px;
+    font-size: 1.6rem;
 
 }
 
-.card li{
 
-    margin-bottom:12px;
+.card p {
 
-    color:#555;
+    color: #555;
 
-    line-height:1.7;
+    line-height: 1.9;
 
 }
+
+
+.card ul {
+
+    padding-left: 20px;
+
+}
+
+
+.card li {
+
+    margin-bottom: 12px;
+
+    color: #555;
+
+    line-height: 1.7;
+
+}
+
 
 /* =====================================
    TABLA
 ===================================== */
 
-table{
+table {
 
-    width:100%;
+    width: 100%;
 
-    border-collapse:collapse;
+    border-collapse: collapse;
 
-    overflow:hidden;
+    overflow: hidden;
 
-    border-radius:12px;
-
-}
-
-thead{
-
-    background:#003366;
-
-    color:white;
+    border-radius: 12px;
 
 }
 
-th{
 
-    padding:14px;
 
-}
+thead {
 
-td{
+    background: #003366;
 
-    padding:14px;
-
-    border-bottom:1px solid #ddd;
+    color: white;
 
 }
 
-tbody tr:hover{
 
-    background:#f3f7ff;
+th {
+
+    padding: 14px;
 
 }
+
+
+td {
+
+    padding: 14px;
+
+    border-bottom:
+        1px solid #ddd;
+
+}
+
+
+tbody tr:hover {
+
+    background: #f3f7ff;
+
+}
+
 
 /* =====================================
    PONENTES
 ===================================== */
 
-.speakers{
+.speakers {
 
-    display:grid;
+    display: grid;
 
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(180px, 1fr)
+        );
 
-    gap:25px;
-
-}
-
-.speaker{
-
-    text-align:center;
-
-    padding:20px;
-
-    border-radius:15px;
-
-    background:#fafafa;
-
-    transition:.3s;
+    gap: 25px;
 
 }
 
-.speaker:hover{
 
-    transform:translateY(-5px);
+.speaker {
 
-    box-shadow:0 10px 20px rgba(0,0,0,.10);
+    text-align: center;
 
-}
+    padding: 20px;
 
-.speaker img{
+    border-radius: 15px;
 
-    width:120px;
+    background: #fafafa;
 
-    height:120px;
-
-    object-fit:cover;
-
-    border-radius:50%;
-
-    border:4px solid #0055aa;
-
-    margin-bottom:15px;
+    transition: .3s;
 
 }
 
-.speaker h4{
 
-    color:#003366;
+.speaker:hover {
 
-    margin-bottom:8px;
+    transform:
+        translateY(-5px);
+
+    box-shadow:
+        0 10px 20px
+        rgba(0, 0, 0, .10);
+
+}
+
+
+.speaker img {
+
+    width: 120px;
+
+    height: 120px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border:
+        4px solid #0055aa;
+
+    margin-bottom: 15px;
 
 }
 
-.speaker p{
 
-    color:#666;
+.speaker h4 {
 
-    font-size:.9rem;
+    color: #003366;
+
+    margin-bottom: 8px;
 
 }
+
+
+.speaker p {
+
+    color: #666;
+
+    font-size: .9rem;
+
+}
+
 
 /* =====================================
    SIDEBAR
 ===================================== */
 
-.sidebar{
+.sidebar {
 
-    position:sticky;
+    position: sticky;
 
-    top:90px;
+    top: 90px;
 
-    height:max-content;
-
-}
-
-.info-card{
-
-    background:white;
-
-    border-radius:18px;
-
-    padding:30px;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-
-    margin-bottom:25px;
+    height: max-content;
 
 }
 
-.info-card h3{
 
-    color:#003366;
+.info-card {
 
-    margin-bottom:20px;
+    background: white;
+
+    border-radius: 18px;
+
+    padding: 30px;
+
+    box-shadow:
+        0 10px 25px
+        rgba(0, 0, 0, .08);
+
+    margin-bottom: 25px;
 
 }
 
-.info-card p{
 
-    color:#555;
+.info-card h3 {
 
-    margin-bottom:15px;
+    color: #003366;
 
-    line-height:1.7;
+    margin-bottom: 20px;
+
+}
+
+
+.info-card p {
+
+    color: #555;
+
+    margin-bottom: 15px;
+
+    line-height: 1.7;
+
+}
+
+
+/* =====================================
+   BOTÓN REGISTRO
+===================================== */
+
+.register-btn {
+
+    display: block;
+
+    width: 100%;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    background:
+        linear-gradient(
+            90deg,
+            #003366,
+            #0055aa
+        );
+
+    color: white;
+
+    padding: 16px;
+
+    border-radius: 12px;
+
+    font-size: 1rem;
+
+    font-weight: bold;
+
+    margin-bottom: 15px;
+
+    transition: .3s;
+
+}
+
+
+.register-btn:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 25px
+        rgba(0, 85, 170, .35);
+
+}
+
+
+/* =====================================
+   BOTÓN REFERENCIA BANCARIA
+===================================== */
+
+.bank-btn {
+
+    width: 100%;
+
+    border: none;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2e7d32,
+            #43a047
+        );
+
+    color: #fff;
+
+    padding: 16px 20px;
+
+    border-radius: 14px;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    margin-bottom: 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    box-shadow:
+        0 6px 15px
+        rgba(46, 125, 50, .25);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
+
+}
+
+
+.bank-btn:hover {
+
+    background:
+        linear-gradient(
+            135deg,
+            #1b5e20,
+            #2e7d32
+        );
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 25px
+        rgba(46, 125, 50, .35);
+
+}
+
+
+.bank-btn:active {
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 6px 12px
+        rgba(46, 125, 50, .25);
+
+}
+
+
+.bank-btn:focus-visible {
+
+    outline:
+        3px solid
+        rgba(76, 175, 80, .35);
+
+    outline-offset: 3px;
 
 }
 
 /* =====================================
-   BOTONES
+   BOTONES SECUNDARIOS
 ===================================== */
 
-.register-btn{
+.secondary {
 
-    display:block;
-
-    width:100%;
-
-    text-align:center;
-
-    text-decoration:none;
-
-    background:linear-gradient(90deg,#003366,#0055aa);
-
-    color:white;
-
-    padding:16px;
-
-    border-radius:12px;
-
-    font-size:1rem;
-
-    font-weight:bold;
-
-    margin-bottom:15px;
-
-    transition:.3s;
-
-}
-
-.register-btn:hover{
-
-    transform:translateY(-3px);
-
-    box-shadow:0 12px 25px rgba(0,85,170,.35);
-
-}
-
-/* BOTÓN REFERENCIA BANCARIA */
-
-.bank-btn {
     width: 100%;
+
+    display: block;
+
+    text-align: center;
+
+    text-decoration: none;
+
     border: none;
-    background: linear-gradient(135deg, #2e7d32, #43a047);
-    color: #fff;
-    padding: 16px 20px;
-    border-radius: 14px;
-    font-size: 1rem;
-    font-weight: 700;
+
+    background: #eef3fb;
+
+    color: #003366;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    font-size: .95rem;
+
+    font-weight: 600;
+
     cursor: pointer;
-    margin-bottom: 15px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+    margin-bottom: 12px;
 
-    box-shadow: 0 6px 15px rgba(46, 125, 50, 0.25);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        background 0.25s ease;
-}
-
-.bank-btn:hover {
-    background: linear-gradient(135deg, #1b5e20, #2e7d32);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 25px rgba(46, 125, 50, 0.35);
-}
-
-.bank-btn:active {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(46, 125, 50, 0.25);
-}
-
-.bank-btn:focus-visible {
-    outline: 3px solid rgba(76, 175, 80, 0.35);
-    outline-offset: 3px;
-}
-
-/* BOTONES SECUNDARIOS */
-
-.secondary{
-
-    width:100%;
-
-    display:block;
-
-    text-align:center;
-
-    text-decoration:none;
-
-    border:none;
-
-    background:#eef3fb;
-
-    color:#003366;
-
-    padding:15px;
-
-    border-radius:12px;
-
-    font-size:.95rem;
-
-    font-weight:600;
-
-    cursor:pointer;
-
-    margin-bottom:12px;
-
-    transition:.3s;
+    transition: .3s;
 
 }
 
-.secondary:hover{
 
-    background:#003366;
+.secondary:hover {
 
-    color:white;
+    background: #003366;
+
+    color: white;
 
 }
+
+
+/* =====================================
+   ESTADO DEL PAGO
+===================================== */
+
+.payment-status-btn {
+
+    background: #e8f1ff;
+
+    color: #0055aa;
+
+    border:
+        1px solid #c9ddf5;
+
+}
+
+
+.payment-status-btn:hover {
+
+    background: #0055aa;
+
+    color: white;
+
+}
+
 
 /* =====================================
    EVENTO NO ENCONTRADO
 ===================================== */
 
-.not-found{
+.not-found {
 
-    min-height:100vh;
+    min-height: 100vh;
 
-    display:flex;
+    display: flex;
 
-    flex-direction:column;
+    flex-direction: column;
 
-    justify-content:center;
+    justify-content: center;
 
-    align-items:center;
+    align-items: center;
 
-    text-align:center;
+    text-align: center;
 
-    padding:40px;
-
-}
-
-.not-found h1{
-
-    color:#003366;
-
-    font-size:3rem;
-
-    margin-bottom:20px;
+    padding: 40px;
 
 }
 
-.not-found p{
 
-    color:#666;
 
-    margin-bottom:30px;
+.not-found h1 {
 
-    max-width:600px;
+    color: #003366;
 
-}
+    font-size: 3rem;
 
-.back-home{
-
-    background:#003366;
-
-    color:white;
-
-    text-decoration:none;
-
-    padding:15px 28px;
-
-    border-radius:12px;
-
-    transition:.3s;
+    margin-bottom: 20px;
 
 }
 
-.back-home:hover{
 
-    background:#0055aa;
+.not-found p {
+
+    color: #666;
+
+    margin-bottom: 30px;
+
+    max-width: 600px;
 
 }
+
+
+.back-home {
+
+    background: #003366;
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 15px 28px;
+
+    border-radius: 12px;
+
+    transition: .3s;
+
+}
+
+
+.back-home:hover {
+
+    background: #0055aa;
+
+}
+
 
 /* =====================================
    RESPONSIVE
 ===================================== */
 
-@media(max-width:1100px){
+@media(max-width: 1100px) {
 
-.container{
+    .container {
 
-grid-template-columns:1fr;
+        grid-template-columns: 1fr;
 
-}
+    }
 
-.sidebar{
+    .sidebar {
 
-position:relative;
+        position: relative;
 
-top:0;
+        top: 0;
 
-}
+    }
 
-.overlay{
+    .overlay {
 
-flex-direction:column;
+        flex-direction: column;
 
-justify-content:center;
+        justify-content: center;
 
-text-align:center;
+        text-align: center;
 
-padding:40px;
+        padding: 40px;
 
-}
+    }
 
-.logo{
+    .logo {
 
-width:140px;
+        width: 140px;
 
-height:140px;
+        height: 140px;
 
-}
+    }
 
-.overlay h1{
+    .overlay h1 {
 
-font-size:2.3rem;
+        font-size: 2.3rem;
 
-}
-
-}
-
-@media(max-width:768px){
-
-.hero{
-
-height:650px;
+    }
 
 }
 
-.overlay{
 
-padding:30px 20px;
 
-}
+@media(max-width: 768px) {
 
-.overlay h1{
+    .hero {
 
-font-size:2rem;
+        height: 650px;
 
-}
+    }
 
-.overlay p{
+    .overlay {
 
-font-size:1rem;
+        padding: 30px 20px;
 
-}
+    }
 
-.container{
+    .overlay h1 {
 
-padding:30px 15px;
+        font-size: 2rem;
 
-}
+    }
 
-.card{
+    .overlay p {
 
-padding:22px;
+        font-size: 1rem;
 
-}
+    }
 
-.back-btn{
+    .container {
 
-top:15px;
+        padding: 30px 15px;
 
-left:15px;
+    }
 
-padding:10px 16px;
+    .card {
 
-font-size:.9rem;
+        padding: 22px;
 
-}
+    }
 
-.speakers{
+    .back-btn {
 
-grid-template-columns:1fr;
+        top: 15px;
 
-}
+        left: 15px;
+
+        padding: 10px 16px;
+
+        font-size: .9rem;
+
+    }
+
+    .speakers {
+
+        grid-template-columns: 1fr;
+
+    }
 
 }
 
