@@ -14,7 +14,7 @@ import AboutView from "../Views/public/AboutView.vue";
 import ReferenciaEscalaView from "../Views/public/ReferenciaEscalaView.vue";
 import SubirComprobanteView from "../Views/public/SubirComprobanteView.vue";
 import EstadoPagoView from "../Views/public/EstadoPagoView.vue";
-import ConsultarFolioView from "../views/public/ConsultarFolioView.vue";
+import ConsultarFolioView from "../views/public/RecuperarFolio.vue";
 
 import RegistroEscala from "../Views/public/RegistroEscala.vue";
 import RegistroArgos from "../Views/public/RegistroArgos.vue";
