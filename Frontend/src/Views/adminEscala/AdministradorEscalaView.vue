@@ -4654,6 +4654,20 @@ td {
 
 }
 
+.receipt-frame {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: contain;
+
+  border: none;
+
+  border-radius: 14px;
+
+}
+
 
 .document-viewer div {
 
