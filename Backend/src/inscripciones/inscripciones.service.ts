@@ -319,7 +319,7 @@ export class InscripcionesService {
     let payment = 'pending';
     if (estadoNombre === 'Confirmado') payment = 'approved';
     else if (estadoNombre === 'Rechazada') payment = 'rejected';
-    else if (estadoNombre === 'En revisión') payment = 'in_review';
+    else if (estadoNombre === 'En revisión') payment = 'review';
 
     const receiptName = p.comprobante_pago ? p.comprobante_pago.split('/').pop() : null;
 

@@ -1532,19 +1532,17 @@
 
 
         <div class="document-viewer">
-
-          <div>
-            📄
-          </div>
-
-          <strong>
-            {{ selectedReceipt.receiptName }}
-          </strong>
-
-          <span>
-            Vista previa simulada del comprobante
-          </span>
-
+          <template v-if="selectedReceipt.receiptUrl">
+            <div>📄</div>
+            <strong>{{ selectedReceipt.receiptName }}</strong>
+            <a :href="selectedReceipt.receiptUrl" target="_blank" rel="noopener" class="view-file">
+              👁 Abrir comprobante
+            </a>
+          </template>
+          <template v-else>
+            <div>📄</div>
+            <span>Comprobante no disponible</span>
+          </template>
         </div>
 
 
@@ -2043,39 +2041,41 @@ function openReceipt(participant) {
 // APROBAR
 // =====================================================
 
-function approvePayment(participant) {
+const EVENTO_ID = 4;
 
-  participant.payment =
-    "approved";
-
-  selectedReceipt.value =
-    null;
-
-  alert(
-    `El pago de ${participant.name} fue aprobado correctamente.`
-  );
-
+async function approvePayment(participant) {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participant.id}/aprobar`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!response.ok) throw new Error("No se pudo aprobar el pago.");
+    participant.payment = "approved";
+    selectedReceipt.value = null;
+  } catch (e) {
+    alert(e.message);
+  }
 }
-
 
 // =====================================================
 // RECHAZAR
 // =====================================================
 
-function rejectPayment(participant) {
-
-  participant.payment =
-    "rejected";
-
-  selectedReceipt.value =
-    null;
-
-  alert(
-    `El comprobante de ${participant.name} fue rechazado.`
-  );
-
+async function rejectPayment(participant) {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participant.id}/rechazar`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!response.ok) throw new Error("No se pudo rechazar el comprobante.");
+    participant.payment = "rejected";
+    selectedReceipt.value = null;
+  } catch (e) {
+    alert(e.message);
+  }
 }
-
 
 // =====================================================
 // SUBIR PLANTILLA
