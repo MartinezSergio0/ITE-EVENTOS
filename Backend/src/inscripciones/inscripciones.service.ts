@@ -325,9 +325,14 @@ export class InscripcionesService {
 
     let receiptUrl: string | null = null;
     if (p.comprobante_pago) {
-      const { data } = await this.supabase.client.storage
+      const { data, error } = await this.supabase.client.storage
         .from('comprobantes')
-        .createSignedUrl(p.comprobante_pago, 300); // válida 5 minutos
+        .createSignedUrl(p.comprobante_pago, 300);
+
+      if (error) {
+        console.error('Error al firmar comprobante:', p.comprobante_pago, error.message);
+      }
+
       receiptUrl = data?.signedUrl ?? null;
     }
 
