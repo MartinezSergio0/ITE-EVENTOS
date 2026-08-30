@@ -886,11 +886,19 @@ const participants = ref([]);
    INFORMACIÓN DEL EVENTO
 ========================================= */
 
-const eventInfo = ref({
+const eventInfo = ref({ cost: "" });
 
-  cost: "$700 MXN"
-
-});
+async function loadEvento() {
+  try {
+    const response = await fetch(`${API_URL}/eventos/${EVENTO_ID}`);
+    if (response.ok) {
+      const data = await response.json();
+      eventInfo.value.cost = data.cost;
+    }
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
+  }
+}
 
 
 /* =========================================
@@ -929,19 +937,6 @@ async function loadParticipants() {
   }
 }
 
-const eventInfo = ref({ cost: "" });
-
-async function loadEvento() {
-  try {
-    const response = await fetch(`${API_URL}/eventos/${EVENTO_ID}`);
-    if (response.ok) {
-      const data = await response.json();
-      eventInfo.value.cost = data.cost;
-    }
-  } catch (e) {
-    console.error("Error al cargar el evento:", e);
-  }
-}
 
 /* =========================================
    PENDIENTES
@@ -1130,7 +1125,7 @@ function initials(name = "") {
    INICIO
 ========================================= */
 
-onMounted(() => {
+onMounted(async () => {
 
   await loadParticipants();
   await loadEvento();
