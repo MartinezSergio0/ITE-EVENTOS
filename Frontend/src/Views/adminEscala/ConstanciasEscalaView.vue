@@ -313,16 +313,7 @@ function handleFile(event) {
   };
 
 
-  /*
-   * IMPORTANTE:
-   *
-   * Aquí NO se manda todavía al backend.
-   *
-   * Tu compañero podrá utilizar posteriormente
-   * este objeto para enviar el archivo mediante
-   * FormData.
-   */
-
+ 
 }
 
 
