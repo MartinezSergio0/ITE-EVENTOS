@@ -1787,6 +1787,7 @@ function normalizePaymentStatus(participant) {
   if (
     rawStatus === "review" ||
     rawStatus === "under_review" ||
+    rawStatus === "in_review" ||
     rawStatus === "en_revision" ||
     rawStatus === "en revisión"
   ) {

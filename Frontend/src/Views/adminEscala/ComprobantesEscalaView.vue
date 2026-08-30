@@ -498,14 +498,14 @@
               <!-- NOMBRE DEL ARCHIVO -->
 
               <div
-                v-if="participant.receipt"
+                v-if="participant.receiptName"
                 class="file-name"
               >
 
                 📎
 
                 <span>
-                  {{ participant.receipt.name }}
+                  {{ participant.receiptName }}
                 </span>
 
               </div>
@@ -777,6 +777,9 @@ import {
   useRouter,
   useRoute
 } from "vue-router";
+import { API_URL } from "../../config/api";
+
+const EVENTO_ID = 4;
 
 
 /* =========================================
@@ -904,169 +907,41 @@ const eventInfo = ref({
   se puede volver a conectar a la API.
 */
 
-function loadParticipants() {
+async function loadParticipants() {
+  const token = localStorage.getItem("token");
 
-  participants.value = [
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/participantes`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-    /* =====================================
-       PENDIENTE
-       NO HA SUBIDO COMPROBANTE
-    ====================================== */
-
-    {
-      id: 1,
-      name: "Ana López García",
-      control: "22400001",
-      email: "ana.lopez@gmail.com",
-      reference: "",
-      payment: "pending",
-      receiptUrl: null,
-      receipt: null
-    },
-
-    {
-      id: 2,
-      name: "Carlos Martínez Pérez",
-      control: "22400002",
-      email: "carlos.martinez@gmail.com",
-      reference: "",
-      payment: "pending",
-      receiptUrl: null,
-      receipt: null
-    },
-
-
-    /* =====================================
-       EN REVISIÓN
-       YA SUBIÓ COMPROBANTE
-    ====================================== */
-
-    {
-      id: 3,
-      name: "María Fernanda Torres",
-      control: "22400003",
-      email: "maria.torres@gmail.com",
-      reference: "ESC-2026-00125",
-      payment: "in_review",
-
-      receiptUrl:
-        "https://placehold.co/800x600/png?text=Comprobante+Maria+Torres",
-
-      receipt: {
-        name: "comprobante_maria_torres.png"
-      }
-    },
-
-    {
-      id: 4,
-      name: "José Hernández Ramírez",
-      control: "22400004",
-      email: "jose.hernandez@gmail.com",
-      reference: "ESC-2026-00126",
-      payment: "in_review",
-
-      receiptUrl:
-        "https://placehold.co/800x600/png?text=Comprobante+Jose+Hernandez",
-
-      receipt: {
-        name: "comprobante_jose_hernandez.png"
-      }
-    },
-
-    {
-      id: 5,
-      name: "Sofía Rodríguez Sánchez",
-      control: "22400005",
-      email: "sofia.rodriguez@gmail.com",
-      reference: "ESC-2026-00127",
-      payment: "in_review",
-
-      receiptUrl:
-        "https://placehold.co/800x600/png?text=Comprobante+Sofia+Rodriguez",
-
-      receipt: {
-        name: "comprobante_sofia_rodriguez.png"
-      }
-    },
-
-
-    /* =====================================
-       APROBADOS
-    ====================================== */
-
-    {
-      id: 6,
-      name: "Luis Alberto González",
-      control: "22400006",
-      email: "luis.gonzalez@gmail.com",
-      reference: "ESC-2026-00098",
-      payment: "approved",
-
-      receiptUrl:
-        "https://placehold.co/800x600/png?text=Pago+Aprobado",
-
-      receipt: {
-        name: "comprobante_luis_gonzalez.png"
-      }
-    },
-
-    {
-      id: 7,
-      name: "Valeria Jiménez Cruz",
-      control: "22400007",
-      email: "valeria.jimenez@gmail.com",
-      reference: "ESC-2026-00099",
-      payment: "approved",
-
-      receiptUrl:
-        "https://placehold.co/800x600/png?text=Pago+Aprobado",
-
-      receipt: {
-        name: "comprobante_valeria_jimenez.png"
-      }
-    },
-
-
-    /* =====================================
-       RECHAZADOS
-    ====================================== */
-
-    {
-      id: 8,
-      name: "Diego Ramírez Flores",
-      control: "22400008",
-      email: "diego.ramirez@gmail.com",
-      reference: "ESC-2026-00075",
-      payment: "rejected",
-
-      receiptUrl:
-        "https://placehold.co/800x600/png?text=Pago+Rechazado",
-
-      receipt: {
-        name: "comprobante_diego_ramirez.png"
-      }
-    },
-
-    {
-      id: 9,
-      name: "Andrea Morales Ruiz",
-      control: "22400009",
-      email: "andrea.morales@gmail.com",
-      reference: "ESC-2026-00076",
-      payment: "rejected",
-
-      receiptUrl:
-        "https://placehold.co/800x600/png?text=Pago+Rechazado",
-
-      receipt: {
-        name: "comprobante_andrea_morales.png"
-      }
+    if (response.status === 401) {
+      router.push("/login");
+      return;
     }
 
-  ];
-
+    if (response.ok) {
+      participants.value = await response.json();
+    }
+  } catch (e) {
+    console.error("Error al cargar participantes:", e);
+  }
 }
 
+const eventInfo = ref({ cost: "" });
+
+async function loadEvento() {
+  try {
+    const response = await fetch(`${API_URL}/eventos/${EVENTO_ID}`);
+    if (response.ok) {
+      const data = await response.json();
+      eventInfo.value.cost = data.cost;
+    }
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
+  }
+}
 
 /* =========================================
    PENDIENTES
@@ -1173,14 +1048,18 @@ const history = computed(() => {
    APROBAR
 ========================================= */
 
-function approve(participant) {
-
-  participant.payment = "approved";
-
-  alert(
-    `Pago aprobado correctamente para ${participant.name}.`
-  );
-
+async function approve(participant) {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participant.id}/aprobar`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!response.ok) throw new Error("No se pudo aprobar el pago.");
+    participant.payment = "approved";
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
 
@@ -1188,14 +1067,18 @@ function approve(participant) {
    RECHAZAR
 ========================================= */
 
-function reject(participant) {
-
-  participant.payment = "rejected";
-
-  alert(
-    `Comprobante rechazado para ${participant.name}.`
-  );
-
+async function reject(participant) {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participant.id}/rechazar`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!response.ok) throw new Error("No se pudo rechazar el comprobante.");
+    participant.payment = "rejected";
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
 
@@ -1249,7 +1132,8 @@ function initials(name = "") {
 
 onMounted(() => {
 
-  loadParticipants();
+  await loadParticipants();
+  await loadEvento();
 
 });
 
