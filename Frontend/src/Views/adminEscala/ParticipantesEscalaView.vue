@@ -373,29 +373,10 @@
 
 
             <div class="event-info">
-
-              <div>
-                <span>Fecha</span>
-                <strong>10 al 12 de Septiembre</strong>
-              </div>
-
-              <div>
-                <span>Lugar</span>
-                <strong>
-                  Instituto Tecnológico de Ensenada
-                </strong>
-              </div>
-
-              <div>
-                <span>Cuota</span>
-                <strong>$1,000 MXN</strong>
-              </div>
-
-              <div>
-                <span>Capacidad</span>
-                <strong>500 participantes</strong>
-              </div>
-
+              <div><span>Fecha</span><strong>{{ eventInfo.date }}</strong></div>
+              <div><span>Lugar</span><strong>{{ eventInfo.place }}</strong></div>
+              <div><span>Cuota</span><strong>{{ eventInfo.cost }}</strong></div>
+              <div><span>Capacidad</span><strong>{{ eventInfo.capacity }}</strong></div>
             </div>
 
           </div>
@@ -574,6 +555,10 @@
 
             <option value="pending">
               Pendientes
+            </option>
+
+            <option value="in_review">
+              En revisión
             </option>
 
             <option value="rejected">
@@ -878,9 +863,7 @@
                   Monto
                 </span>
 
-                <strong>
-                  $1,000 MXN
-                </strong>
+                <strong>{{ eventInfo.cost }}</strong>
 
               </div>
 
@@ -1365,19 +1348,25 @@
 
 
         <div class="document-viewer">
-
-          <div>
-            📄
-          </div>
-
-          <strong>
-            {{ selectedReceipt.receiptName }}
-          </strong>
-
-          <span>
-            Vista previa simulada del comprobante
-          </span>
-
+          <template v-if="selectedReceipt.receiptUrl">
+            <iframe
+              v-if="selectedReceipt.receiptUrl.includes('.pdf')"
+              :src="selectedReceipt.receiptUrl"
+              class="receipt-frame"
+              title="Comprobante"
+            ></iframe>
+            <img
+              v-else
+              :src="selectedReceipt.receiptUrl"
+              class="receipt-frame"
+              alt="Comprobante de pago"
+            >
+          </template>
+          <template v-else>
+            <div>📄</div>
+            <strong>{{ selectedReceipt.receiptName }}</strong>
+            <span>Comprobante no disponible</span>
+          </template>
         </div>
 
 
@@ -1408,562 +1397,269 @@
 
 
 <script setup>
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { API_URL } from "../../config/api";
 
-import {
-  ref,
-  computed,
-  onMounted,
-  watch
-} from "vue";
-
-import {
-  useRouter
-} from "vue-router";
-
-
-// =====================================================
-// ROUTER
-// =====================================================
+const EVENTO_ID = 4;
 
 const router = useRouter();
 
-
-// =====================================================
-// SIDEBAR
-// =====================================================
-
 const sidebarOpen = ref(false);
-
-
-// =====================================================
-// SECCIÓN
-// =====================================================
-
-// IMPORTANTE:
-// Comprobantes será la pantalla inicial
-
-const currentSection = ref("dashboard");
-
-
-// =====================================================
-// FILTROS
-// =====================================================
+const currentSection = ref("participantes"); // esta vista abre en Participantes
 
 const search = ref("");
-
 const paymentFilter = ref("all");
-
 const typeFilter = ref("all");
 
-
-// =====================================================
-// MODALES
-// =====================================================
-
 const selectedParticipant = ref(null);
-
 const selectedReceipt = ref(null);
 
-
-// =====================================================
-// PLANTILLA
-// =====================================================
-
 const certificateTemplate = ref(null);
+const participants = ref([]);
 
+const eventInfo = ref({
+  date: "",
+  place: "",
+  cost: "",
+  capacity: ""
+});
 
 // =====================================================
-// PARTICIPANTES
+// CARGAR DATOS REALES
 // =====================================================
 
-const participants = ref([
-
-  {
-    id: 1,
-    name: "Ana López García",
-    control: "21460234",
-    type: "Estudiante",
-    email: "ana@ite.edu.mx",
-    payment: "approved",
-    attended: true,
-    reference: "2608000001",
-    receiptName: "comprobante_ana_lopez.pdf",
-    receiptDate: "20/08/2026",
-    certificate: false
-  },
-
-  {
-    id: 2,
-    name: "Carlos Hernández",
-    control: "21460321",
-    type: "Estudiante",
-    email: "carlos@ite.edu.mx",
-    payment: "pending",
-    attended: false,
-    reference: "2608000002",
-    receiptName: "comprobante_carlos.pdf",
-    receiptDate: "21/08/2026",
-    certificate: false
-  },
-
-  {
-    id: 3,
-    name: "María Fernanda Ruiz",
-    control: "21460120",
-    type: "Docente",
-    email: "maria@ite.edu.mx",
-    payment: "approved",
-    attended: true,
-    reference: "2608000003",
-    receiptName: "comprobante_maria.pdf",
-    receiptDate: "20/08/2026",
-    certificate: true
-  },
-
-  {
-    id: 4,
-    name: "José Martínez",
-    control: "GENERAL",
-    type: "General",
-    email: "jose@gmail.com",
-    payment: "pending",
-    attended: false,
-    reference: "2608000004",
-    receiptName: "comprobante_jose.jpg",
-    receiptDate: "22/08/2026",
-    certificate: false
-  },
-
-  {
-    id: 5,
-    name: "Laura Sánchez",
-    control: "21460444",
-    type: "Estudiante",
-    email: "laura@ite.edu.mx",
-    payment: "approved",
-    attended: true,
-    reference: "2608000005",
-    receiptName: "comprobante_laura.pdf",
-    receiptDate: "21/08/2026",
-    certificate: true
-  },
-
-  {
-    id: 6,
-    name: "Miguel Torres",
-    control: "21460555",
-    type: "Estudiante",
-    email: "miguel@ite.edu.mx",
-    payment: "rejected",
-    attended: false,
-    reference: "2608000006",
-    receiptName: "comprobante_miguel.pdf",
-    receiptDate: "22/08/2026",
-    certificate: false
+async function loadParticipants() {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/participantes`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (response.status === 401) {
+      router.push("/login");
+      return;
+    }
+    if (response.ok) {
+      participants.value = await response.json();
+    }
+  } catch (e) {
+    console.error("Error al cargar participantes:", e);
   }
+}
 
-]);
-
+async function loadEvento() {
+  try {
+    const response = await fetch(`${API_URL}/eventos/${EVENTO_ID}`);
+    if (response.ok) {
+      const data = await response.json();
+      eventInfo.value = {
+        date: data.date,
+        place: data.place,
+        cost: data.cost,
+        capacity: data.capacity
+      };
+    }
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
+  }
+}
 
 // =====================================================
 // ESTADÍSTICAS
 // =====================================================
 
-const approvedPayments = computed(() => {
+const approvedPayments = computed(() =>
+  participants.value.filter(p => p.payment === "approved").length
+);
 
-  return participants.value.filter(
-    participant =>
-      participant.payment === "approved"
-  ).length;
+// participantes con comprobante EN REVISIÓN (esperan aprobar/rechazar)
+const pendingParticipants = computed(() =>
+  participants.value.filter(p => p.payment === "in_review")
+);
 
-});
+const pendingReceipts = computed(() => pendingParticipants.value.length);
 
+const reviewedParticipants = computed(() =>
+  participants.value.filter(
+    p => p.payment === "approved" || p.payment === "rejected"
+  )
+);
 
-const pendingParticipants = computed(() => {
-
-  return participants.value.filter(
-    participant =>
-      participant.payment === "pending"
-  );
-
-});
-
-
-const pendingReceipts = computed(() => {
-
-  return pendingParticipants.value.length;
-
-});
-
-
-const reviewedParticipants = computed(() => {
-
-  return participants.value.filter(
-    participant =>
-      participant.payment !== "pending"
-  );
-
-});
-
-
-const generatedCertificates = computed(() => {
-
-  return participants.value.filter(
-    participant =>
-      participant.certificate
-  ).length;
-
-});
-
+const generatedCertificates = computed(() =>
+  participants.value.filter(p => p.certificate).length
+);
 
 // =====================================================
 // FILTRAR PARTICIPANTES
 // =====================================================
 
 const filteredParticipants = computed(() => {
-
   return participants.value.filter(participant => {
-
-    const text =
-      search.value.toLowerCase().trim();
+    const text = search.value.toLowerCase().trim();
 
     const matchesSearch =
-      participant.name
-        .toLowerCase()
-        .includes(text)
-
-      ||
-
-      participant.control
-        .toLowerCase()
-        .includes(text)
-
-      ||
-
-      participant.email
-        .toLowerCase()
-        .includes(text);
-
+      (participant.name || "").toLowerCase().includes(text) ||
+      (participant.control || "").toLowerCase().includes(text) ||
+      (participant.email || "").toLowerCase().includes(text);
 
     const matchesPayment =
-      paymentFilter.value === "all"
-
-      ||
-
-      participant.payment ===
-        paymentFilter.value;
-
+      paymentFilter.value === "all" ||
+      participant.payment === paymentFilter.value;
 
     const matchesType =
-      typeFilter.value === "all"
+      typeFilter.value === "all" ||
+      participant.type === typeFilter.value;
 
-      ||
-
-      participant.type ===
-        typeFilter.value;
-
-
-    return (
-      matchesSearch &&
-      matchesPayment &&
-      matchesType
-    );
-
+    return matchesSearch && matchesPayment && matchesType;
   });
-
 });
 
-
 // =====================================================
-// TITULO
+// TITULO / CAMBIAR SECCIÓN
 // =====================================================
 
 const sectionTitle = computed(() => {
-
   const titles = {
-
-    dashboard:
-      "Dashboard",
-
-    participantes:
-      "Participantes",
-
-    comprobantes:
-      "Comprobantes de pago",
-
-    constancias:
-      "Constancias"
-
+    dashboard: "Dashboard",
+    participantes: "Participantes",
+    comprobantes: "Comprobantes de pago",
+    constancias: "Constancias"
   };
-
   return titles[currentSection.value];
-
 });
 
-
-// =====================================================
-// CAMBIAR SECCIÓN
-// =====================================================
-
 function changeSection(section) {
-
-  currentSection.value =
-    section;
-
-  sidebarOpen.value =
-    false;
-
+  currentSection.value = section;
+  sidebarOpen.value = false;
 
   const routes = {
-
-    dashboard:
-      "/admin/escala",
-
-    participantes:
-      "/admin/escala/participantes",
-
-    comprobantes:
-      "/admin/escala/comprobantes",
-
-    constancias:
-      "/admin/escala/constancias"
-
+    dashboard: "/admin/escala",
+    participantes: "/admin/escala/participantes",
+    comprobantes: "/admin/escala/comprobantes",
+    constancias: "/admin/escala/constancias"
   };
 
-
   if (routes[section]) {
-
-    router.push(
-      routes[section]
-    );
-
+    router.push(routes[section]);
   }
-
 }
-
 
 // =====================================================
 // INICIALES
 // =====================================================
 
 function getInitials(name) {
-
-  return name
-
+  return String(name || "")
     .split(" ")
-
     .filter(Boolean)
-
     .slice(0, 2)
-
-    .map(word =>
-      word.charAt(0)
-    )
-
+    .map(word => word.charAt(0))
     .join("")
-
     .toUpperCase();
-
 }
-
 
 // =====================================================
 // TEXTO PAGO
 // =====================================================
 
 function paymentText(status) {
-
-  if (status === "approved") {
-    return "Aprobado";
-  }
-
-  if (status === "pending") {
-    return "Pendiente";
-  }
-
-  if (status === "rejected") {
-    return "Rechazado";
-  }
-
+  if (status === "approved") return "Aprobado";
+  if (status === "in_review") return "En revisión";
+  if (status === "pending") return "Pendiente";
+  if (status === "rejected") return "Rechazado";
   return status;
-
 }
 
-
 // =====================================================
-// ABRIR COMPROBANTE
+// COMPROBANTE
 // =====================================================
 
 function openReceipt(participant) {
-
-  selectedReceipt.value =
-    participant;
-
+  selectedReceipt.value = participant;
 }
 
-
-// =====================================================
-// APROBAR
-// =====================================================
-
-function approvePayment(participant) {
-
-  participant.payment =
-    "approved";
-
-  selectedReceipt.value =
-    null;
-
-  alert(
-    `El pago de ${participant.name} fue aprobado correctamente.`
-  );
-
+async function approvePayment(participant) {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participant.id}/aprobar`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!response.ok) throw new Error("No se pudo aprobar el pago.");
+    participant.payment = "approved";
+    selectedReceipt.value = null;
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
-
-// =====================================================
-// RECHAZAR
-// =====================================================
-
-function rejectPayment(participant) {
-
-  participant.payment =
-    "rejected";
-
-  selectedReceipt.value =
-    null;
-
-  alert(
-    `El comprobante de ${participant.name} fue rechazado.`
-  );
-
+async function rejectPayment(participant) {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participant.id}/rechazar`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!response.ok) throw new Error("No se pudo rechazar el comprobante.");
+    participant.payment = "rejected";
+    selectedReceipt.value = null;
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
-
 // =====================================================
-// SUBIR PLANTILLA
+// PLANTILLA / CONSTANCIAS (sigue local, sin backend por ahora)
 // =====================================================
 
 function uploadTemplate(event) {
-
-  const file =
-    event.target.files[0];
-
-  if (!file) {
-    return;
-  }
-
+  const file = event.target.files[0];
+  if (!file) return;
 
   const allowedTypes = [
-
     "application/pdf",
-
     "application/msword",
-
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-
   ];
 
-
   if (!allowedTypes.includes(file.type)) {
-
-    alert(
-      "Solo se permiten archivos PDF o Word."
-    );
-
+    alert("Solo se permiten archivos PDF o Word.");
     return;
-
   }
-
 
   certificateTemplate.value = {
-
     name: file.name,
-
     size: file.size,
-
     type: file.type
-
   };
 
-
   localStorage.setItem(
-
     "escala_certificate_template",
-
-    JSON.stringify(
-      certificateTemplate.value
-    )
-
+    JSON.stringify(certificateTemplate.value)
   );
 
-
-  alert(
-    "Plantilla cargada correctamente."
-  );
-
+  alert("Plantilla cargada correctamente.");
 }
-
-
-// =====================================================
-// CONSTANCIA
-// =====================================================
 
 function canGenerateCertificate(participant) {
-
   return (
-
     certificateTemplate.value &&
-
-    participant.payment ===
-      "approved" &&
-
-    participant.attended ===
-      true
-
+    participant.payment === "approved" &&
+    participant.attended === true
   );
-
 }
-
-
-// =====================================================
-// GENERAR CONSTANCIA
-// =====================================================
 
 function generateCertificate(participant) {
-
-  if (
-    !canGenerateCertificate(
-      participant
-    )
-  ) {
-
-    alert(
-      "El participante no cumple los requisitos."
-    );
-
+  if (!canGenerateCertificate(participant)) {
+    alert("El participante no cumple los requisitos.");
     return;
-
   }
-
-
-  participant.certificate =
-    true;
-
-
-  alert(
-    `Constancia generada para ${participant.name}.`
-  );
-
+  participant.certificate = true;
+  alert(`Constancia generada para ${participant.name}.`);
 }
 
-
-// =====================================================
-// DESCARGAR
-// =====================================================
-
 function downloadCertificate(participant) {
-
   const content = `
 
 CONGRESO ESCALA
@@ -1985,129 +1681,36 @@ ESCALA-${participant.id}-${participant.control}
 
 `;
 
-
-  const blob =
-    new Blob(
-
-      [content],
-
-      {
-        type:
-          "text/plain"
-      }
-
-    );
-
-
-  const url =
-    URL.createObjectURL(
-      blob
-    );
-
-
-  const link =
-    document.createElement(
-      "a"
-    );
-
-
-  link.href =
-    url;
-
-
-  link.download =
-    `Constancia_${participant.name.replaceAll(" ", "_")}.txt`;
-
-
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `Constancia_${String(participant.name || "participante").replaceAll(" ", "_")}.txt`;
   link.click();
-
-
-  URL.revokeObjectURL(
-    url
-  );
-
+  URL.revokeObjectURL(url);
 }
-
 
 // =====================================================
 // VOLVER
 // =====================================================
 
 function goBack() {
-
   router.push("/admin");
-
 }
 
-
 // =====================================================
-// CARGAR DATOS
+// INICIO
 // =====================================================
 
-onMounted(() => {
-
-  const savedTemplate =
-    localStorage.getItem(
-      "escala_certificate_template"
-    );
-
-
+onMounted(async () => {
+  const savedTemplate = localStorage.getItem("escala_certificate_template");
   if (savedTemplate) {
-
-    certificateTemplate.value =
-      JSON.parse(
-        savedTemplate
-      );
-
+    certificateTemplate.value = JSON.parse(savedTemplate);
   }
 
-
-  const savedParticipants =
-    localStorage.getItem(
-      "escala_participants"
-    );
-
-
-  if (savedParticipants) {
-
-    participants.value =
-      JSON.parse(
-        savedParticipants
-      );
-
-  }
-
-
+  await loadParticipants();
+  await loadEvento();
 });
-
-
-// =====================================================
-// GUARDAR PARTICIPANTES
-// =====================================================
-
-watch(
-
-  participants,
-
-  value => {
-
-    localStorage.setItem(
-
-      "escala_participants",
-
-      JSON.stringify(
-        value
-      )
-
-    );
-
-  },
-
-  {
-    deep: true
-  }
-
-);
 
 </script>
 
@@ -4114,6 +3717,18 @@ td {
 
 }
 
+.payment.in_review {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.receipt-frame {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: none;
+  border-radius: 14px;
+}
 
 .modal-actions {
 
