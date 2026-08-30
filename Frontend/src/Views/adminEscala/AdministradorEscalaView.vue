@@ -1533,16 +1533,28 @@
 
         <div class="document-viewer">
           <template v-if="selectedReceipt.receiptUrl">
-            <div>📄</div>
-            <strong>{{ selectedReceipt.receiptName }}</strong>
-            <a :href="selectedReceipt.receiptUrl" target="_blank" rel="noopener" class="view-file">
-              👁 Abrir comprobante
-            </a>
+            <iframe
+              v-if="selectedReceipt.receiptUrl.includes('.pdf')"
+              :src="selectedReceipt.receiptUrl"
+              class="receipt-frame"
+              title="Comprobante"
+            ></iframe>
+
+            <img
+              v-else
+              :src="selectedReceipt.receiptUrl"
+              class="receipt-frame"
+              alt="Comprobante de pago"
+            >
+
           </template>
+
           <template v-else>
             <div>📄</div>
+            <strong>{{ selectedReceipt.receiptName }}</strong>
             <span>Comprobante no disponible</span>
           </template>
+
         </div>
 
 
