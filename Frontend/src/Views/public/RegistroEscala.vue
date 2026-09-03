@@ -10,7 +10,7 @@
       <div class="header-content">
 
         <router-link
-          to="/evento/1"
+          to="/evento/4"
           class="back-link"
         >
           ← Regresar al evento
@@ -1115,7 +1115,7 @@
               </strong>
 
               <p>
-                10 al 12 de Septiembre
+                {{ event?.date }}
               </p>
 
             </div>
@@ -1138,30 +1138,7 @@
               </strong>
 
               <p>
-                Instituto Tecnológico de Ensenada
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- ORGANIZADOR -->
-
-          <div class="info-item">
-
-            <span>
-              🏢
-            </span>
-
-            <div>
-
-              <strong>
-                Organizador
-              </strong>
-
-              <p>
-                Departamento de Sistemas
+                {{ event?.place }}
               </p>
 
             </div>
@@ -1184,7 +1161,29 @@
               </strong>
 
               <p>
-                500 participantes
+                {{ event?.capacity }}
+              </p>
+
+            </div>
+
+          </div>
+
+          <!-- COSTO -->
+
+          <div class="info-item">
+
+            <span>
+              💲
+            </span>
+
+            <div>
+
+              <strong>
+                Costo
+              </strong>
+
+              <p>
+                {{ event?.cost }}
               </p>
 
             </div>
@@ -1225,11 +1224,40 @@
 <script setup>
 
 import {
+  onMounted,
   reactive,
   ref
 } from "vue";
 
 import { API_URL } from "../../config/api";
+
+const eventId = 4;
+
+const event = ref(null);
+
+// ============================================
+// CARGAR EVENTO
+// ============================================
+
+onMounted(async () => {
+
+  try {
+
+    const response = await fetch(`${API_URL}/eventos/${eventId}`);
+
+    if (!response.ok) {
+      event.value = null;
+      return;
+    }
+
+    event.value = await response.json();
+
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
+    event.value = null;
+  }
+
+});
 
 // ============================================
 // FORMULARIO
