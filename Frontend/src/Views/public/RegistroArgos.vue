@@ -1,1152 +1,467 @@
+
 <template>
   <div class="registro-page">
-
-    <!-- =========================================
-         HEADER
-    ========================================== -->
-
+    <!-- HEADER -->
     <header class="registro-header">
 
       <div class="header-content">
-
-        <router-link
-          to="/evento/2"
-          class="back-link"
-        >
+        <router-link to="/evento/argos" class="back-link">
           ← Regresar al evento
         </router-link>
 
         <div class="header-title">
-
-          <span class="event-badge">
-            CONGRESO ARGOS
-          </span>
-
-          <h1>
-            Registro de Participante
-          </h1>
-
+          <span class="event-badge">CONGRESO ARGOS</span>
+          <h1>Registro de Estudiante</h1>
           <p>
-            Completa el formulario para registrarte
-            al Congreso ARGOS.
+            Completa tus datos y selecciona el taller y la visita
+            industrial a los que deseas asistir.
           </p>
-
+      
         </div>
-
+      
       </div>
-
+    
     </header>
 
 
-    <!-- =========================================
-         CONTENIDO
-    ========================================== -->
-
     <main class="registro-container">
-
-
-      <!-- =======================================
-           FORMULARIO
-      ======================================== -->
-
+    
+      <!-- FORMULARIO -->
       <div class="registro-card">
-
-
-        <!-- =====================================
-             REGISTRO EXITOSO
-        ====================================== -->
-
-        <div
-          v-if="registroExitoso"
-          class="success-message"
-        >
-
-          <div class="success-icon">
-            ✓
-          </div>
-
-          <div>
-
-            <h3>
-              ¡Registro realizado correctamente!
-            </h3>
-
-            <p>
-              Tus datos fueron registrados
-              correctamente para el Congreso ARGOS.
-            </p>
+        <!-- MENSAJE DE EXITO -->
+        <div v-if="registroExitoso" class="success-message">
+          <div class="success-icon">✓</div>
+          <div class="success-content">
+            <h2>¡Registro realizado correctamente!</h2>
+            <p>Tu información fue enviada para el Congreso Argos.</p>
 
             <div class="folio-box">
-
-              <span>
-                Folio de registro
-              </span>
-
-              <strong>
-                {{ folio }}
-              </strong>
-
+              <span>Folio de registro</span>
+              <strong>{{ folio }}</strong>
             </div>
 
             <p class="success-note">
-              Guarda este folio. Te servirá para
-              consultar posteriormente tu registro.
+              Guarda tu folio para consultar posteriormente tu registro.
             </p>
 
+            <button class="new-register-button" @click="nuevoRegistro">
+              Realizar otro registro
+            </button>
           </div>
-
+    
         </div>
 
-
-        <!-- =====================================
-             FORMULARIO
-        ====================================== -->
-
-        <form
-          v-else
-          class="registro-form"
-          @submit.prevent="registrar"
-        >
-
-
-          <!-- ===================================
-               DATOS PERSONALES
-          ==================================== -->
-
+        <form v-else class="registro-form" @submit.prevent="registrar">
+          <!-- DATOS DEL ESTUDIANTE -->
           <section class="form-section">
-
+    
             <div class="section-header">
-
-              <div class="section-icon">
-                👤
-              </div>
-
+    
+              <div class="section-icon">👨‍🎓</div>
+    
               <div>
-
-                <h2>
-                  Datos Personales
-                </h2>
-
-                <p>
-                  Le solicitamos que complete cada uno
-                  de los campos requeridos con datos
-                  verídicos y actualizados.
-                </p>
-
+                <h2>Datos del estudiante</h2>
+                <p>Ingresa tus datos personales y escolares.</p>
               </div>
-
-            </div>
-
-
-            <div class="privacy-intro">
-
-              <p>
-                La información proporcionada será
-                utilizada únicamente para fines
-                relacionados con la organización y
-                logística del congreso, respetando en
-                todo momento la confidencialidad y
-                protección de sus datos personales.
-              </p>
-
-            </div>
-
-
-            <!-- APELLIDOS -->
-
-            <div class="form-grid">
-
-              <div class="form-group">
-
-                <label>
-                  Apellido paterno
-                  <span>*</span>
-                </label>
-
-                <input
-                  v-model="form.apellidoPaterno"
-                  type="text"
-                  placeholder="Apellido paterno"
-                  required
-                />
-
-              </div>
-
-
-              <div class="form-group">
-
-                <label>
-                  Apellido materno
-                  <span>*</span>
-                </label>
-
-                <input
-                  v-model="form.apellidoMaterno"
-                  type="text"
-                  placeholder="Apellido materno"
-                  required
-                />
-
-              </div>
-
-            </div>
-
-
-            <!-- NOMBRE -->
-
-            <div class="form-group">
-
-              <label>
-                Nombre(s)
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.nombre"
-                type="text"
-                placeholder="Nombre(s)"
-                required
-              />
-
-            </div>
-
-
-            <!-- EDAD -->
-
-            <div class="form-group">
-
-              <label>
-                Edad
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.edad"
-                required
-              >
-
-                <option value="">
-                  Selecciona un rango de edad
-                </option>
-
-                <option value="Menos de 18 años">
-                  Menos de 18 años
-                </option>
-
-                <option value="18 a 29 años">
-                  18 a 29 años
-                </option>
-
-                <option value="30 a 39 años">
-                  30 a 39 años
-                </option>
-
-                <option value="40 a 49 años">
-                  40 a 49 años
-                </option>
-
-                <option value="Más de 50 años">
-                  Más de 50 años
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <!-- SEXO -->
-
-            <div class="form-group">
-
-              <label>
-                Sexo biológico
-                <span>*</span>
-              </label>
-
-              <div class="radio-group">
-
-                <label class="radio-option">
-
-                  <input
-                    v-model="form.sexo"
-                    type="radio"
-                    value="Masculino"
-                    required
-                  />
-
-                  <span>
-                    Masculino
-                  </span>
-
-                </label>
-
-
-                <label class="radio-option">
-
-                  <input
-                    v-model="form.sexo"
-                    type="radio"
-                    value="Femenino"
-                  />
-
-                  <span>
-                    Femenino
-                  </span>
-
-                </label>
-
-
-                <label class="radio-option">
-
-                  <input
-                    v-model="form.sexo"
-                    type="radio"
-                    value="Otro"
-                  />
-
-                  <span>
-                    Otro
-                  </span>
-
-                </label>
-
-              </div>
-
-            </div>
-
-          </section>
-
-
-          <!-- ===================================
-               INFORMACIÓN DE CONTACTO
-          ==================================== -->
-
-          <section class="form-section">
-
-            <div class="section-header">
-
-              <div class="section-icon">
-                📱
-              </div>
-
-              <div>
-
-                <h2>
-                  Información de Contacto
-                </h2>
-
-                <p>
-                  Proporciona información mediante la
-                  cual podamos comunicarnos contigo.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <!-- CORREO -->
-
-            <div class="form-group">
-
-              <label>
-                Correo electrónico
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.email"
-                type="email"
-                placeholder="ejemplo@correo.com"
-                required
-              />
-
-            </div>
-
-
-            <!-- TELEFONO -->
-
-            <div class="form-group">
-
-              <label>
-                Teléfono
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.telefono"
-                type="tel"
-                placeholder="646 000 0000"
-                maxlength="15"
-                required
-              />
-
-            </div>
-
-
-            <!-- ESTADO -->
-
-            <div class="form-group">
-
-              <label>
-                Estado de procedencia
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.estado"
-                required
-              >
-
-                <option value="">
-                  Selecciona tu estado
-                </option>
-
-                <option value="Aguascalientes">
-                  Aguascalientes
-                </option>
-
-                <option value="Baja California">
-                  Baja California
-                </option>
-
-                <option value="Baja California Sur">
-                  Baja California Sur
-                </option>
-
-                <option value="Campeche">
-                  Campeche
-                </option>
-
-                <option value="Chiapas">
-                  Chiapas
-                </option>
-
-                <option value="Chihuahua">
-                  Chihuahua
-                </option>
-
-                <option value="Ciudad de México">
-                  Ciudad de México
-                </option>
-
-                <option value="Coahuila">
-                  Coahuila
-                </option>
-
-                <option value="Colima">
-                  Colima
-                </option>
-
-                <option value="Durango">
-                  Durango
-                </option>
-
-                <option value="Estado de México">
-                  Estado de México
-                </option>
-
-                <option value="Guanajuato">
-                  Guanajuato
-                </option>
-
-                <option value="Guerrero">
-                  Guerrero
-                </option>
-
-                <option value="Hidalgo">
-                  Hidalgo
-                </option>
-
-                <option value="Jalisco">
-                  Jalisco
-                </option>
-
-                <option value="Michoacán">
-                  Michoacán
-                </option>
-
-                <option value="Morelos">
-                  Morelos
-                </option>
-
-                <option value="Nayarit">
-                  Nayarit
-                </option>
-
-                <option value="Nuevo León">
-                  Nuevo León
-                </option>
-
-                <option value="Oaxaca">
-                  Oaxaca
-                </option>
-
-                <option value="Puebla">
-                  Puebla
-                </option>
-
-                <option value="Querétaro">
-                  Querétaro
-                </option>
-
-                <option value="Quintana Roo">
-                  Quintana Roo
-                </option>
-
-                <option value="San Luis Potosí">
-                  San Luis Potosí
-                </option>
-
-                <option value="Sinaloa">
-                  Sinaloa
-                </option>
-
-                <option value="Sonora">
-                  Sonora
-                </option>
-
-                <option value="Tabasco">
-                  Tabasco
-                </option>
-
-                <option value="Tamaulipas">
-                  Tamaulipas
-                </option>
-
-                <option value="Tlaxcala">
-                  Tlaxcala
-                </option>
-
-                <option value="Veracruz">
-                  Veracruz
-                </option>
-
-                <option value="Yucatán">
-                  Yucatán
-                </option>
-
-                <option value="Zacatecas">
-                  Zacatecas
-                </option>
-
-                <option value="Otro">
-                  Otro
-                </option>
-
-              </select>
-
-            </div>
-
-          </section>
-
-
-          <!-- ===================================
-               INSTITUCIÓN
-          ==================================== -->
-
-          <section class="form-section">
-
-            <div class="section-header">
-
-              <div class="section-icon">
-                🏫
-              </div>
-
-              <div>
-
-                <h2>
-                  Institución de procedencia
-                </h2>
-
-                <p>
-                  Indica la institución a la que
-                  perteneces actualmente.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <!-- INSTITUCIÓN -->
-
-            <div class="form-group">
-
-              <label>
-                Institución de procedencia
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.institucion"
-                required
-              >
-
-                <option value="">
-                  Selecciona una institución
-                </option>
-
-                <option value="TecNM, Ensenada">
-                  TecNM, Ensenada
-                </option>
-
-                <option value="TecNM, Tijuana">
-                  TecNM, Tijuana
-                </option>
-
-                <option value="TecNM, Mexicali">
-                  TecNM, Mexicali
-                </option>
-
-                <option value="UABC">
-                  UABC
-                </option>
-
-                <option value="Otro">
-                  Otro
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <!-- OTRA INSTITUCIÓN -->
-
-            <div
-              v-if="form.institucion === 'Otro'"
-              class="form-group"
-            >
-
-              <label>
-                Especifica tu institución
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.otraInstitucion"
-                type="text"
-                placeholder="Nombre de la institución"
-                :required="form.institucion === 'Otro'"
-              />
-
-            </div>
-
-
-            <!-- CARRERA -->
-
-            <div class="form-group">
-
-              <label>
-                Carrera / Área de especialización /
-                disciplina
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.carrera"
-                required
-              >
-
-                <option value="">
-                  Selecciona una opción
-                </option>
-
-                <option value="Lic. en Administración">
-                  Lic. en Administración
-                </option>
-
-                <option value="Lic. Contador Público">
-                  Lic. Contador Público
-                </option>
-
-                <option value="Ing. en Gestión Empresarial">
-                  Ing. en Gestión Empresarial
-                </option>
-
-                <option value="Ing. en Logística">
-                  Ing. en Logística
-                </option>
-
-                <option value="Ing. Industrial">
-                  Ing. Industrial
-                </option>
-
-                <option value="Maestría en Administración">
-                  Maestría en Administración
-                </option>
-
-                <option value="Doctorado en Administración">
-                  Doctorado en Administración
-                </option>
-
-                <option value="Ingeniería en Administración">
-                  Ingeniería en Administración
-                </option>
-
-                <option value="Otro">
-                  Otro
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <!-- OTRA CARRERA -->
-
-            <div
-              v-if="form.carrera === 'Otro'"
-              class="form-group"
-            >
-
-              <label>
-                Especifica tu carrera / área
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.otraCarrera"
-                type="text"
-                placeholder="Escribe tu carrera o área"
-                :required="form.carrera === 'Otro'"
-              />
-
-            </div>
-
-          </section>
-
-
-          <!-- ===================================
-               TALLA DE PLAYERA
-          ==================================== -->
-
-          <section class="form-section">
-
-            <div class="section-header">
-
-              <div class="section-icon">
-                👕
-              </div>
-
-              <div>
-
-                <h2>
-                  Talla de playera
-                </h2>
-
-                <p>
-                  Selecciona la talla de playera que
-                  utilizarás durante el evento.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label>
-                Talla de playera
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.tallaPlayera"
-                required
-              >
-
-                <option value="">
-                  Selecciona una talla
-                </option>
-
-                <option value="CH">
-                  CH
-                </option>
-
-                <option value="M">
-                  M
-                </option>
-
-                <option value="G">
-                  G
-                </option>
-
-                <option value="XL">
-                  XL
-                </option>
-
-                <option value="XXL">
-                  XXL
-                </option>
-
-                <option value="XXXL">
-                  XXXL
-                </option>
-
-              </select>
-
-            </div>
-
-          </section>
-
-
-          <!-- ===================================
-               CONTACTO DE EMERGENCIA
-          ==================================== -->
-
-          <section class="form-section">
-
-            <div class="section-header">
-
-              <div class="section-icon">
-                🚨
-              </div>
-
-              <div>
-
-                <h2>
-                  Contacto de emergencia
-                </h2>
-
-                <p>
-                  Proporciona los datos de una persona
-                  a quien podamos contactar en caso
-                  de emergencia.
-                </p>
-
-              </div>
-
+    
             </div>
 
 
             <div class="form-grid">
-
+    
               <div class="form-group">
-
-                <label>
-                  Nombre del contacto
-                  <span>*</span>
-                </label>
-
+                <label>Nombre(s) <span>*</span></label>
                 <input
-                  v-model="form.contactoEmergenciaNombre"
+                  v-model.trim="form.nombre"
                   type="text"
-                  placeholder="Nombre completo"
+                  maxlength="100"
+                  placeholder="Escribe tu nombre"
                   required
                 />
-
+            
               </div>
 
 
               <div class="form-group">
-
-                <label>
-                  Número de celular
-                  <span>*</span>
-                </label>
-
+                <label>Apellidos <span>*</span></label>
                 <input
-                  v-model="form.contactoEmergenciaTelefono"
+                  v-model.trim="form.apellidos"
+                  type="text"
+                  maxlength="120"
+                  placeholder="Escribe tus apellidos"
+                  required
+                />
+              
+              </div>
+
+              <div class="form-group">
+                <label>Número de control</label>
+                <input
+                  v-model.trim="form.numeroControl"
+                  type="text"
+                  maxlength="30"
+                  placeholder="Número de control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Edad <span>*</span></label>
+                <input
+                  v-model.number="form.edad"
+                  type="number"
+                  min="1"
+                  max="120"
+                  placeholder="Tu edad"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Sexo <span>*</span></label>
+                <select v-model="form.sexo" required>
+                  <option value="">Selecciona una opción</option>
+                  <option value="Femenino">Femenino</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Prefiero no especificar">
+                    Prefiero no especificar
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Talla de playera <span>*</span></label>
+                <select v-model="form.tallaPlayera" required>
+                  <option value="">Selecciona tu talla</option>
+                  <option value="XS">XS</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                  <option value="XXL">XXL</option>
+                  <option value="XXXL">XXXL</option>
+                </select>
+                <small>Selecciona cuidadosamente tu talla.</small>
+              </div>
+            </div>
+          </section>
+
+          <!-- INSTITUCION -->
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">🏫</div>
+              <div>
+                <h2>Tecnológico de procedencia</h2>
+                <p>Indica la institución donde estudias actualmente.</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Institución de procedencia <span>*</span></label>
+              <select v-model="form.tecnologico" required>
+                <option value="">Selecciona tu tecnológico</option>
+                <option value="Instituto Tecnológico de Ensenada">
+                  Instituto Tecnológico de Ensenada
+                </option>
+                <option value="Instituto Tecnológico de Tijuana">
+                  Instituto Tecnológico de Tijuana
+                </option>
+                <option value="Instituto Tecnológico de Mexicali">
+                  Instituto Tecnológico de Mexicali
+                </option>
+                <option value="Instituto Tecnológico de La Paz">
+                  Instituto Tecnológico de La Paz
+                </option>
+                <option value="Otro tecnológico">Otro tecnológico</option>
+                <option value="Otra institución">Otra institución</option>
+              </select>
+            </div>
+
+            <div
+              v-if="form.tecnologico === 'Otro tecnológico' ||
+                    form.tecnologico === 'Otra institución'"
+              class="form-group"
+            >
+              <label>Nombre de tu institución <span>*</span></label>
+              <input
+                v-model.trim="form.otroTecnologico"
+                type="text"
+                maxlength="150"
+                placeholder="Escribe el nombre de tu institución"
+                required
+              />
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Carrera <span>*</span></label>
+                <input
+                  v-model.trim="form.carrera"
+                  type="text"
+                  maxlength="120"
+                  placeholder="Ej. Ingeniería Industrial"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Semestre <span>*</span></label>
+                <select v-model="form.semestre" required>
+                  <option value="">Selecciona tu semestre</option>
+                  <option v-for="n in 12" :key="n" :value="String(n)">
+                    {{ n }}° semestre
+                  </option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- CONTACTO -->
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">📱</div>
+              <div>
+                <h2>Información de contacto</h2>
+                <p>Para comunicarnos contigo sobre el congreso.</p>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Correo electrónico <span>*</span></label>
+                <input
+                  v-model.trim="form.email"
+                  type="email"
+                  maxlength="150"
+                  placeholder="ejemplo@correo.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label>Teléfono <span>*</span></label>
+                <input
+                  v-model.trim="form.telefono"
                   type="tel"
+                  maxlength="20"
                   placeholder="646 000 0000"
-                  maxlength="15"
                   required
                 />
-
               </div>
-
             </div>
-
           </section>
 
-
-          <!-- ===================================
-               TIPO DE PARTICIPACIÓN
-          ==================================== -->
-
+          <!-- TALLER -->
           <section class="form-section">
-
             <div class="section-header">
-
-              <div class="section-icon">
-                🎓
-              </div>
-
+              <div class="section-icon">🛠️</div>
               <div>
-
-                <h2>
-                  Tipo de participación
-                </h2>
-
+                <h2>Selección de taller</h2>
                 <p>
-                  Selecciona la opción que corresponda
-                  a tu participación.
+                  Selecciona el taller al que deseas asistir el jueves 5
+                  de noviembre.
                 </p>
-
               </div>
-
             </div>
 
+            <div class="schedule-note">
+              <strong>Horario de talleres</strong>
+              <p>11:00 a 14:00 y 16:00 a 19:00.</p>
+              <p>La asignación final dependerá del cupo disponible.</p>
+            </div>
 
             <div class="form-group">
-
-              <label>
-                Tipo de participación
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.tipoParticipacion"
-                required
-              >
-
-                <option value="">
-                  Selecciona una opción
+              <label>Taller al que deseas asistir <span>*</span></label>
+              <select v-model="form.taller" required>
+                <option value="">Selecciona un taller</option>
+                <option
+                  v-for="taller in talleres"
+                  :key="taller"
+                  :value="taller"
+                >
+                  {{ taller }}
                 </option>
-
-                <option value="Asistente estudiante de Licenciatura">
-                  Asistente estudiante de Licenciatura
-                </option>
-
-                <option value="Asistente estudiante de Posgrado">
-                  Asistente estudiante de Posgrado
-                </option>
-
-                <option value="Docente">
-                  Docente
-                </option>
-
-                <option value="Empresario(a)">
-                  Empresario(a)
-                </option>
-
-                <option value="Público en general">
-                  Público en general
-                </option>
-
-                <option value="Ponente">
-                  Ponente
-                </option>
-
-                <option value="Egresada / Egresado">
-                  Egresada / Egresado
-                </option>
-
-                <option value="Otro">
-                  Otro
-                </option>
-
               </select>
-
             </div>
-
-
-            <div
-              v-if="form.tipoParticipacion === 'Otro'"
-              class="form-group"
-            >
-
-              <label>
-                Especifica tu participación
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.otraParticipacion"
-                type="text"
-                placeholder="Especifica"
-                :required="
-                  form.tipoParticipacion === 'Otro'
-                "
-              />
-
-            </div>
-
           </section>
 
-
-          <!-- ===================================
-               COMO SE ENTERÓ
-          ==================================== -->
-
+          <!-- VISITA INDUSTRIAL -->
           <section class="form-section">
-
             <div class="section-header">
-
-              <div class="section-icon">
-                📢
-              </div>
-
+              <div class="section-icon">🏭</div>
               <div>
-
-                <h2>
-                  ¿Cómo se enteró del congreso?
-                </h2>
-
+                <h2>Visita industrial</h2>
                 <p>
-                  Esta información nos ayuda a mejorar
-                  nuestros medios de difusión.
+                  Indica la empresa que te interesa visitar el jueves
+                  5 de noviembre.
                 </p>
-
               </div>
-
             </div>
 
+            <div class="schedule-note">
+              <strong>Horario de visitas industriales</strong>
+              <p>09:00 a 14:00 y 16:00 a 20:00.</p>
+              <p>
+                Las empresas y los horarios definitivos deberán ser
+                confirmados por el comité organizador.
+              </p>
+            </div>
 
             <div class="form-group">
-
-              <label>
-                Medio por el que conoció el congreso
-                <span>*</span>
-              </label>
-
-              <select
-                v-model="form.comoSeEntero"
-                required
-              >
-
-                <option value="">
-                  Selecciona una opción
+              <label>Empresa que deseas visitar <span>*</span></label>
+              <select v-model="form.visitaEmpresa" required>
+                <option value="">Selecciona una opción</option>
+                <option
+                  v-for="empresa in empresas"
+                  :key="empresa"
+                  :value="empresa"
+                >
+                  {{ empresa }}
                 </option>
-
-                <option value="Facebook">
-                  Facebook
-                </option>
-
-                <option value="Instagram">
-                  Instagram
-                </option>
-
-                <option value="TikTok">
-                  TikTok
-                </option>
-
-                <option value="Página Web">
-                  Página Web
-                </option>
-
-                <option value="Promoción presencial del Comité Organizador">
-                  Promoción presencial del Comité Organizador
-                </option>
-
-                <option value="A través de un(a) amigo(a)">
-                  A través de un(a) amigo(a)
-                </option>
-
-                <option value="A través de un(a) docente">
-                  A través de un(a) docente
-                </option>
-
-                <option value="Otro">
-                  Otro
-                </option>
-
               </select>
-
+              <small>
+                Las opciones pendientes de confirmación son provisionales.
+              </small>
             </div>
-
-
-            <div
-              v-if="form.comoSeEntero === 'Otro'"
-              class="form-group"
-            >
-
-              <label>
-                Especifica
-                <span>*</span>
-              </label>
-
-              <input
-                v-model="form.otroMedio"
-                type="text"
-                placeholder="Especifica cómo te enteraste"
-                :required="
-                  form.comoSeEntero === 'Otro'
-                "
-              />
-
-            </div>
-
           </section>
 
+          <!-- PROGRAMA -->
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">📅</div>
+              <div>
+                <h2>Programa del congreso</h2>
+                <p>Consulta las actividades programadas.</p>
+              </div>
+            </div>
 
-          <!-- ===================================
-               CONSENTIMIENTO
-          ==================================== -->
+            <div class="program-day">
+              <h3>Martes 3 de noviembre</h3>
+              <div class="program-item">
+                <span class="program-time">18:00 - 21:00</span>
+                <div>
+                  <strong>Preregistro</strong>
+                  <p>Recepción y preregistro de participantes.</p>
+                </div>
+              </div>
+            </div>
 
+            <div class="program-day">
+              <h3>Miércoles 4 de noviembre</h3>
+
+              <div
+                v-for="actividad in programaMiercoles"
+                :key="actividad.hora + actividad.nombre"
+                class="program-item"
+                :class="{ comida: actividad.tipo === 'comida' }"
+              >
+                <span class="program-time">{{ actividad.hora }}</span>
+                <div>
+                  <strong>{{ actividad.nombre }}</strong>
+                  <p v-if="actividad.detalle">{{ actividad.detalle }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="program-day">
+              <h3>Jueves 5 de noviembre</h3>
+
+              <div class="program-item">
+                <span class="program-time">09:00 - 14:00</span>
+                <div>
+                  <strong>Visitas industriales</strong>
+                  <p>Recorridos por empresas participantes.</p>
+                </div>
+              </div>
+
+              <div class="program-item">
+                <span class="program-time">11:00 - 14:00</span>
+                <div>
+                  <strong>Talleres</strong>
+                  <p>Primera parte de las actividades prácticas.</p>
+                </div>
+              </div>
+
+              <div class="program-item comida">
+                <span class="program-time">14:00 - 16:00</span>
+                <div><strong>COMIDA</strong></div>
+              </div>
+
+              <div class="program-item">
+                <span class="program-time">16:00 - 19:00</span>
+                <div>
+                  <strong>Talleres</strong>
+                  <p>Segunda parte de las actividades prácticas.</p>
+                </div>
+              </div>
+
+              <div class="program-item">
+                <span class="program-time">16:00 - 20:00</span>
+                <div>
+                  <strong>Visitas industriales</strong>
+                  <p>Continuación de los recorridos empresariales.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="program-day">
+              <h3>Viernes 6 de noviembre</h3>
+
+              <div class="program-item">
+                <span class="program-time">11:00 - 12:00</span>
+                <div>
+                  <strong>Conferencia y cierre</strong>
+                  <p>MFC. Luis Alberto Barrera Vela. Auditorio.</p>
+                </div>
+              </div>
+
+              <div class="program-item comida">
+                <span class="program-time">14:00 - 16:00</span>
+                <div><strong>COMIDA</strong></div>
+              </div>
+
+              <div class="program-item">
+                <span class="program-time">18:00 - 19:00</span>
+                <div><strong>Conferencia Plenimex</strong></div>
+              </div>
+
+              <div class="program-item">
+                <span class="program-time">19:00 - 20:00</span>
+                <div><strong>Conferencia ICU / Hutchinson</strong></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- CONSENTIMIENTO -->
           <section class="form-section consent-section">
-
             <div class="section-header">
-
-              <div class="section-icon">
-                🔐
-              </div>
-
+              <div class="section-icon">🔐</div>
               <div>
-
-                <h2>
-                  Consentimiento y protección de datos
-                </h2>
-
+                <h2>Consentimiento</h2>
+                <p>Confirma que la información proporcionada es correcta.</p>
               </div>
-
             </div>
-
-
-            <div class="consent-box">
-
-              <p>
-                Autorizo expresamente al Comité
-                Organizador del Congreso ARGOS para
-                recopilar, almacenar, tratar y utilizar
-                mis datos personales proporcionados en
-                este formulario, con el único propósito
-                de gestionar mi participación en el
-                evento, así como para enviarme
-                información relevante relacionada con
-                el congreso.
-              </p>
-
-              <p>
-                Reconozco que mis datos serán tratados
-                de manera confidencial y conforme a la
-                legislación aplicable en materia de
-                protección de datos personales.
-              </p>
-
-            </div>
-
 
             <label class="consent-checkbox">
-
               <input
                 v-model="form.consentimiento"
                 type="checkbox"
                 required
               />
-
               <span>
-                He leído y acepto el consentimiento.
-                <strong>*</strong>
+                Confirmo que los datos proporcionados son correctos y
+                autorizo su uso para gestionar mi participación en el
+                Congreso Argos. <strong>*</strong>
               </span>
-
             </label>
-
           </section>
 
-
-          <!-- ===================================
-               BOTÓN
-          ==================================== -->
+          <div v-if="error" class="error-message">
+            ⚠️ {{ error }}
+          </div>
 
           <div class="submit-area">
-
             <p class="required-note">
-              <span>*</span>
-              Campos obligatorios
+              <span>*</span> Campos obligatorios
             </p>
 
             <button
@@ -1154,1414 +469,815 @@
               class="submit-button"
               :disabled="loading"
             >
-
               <span v-if="!loading">
-                Completar registro
+                Completar registro <span class="arrow">→</span>
               </span>
-
-              <span
-                v-else
-                class="loading-content"
-              >
-
-                <span class="spinner"></span>
-
-                Registrando...
-
-              </span>
-
+              <span v-else>Registrando...</span>
             </button>
-
           </div>
-
         </form>
-
       </div>
 
-
-      <!-- =======================================
-           INFORMACIÓN DEL EVENTO
-      ======================================== -->
-
+      <!-- INFORMACION LATERAL -->
       <aside class="event-info">
-
         <div class="info-card">
-
-          <div class="info-icon">
-            🎓
-          </div>
-
-          <h3>
-            Congreso ARGOS
-          </h3>
-
-          <p>
-            Registro de participantes del
-            Congreso ARGOS.
-          </p>
-
+          <div class="info-icon">🎓</div>
+          <h3>Congreso Argos</h3>
+          <p>Consulta el programa y completa tu inscripción.</p>
 
           <div class="info-item">
-
-            <span>
-              📅
-            </span>
-
+            <span>📅</span>
             <div>
-
-              <strong>
-                Fecha
-              </strong>
-
-              <p>
-                25 de Octubre
-              </p>
-
+              <strong>Fechas</strong>
+              <p>3 al 6 de noviembre</p>
             </div>
-
           </div>
-
 
           <div class="info-item">
-
-            <span>
-              📍
-            </span>
-
+            <span>🛠️</span>
             <div>
-
-              <strong>
-                Lugar
-              </strong>
-
-              <p>
-                Instituto Tecnológico de Ensenada
-              </p>
-
+              <strong>Talleres</strong>
+              <p>Jueves 5 de noviembre</p>
             </div>
-
           </div>
-
 
           <div class="info-item">
-
-            <span>
-              👥
-            </span>
-
+            <span>🏭</span>
             <div>
-
-              <strong>
-                Cupo
-              </strong>
-
-              <p>
-                300 participantes
-              </p>
-
+              <strong>Visitas industriales</strong>
+              <p>Jueves 5 de noviembre</p>
             </div>
-
           </div>
-
 
           <div class="info-divider"></div>
 
-
           <div class="important-notice">
-
-            <strong>
-              ℹ Información importante
-            </strong>
-
+            <strong>ℹ Información importante</strong>
             <p>
-              Asegúrate de proporcionar información
-              correcta y actualizada. Los datos serán
-              utilizados para la organización y
-              logística del evento.
+              Revisa tu talla de playera y las opciones de taller y visita
+              industrial antes de enviar el formulario. Las empresas
+              definitivas deben ser confirmadas por el comité organizador.
             </p>
-
           </div>
-
         </div>
-
       </aside>
-
     </main>
-
   </div>
 </template>
 
-
 <script setup>
+import { reactive, ref } from "vue";
+import { API_URL } from "../../config/api";
 
-import {
-  reactive,
-  ref
-} from 'vue'
+// IMPORTANTE:
+// Cambia este ID por el ID real del evento Argos en tu base de datos.
+const eventId = 5;
 
+const talleres = [
+  "Taller 1: Diseño de experimentos",
+  "Taller 2: Promodel básico",
+  "Taller 3: Manufactura aditiva / impresión 3D",
+  "Taller 4: Diseño con Solidworks nivel básico",
+  "Taller 5: Propiedad Industrial",
+  "Taller 6: Corrosión",
+  "Taller 7: Seguridad e higiene",
+  "Taller 8: Taller de inteligencia artificial (por confirmar)",
+  "Taller 9: Taller de moldeo (por confirmar)"
+];
 
-// ========================================
-// FORMULARIO
-// ========================================
+// Reemplaza estas opciones provisionales por los nombres reales
+// de las empresas cuando el comité organizador los confirme.
+const empresas = [
+  "Empresa industrial 1 (por confirmar)",
+  "Empresa industrial 2 (por confirmar)",
+  "Empresa industrial 3 (por confirmar)",
+  "Empresa industrial 4 (por confirmar)",
+  "No deseo asistir a una visita industrial"
+];
 
-const form = reactive({
+const programaMiercoles = [
+  {
+    hora: "09:00 - 10:00",
+    nombre: "Inauguración",
+    detalle: "Gimnasio de usos múltiples"
+  },
+  {
+    hora: "10:00 - 11:00",
+    nombre: "Conferencia Magna",
+    detalle: "Dr. Eduardo Durazo Watanabe"
+  },
+  {
+    hora: "11:00 - 14:00",
+    nombre: "Conferencia 2",
+    detalle: "Gustavo Montaño"
+  },
+  {
+    hora: "14:00 - 16:00",
+    nombre: "COMIDA",
+    tipo: "comida"
+  },
+  {
+    hora: "16:00 - 17:00",
+    nombre: "Conferencia 3",
+    detalle: "Haydee Venegas López"
+  },
+  {
+    hora: "17:00 - 20:00",
+    nombre: "Ponencias"
+  },
+  {
+    hora: "20:00 - 21:00",
+    nombre: "Rompehielos para alumnos"
+  }
+];
 
-  // Datos personales
-
-  apellidoPaterno: '',
-
-  apellidoMaterno: '',
-
-  nombre: '',
-
-  edad: '',
-
-  sexo: '',
-
-
-  // Contacto
-
-  email: '',
-
-  telefono: '',
-
-  estado: '',
-
-
-  // Institución
-
-  institucion: '',
-
-  otraInstitucion: '',
-
-  carrera: '',
-
-  otraCarrera: '',
-
-
-  // Playera
-
-  tallaPlayera: '',
-
-
-  // Emergencia
-
-  contactoEmergenciaNombre: '',
-
-  contactoEmergenciaTelefono: '',
-
-
-  // Participación
-
-  tipoParticipacion: '',
-
-  otraParticipacion: '',
-
-
-  // Difusión
-
-  comoSeEntero: '',
-
-  otroMedio: '',
-
-
-  // Consentimiento
-
-  consentimiento: false
-
-})
-
-
-// ========================================
-// ESTADOS
-// ========================================
-
-const loading = ref(false)
-
-const registroExitoso = ref(false)
-
-const folio = ref('')
-
-
-// ========================================
-// GENERAR FOLIO
-// ========================================
-
-function generarFolio() {
-
-  const fecha =
-    new Date()
-
-  const año =
-    fecha.getFullYear()
-
-  const numero =
-    Math.floor(
-      100000 +
-      Math.random() * 900000
-    )
-
-  return `ARGOS-${año}-${numero}`
-
+function crearFormulario() {
+  return {
+    nombre: "",
+    apellidos: "",
+    numeroControl: "",
+    edad: "",
+    sexo: "",
+    tallaPlayera: "",
+    tecnologico: "",
+    otroTecnologico: "",
+    carrera: "",
+    semestre: "",
+    email: "",
+    telefono: "",
+    taller: "",
+    visitaEmpresa: "",
+    consentimiento: false
+  };
 }
 
+const form = reactive(crearFormulario());
 
-// ========================================
-// REGISTRAR
-// ========================================
+const loading = ref(false);
+const registroExitoso = ref(false);
+const folio = ref("");
+const error = ref("");
 
-function registrar() {
+async function registrar() {
+  error.value = "";
 
-  loading.value = true
-
-
-  const nuevoFolio =
-    generarFolio()
-
-
-  const registro = {
-
-    ...form,
-
-    evento:
-      'Congreso ARGOS',
-
-    eventoId:
-      2,
-
-    folio:
-      nuevoFolio,
-
-    estadoRegistro:
-      'Registrado',
-
-    fechaRegistro:
-      new Date().toISOString()
-
+  if (!form.nombre.trim() || !form.apellidos.trim()) {
+    error.value = "Escribe tu nombre y apellidos.";
+    return;
   }
 
+  if (!form.tecnologico) {
+    error.value = "Selecciona tu tecnológico de procedencia.";
+    return;
+  }
 
-  // Guardar temporalmente
+  if (
+    ["Otro tecnológico", "Otra institución"].includes(form.tecnologico) &&
+    !form.otroTecnologico.trim()
+  ) {
+    error.value = "Escribe el nombre de tu institución.";
+    return;
+  }
 
-  localStorage.setItem(
+  if (!form.taller) {
+    error.value = "Selecciona el taller al que deseas asistir.";
+    return;
+  }
 
-    'registroArgos',
+  if (!form.visitaEmpresa) {
+    error.value = "Selecciona una opción de visita industrial.";
+    return;
+  }
 
-    JSON.stringify(registro)
+  if (!form.consentimiento) {
+    error.value = "Debes aceptar el consentimiento para continuar.";
+    return;
+  }
 
-  )
+  loading.value = true;
 
-
-  localStorage.setItem(
-
-    'folioArgos',
-
-    nuevoFolio
-
-  )
-
-
-  // Simular registro
-
-  setTimeout(() => {
-
-    loading.value = false
-
-    folio.value =
-      nuevoFolio
-
-    registroExitoso.value =
-      true
-
-    window.scrollTo({
-
-      top: 0,
-
-      behavior: 'smooth'
-
-    })
-
-  }, 700)
-
-}
-
-</script>
-
-
-<style scoped>
-
-/* ========================================
-   RESET
-======================================== */
-
-* {
-
-  margin: 0;
-
-  padding: 0;
-
-  box-sizing: border-box;
-
-}
-
-
-/* ========================================
-   PAGE
-======================================== */
-
-.registro-page {
-
-  min-height: 100vh;
-
-  background: #f4f7fb;
-
-  font-family:
-    'Segoe UI',
-    Tahoma,
-    Geneva,
-    Verdana,
-    sans-serif;
-
-}
-
-
-/* ========================================
-   HEADER
-======================================== */
-
-.registro-header {
-
-  background:
-    linear-gradient(
-      135deg,
-      #003366,
-      #0052a3
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${eventId}/inscripciones`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nombre: form.nombre.trim(),
+          apellidos: form.apellidos.trim(),
+          numeroControl: form.numeroControl.trim(),
+          edad: Number(form.edad),
+          sexo: form.sexo,
+          tallaPlayera: form.tallaPlayera,
+          tecnologico:
+            form.tecnologico === "Otro tecnológico" ||
+            form.tecnologico === "Otra institución"
+              ? form.otroTecnologico.trim()
+              : form.tecnologico,
+          carrera: form.carrera.trim(),
+          semestre: form.semestre,
+          email: form.email.trim(),
+          telefono: form.telefono.trim(),
+          taller: form.taller,
+          visitaEmpresa: form.visitaEmpresa,
+          consentimiento: form.consentimiento
+        })
+      }
     );
 
-  color: white;
+    if (!response.ok) {
+      let errorData = {};
 
-  padding:
-    35px 20px 85px;
+      try {
+        errorData = await response.json();
+      } catch {
+        errorData = {};
+      }
 
+      throw new Error(
+        errorData.message || "No se pudo completar el registro."
+      );
+    }
+
+    const data = await response.json();
+
+    if (!data.folio) {
+      throw new Error(
+        "El servidor no devolvió un folio. Revisa la respuesta del backend."
+      );
+    }
+
+    folio.value = data.folio;
+    registroExitoso.value = true;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (e) {
+    console.error("Error al registrar:", e);
+
+    error.value =
+      e.message || "Ocurrió un error. Intenta nuevamente.";
+  } finally {
+    loading.value = false;
+  }
 }
 
+function nuevoRegistro() {
+  Object.assign(form, crearFormulario());
+  folio.value = "";
+  error.value = "";
+  registroExitoso.value = false;
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+</script>
+
+<style scoped>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.registro-page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #334155;
+}
+
+.registro-header {
+  background: linear-gradient(135deg, #003366, #0052a3);
+  color: white;
+  padding: 35px 20px 80px;
+}
 
 .header-content {
-
-  max-width: 1200px;
-
+  max-width: 1150px;
   margin: auto;
-
 }
-
 
 .back-link {
-
   color: white;
-
   text-decoration: none;
-
   font-size: 0.9rem;
-
-  opacity: 0.9;
-
-  transition: 0.2s;
-
 }
-
 
 .back-link:hover {
-
-  opacity: 1;
-
   text-decoration: underline;
-
 }
-
 
 .header-title {
-
   margin-top: 30px;
-
 }
-
 
 .event-badge {
-
   display: inline-block;
-
-  background:
-    rgba(255,255,255,0.15);
-
-  border:
-    1px solid
-    rgba(255,255,255,0.25);
-
-  padding:
-    7px 15px;
-
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 7px 14px;
   border-radius: 30px;
-
   font-size: 0.78rem;
-
   font-weight: 700;
-
   letter-spacing: 1px;
-
 }
-
 
 .header-title h1 {
-
   margin-top: 15px;
-
   font-size: 2.5rem;
-
-  font-weight: 800;
-
+  font-weight: 700;
 }
-
 
 .header-title p {
-
   margin-top: 8px;
-
-  color:
-    rgba(255,255,255,0.85);
-
-  font-size: 1rem;
-
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
 }
-
-
-/* ========================================
-   CONTAINER
-======================================== */
 
 .registro-container {
-
-  max-width: 1200px;
-
-  margin:
-    -45px auto 60px;
-
-  padding:
-    0 20px;
-
+  max-width: 1150px;
+  margin: -45px auto 50px;
+  padding: 0 20px;
   display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr) 330px;
-
+  grid-template-columns: minmax(0, 1fr) 310px;
   gap: 30px;
-
   position: relative;
-
   z-index: 2;
-
+  align-items: start;
 }
 
-
-/* ========================================
-   CARD
-======================================== */
-
-.registro-card {
-
+.registro-card,
+.info-card {
   background: white;
-
   border-radius: 18px;
-
-  padding: 40px;
-
-  box-shadow:
-    0 12px 35px
-    rgba(0,0,0,0.08);
-
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  min-width: 0;
 }
-
-
-/* ========================================
-   SECTIONS
-======================================== */
 
 .form-section {
-
-  padding-bottom: 35px;
-
-  margin-bottom: 35px;
-
-  border-bottom:
-    1px solid #e5eaf0;
-
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e2e8f0;
 }
-
 
 .form-section:last-of-type {
-
   border-bottom: none;
-
-  margin-bottom: 10px;
-
+  margin-bottom: 0;
 }
-
-
-/* ========================================
-   SECTION HEADER
-======================================== */
 
 .section-header {
-
   display: flex;
-
   align-items: flex-start;
-
   gap: 15px;
-
   margin-bottom: 25px;
-
 }
-
 
 .section-icon {
-
-  min-width: 48px;
-
   width: 48px;
-
   height: 48px;
-
+  min-width: 48px;
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   background: #e8f1fb;
-
-  border-radius: 13px;
-
-  font-size: 21px;
-
+  border-radius: 12px;
+  font-size: 22px;
 }
-
 
 .section-header h2 {
-
   color: #003366;
-
-  font-size: 1.35rem;
-
-  font-weight: 750;
-
+  font-size: 1.3rem;
+  margin-bottom: 5px;
 }
-
 
 .section-header p {
-
   color: #64748b;
-
   font-size: 0.88rem;
-
   line-height: 1.5;
-
-  margin-top: 4px;
-
 }
-
-
-/* ========================================
-   PRIVACY
-======================================== */
-
-.privacy-intro {
-
-  background: #f8fafc;
-
-  border-left:
-    4px solid #0052a3;
-
-  padding:
-    15px 17px;
-
-  border-radius:
-    0 10px 10px 0;
-
-  margin-bottom: 25px;
-
-}
-
-
-.privacy-intro p {
-
-  color: #64748b;
-
-  font-size: 0.86rem;
-
-  line-height: 1.6;
-
-}
-
-
-/* ========================================
-   GRID
-======================================== */
 
 .form-grid {
-
   display: grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
-
 }
-
-
-/* ========================================
-   FORM GROUP
-======================================== */
 
 .form-group {
-
   margin-bottom: 20px;
-
+  min-width: 0;
 }
 
+.form-grid .form-group {
+  margin-bottom: 0;
+}
 
 .form-group label {
-
   display: block;
-
   margin-bottom: 8px;
-
   color: #334155;
-
+  font-weight: 600;
   font-size: 0.9rem;
-
-  font-weight: 650;
-
 }
 
-
-.form-group label span {
-
+.form-group label span,
+.required-note span,
+.consent-checkbox strong {
   color: #dc2626;
-
-  margin-left: 2px;
-
 }
-
-
-/* ========================================
-   INPUTS
-======================================== */
 
 .form-group input,
 .form-group select {
-
   width: 100%;
-
-  min-height: 49px;
-
-  padding:
-    12px 14px;
-
-  border:
-    1px solid #d7dee8;
-
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid #d7dee8;
   border-radius: 10px;
-
   background: #f8fafc;
-
-  color: #1e293b;
-
   outline: none;
-
-  font-family: inherit;
-
   font-size: 0.93rem;
-
+  color: #334155;
   transition: 0.2s;
-
 }
-
-
-.form-group input::placeholder {
-
-  color: #9ca3af;
-
-}
-
 
 .form-group input:focus,
 .form-group select:focus {
-
   border-color: #0052a3;
-
   background: white;
-
-  box-shadow:
-    0 0 0 3px
-    rgba(0,82,163,0.10);
-
+  box-shadow: 0 0 0 3px rgba(0, 82, 163, 0.1);
 }
 
-
-/* ========================================
-   RADIO
-======================================== */
-
-.radio-group {
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 12px;
-
-}
-
-
-.radio-option {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 8px;
-
-  padding:
-    11px 15px;
-
-  border:
-    1px solid #d7dee8;
-
-  border-radius: 10px;
-
-  background: #f8fafc;
-
-  cursor: pointer;
-
-  color: #475569;
-
-  font-size: 0.9rem;
-
-  transition: 0.2s;
-
-}
-
-
-.radio-option:hover {
-
-  border-color: #0052a3;
-
-  background: #f1f6fc;
-
-}
-
-
-.radio-option input {
-
-  width: 16px;
-
-  height: 16px;
-
-  accent-color: #003366;
-
-}
-
-
-/* ========================================
-   CONSENT
-======================================== */
-
-.consent-box {
-
-  background: #f8fafc;
-
-  border:
-    1px solid #e2e8f0;
-
-  border-radius: 12px;
-
-  padding: 20px;
-
-  margin-bottom: 18px;
-
-}
-
-
-.consent-box p {
-
+.form-group small {
+  display: block;
   color: #64748b;
-
-  font-size: 0.84rem;
-
-  line-height: 1.65;
-
-  margin-bottom: 12px;
-
+  font-size: 0.78rem;
+  line-height: 1.5;
+  margin-top: 7px;
 }
 
+.schedule-note {
+  background: #eff6ff;
+  border-left: 4px solid #0052a3;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 0 10px 10px 0;
+}
 
-.consent-box p:last-child {
+.schedule-note strong {
+  color: #003366;
+}
 
+.schedule-note p {
+  color: #475569;
+  margin-top: 5px;
+  font-size: 0.87rem;
+  line-height: 1.5;
+}
+
+.program-day {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+  background: #fff;
+}
+
+.program-day:last-child {
   margin-bottom: 0;
-
 }
 
+.program-day h3 {
+  color: #003366;
+  font-size: 1.05rem;
+  margin-bottom: 15px;
+}
+
+.program-item {
+  display: grid;
+  grid-template-columns: 115px minmax(0, 1fr);
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.program-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.program-time {
+  color: #0052a3;
+  font-weight: 700;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.program-item strong {
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.program-item p {
+  color: #64748b;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.program-item.comida {
+  background: #fff7ed;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 5px 0;
+}
+
+.program-item.comida strong {
+  color: #9a3412;
+}
+
+.consent-section {
+  padding-bottom: 15px;
+}
 
 .consent-checkbox {
-
   display: flex;
-
   align-items: flex-start;
-
   gap: 10px;
-
   cursor: pointer;
-
-  color: #334155;
-
+  color: #475569;
   font-size: 0.9rem;
-
-  line-height: 1.5;
-
+  line-height: 1.6;
 }
-
 
 .consent-checkbox input {
-
   width: 18px;
-
   height: 18px;
-
-  margin-top: 2px;
-
-  accent-color: #003366;
-
-  cursor: pointer;
-
+  min-width: 18px;
+  margin-top: 3px;
+  accent-color: #0052a3;
 }
 
-
-.consent-checkbox strong {
-
-  color: #dc2626;
-
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 14px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
-
-
-/* ========================================
-   SUBMIT
-======================================== */
 
 .submit-area {
-
-  margin-top: 30px;
-
+  margin-top: 25px;
 }
-
 
 .required-note {
-
   color: #64748b;
-
   font-size: 0.8rem;
-
   margin-bottom: 12px;
-
 }
-
-
-.required-note span {
-
-  color: #dc2626;
-
-}
-
 
 .submit-button {
-
   width: 100%;
-
   min-height: 54px;
-
+  padding: 12px;
   border: none;
-
   border-radius: 11px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #003366,
-      #0052a3
-    );
-
+  background: linear-gradient(135deg, #003366, #0052a3);
   color: white;
-
-  font-family: inherit;
-
   font-size: 1rem;
-
   font-weight: 700;
-
   cursor: pointer;
-
-  transition: 0.25s;
-
-  box-shadow:
-    0 7px 18px
-    rgba(0,51,102,0.18);
-
+  transition: 0.2s;
 }
-
 
 .submit-button:hover:not(:disabled) {
-
-  transform:
-    translateY(-2px);
-
-  box-shadow:
-    0 10px 25px
-    rgba(0,51,102,0.25);
-
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 51, 102, 0.2);
 }
-
 
 .submit-button:disabled {
-
   opacity: 0.7;
-
   cursor: not-allowed;
-
 }
 
-
-/* ========================================
-   LOADING
-======================================== */
-
-.loading-content {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 10px;
-
+.arrow {
+  margin-left: 8px;
 }
-
-
-.spinner {
-
-  width: 18px;
-
-  height: 18px;
-
-  border:
-    2px solid
-    rgba(255,255,255,0.35);
-
-  border-top-color: white;
-
-  border-radius: 50%;
-
-  animation:
-    spin 0.7s linear infinite;
-
-}
-
-
-@keyframes spin {
-
-  to {
-
-    transform:
-      rotate(360deg);
-
-  }
-
-}
-
-
-/* ========================================
-   EVENT INFO
-======================================== */
 
 .event-info {
-
-  align-self: start;
-
   position: sticky;
-
   top: 25px;
-
 }
-
 
 .info-card {
-
-  background: white;
-
-  border-radius: 18px;
-
-  padding: 28px;
-
-  box-shadow:
-    0 12px 35px
-    rgba(0,0,0,0.08);
-
+  padding: 25px;
 }
-
 
 .info-icon {
-
-  width: 58px;
-
-  height: 58px;
-
+  width: 55px;
+  height: 55px;
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   background: #e8f1fb;
-
-  border-radius: 15px;
-
-  font-size: 26px;
-
-  margin-bottom: 16px;
-
+  border-radius: 14px;
+  font-size: 25px;
+  margin-bottom: 15px;
 }
-
 
 .info-card h3 {
-
   color: #003366;
-
   font-size: 1.3rem;
-
-  font-weight: 750;
-
 }
-
 
 .info-card > p {
-
   color: #64748b;
-
-  font-size: 0.87rem;
-
-  line-height: 1.55;
-
-  margin:
-    7px 0 25px;
-
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 7px 0 25px;
 }
-
 
 .info-item {
-
   display: flex;
-
   gap: 12px;
-
   margin-bottom: 20px;
-
 }
-
 
 .info-item > span {
-
   font-size: 18px;
-
 }
-
 
 .info-item strong {
-
-  display: block;
-
   color: #334155;
-
-  font-size: 0.84rem;
-
+  font-size: 0.85rem;
 }
-
 
 .info-item p {
-
   color: #64748b;
-
   font-size: 0.82rem;
-
   margin-top: 3px;
-
-  line-height: 1.4;
-
+  line-height: 1.5;
 }
-
 
 .info-divider {
-
   height: 1px;
-
-  background: #e5eaf0;
-
-  margin:
-    20px 0;
-
+  background: #e2e8f0;
+  margin: 10px 0 20px;
 }
-
 
 .important-notice {
-
-  padding: 15px;
-
-  border-radius: 11px;
-
   background: #eff6ff;
-
-  border:
-    1px solid #dbeafe;
-
+  border-radius: 10px;
+  padding: 15px;
 }
-
 
 .important-notice strong {
-
-  display: block;
-
   color: #1d4ed8;
-
   font-size: 0.85rem;
-
-  margin-bottom: 5px;
-
 }
-
 
 .important-notice p {
-
-  color: #475569;
-
-  font-size: 0.78rem;
-
-  line-height: 1.5;
-
+  color: #64748b;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  margin-top: 6px;
 }
-
-
-/* ========================================
-   SUCCESS
-======================================== */
 
 .success-message {
-
   display: flex;
-
   align-items: flex-start;
-
   gap: 20px;
-
   padding: 25px;
-
   background: #f0fdf4;
-
-  border:
-    1px solid #bbf7d0;
-
+  border: 1px solid #bbf7d0;
   border-radius: 15px;
-
 }
-
 
 .success-icon {
-
-  min-width: 48px;
-
-  width: 48px;
-
-  height: 48px;
-
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   background: #16a34a;
-
   color: white;
-
   border-radius: 50%;
-
-  font-size: 24px;
-
-  font-weight: 700;
-
+  font-size: 27px;
+  font-weight: bold;
 }
 
+.success-content {
+  min-width: 0;
+  width: 100%;
+}
 
-.success-message h3 {
-
+.success-content h2 {
   color: #166534;
-
-  font-size: 1.25rem;
-
-  margin-bottom: 6px;
-
+  margin-bottom: 8px;
+  font-size: 1.4rem;
 }
 
-
-.success-message p {
-
+.success-content > p {
   color: #4b5563;
-
-  font-size: 0.9rem;
-
-  line-height: 1.5;
-
+  line-height: 1.6;
 }
-
 
 .folio-box {
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 4px;
-
-  margin:
-    18px 0;
-
-  padding: 15px;
-
+  margin: 25px 0 15px;
   background: white;
-
-  border:
-    1px solid #bbf7d0;
-
-  border-radius: 10px;
-
+  border: 2px dashed #22c55e;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
 }
-
 
 .folio-box span {
-
+  display: block;
   color: #64748b;
-
-  font-size: 0.78rem;
-
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
 }
-
 
 .folio-box strong {
-
   color: #166534;
-
   font-size: 1.3rem;
-
-  letter-spacing: 1px;
-
+  overflow-wrap: anywhere;
 }
-
 
 .success-note {
-
-  font-size: 0.8rem !important;
-
+  font-size: 0.85rem;
   color: #64748b !important;
-
 }
 
+.new-register-button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 9px;
+  background: #003366;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-/* ========================================
-   RESPONSIVE
-======================================== */
+.new-register-button:hover {
+  background: #0052a3;
+}
 
 @media (max-width: 900px) {
-
   .registro-container {
-
-    grid-template-columns: 1fr;
-
+    grid-template-columns: minmax(0, 1fr);
   }
-
 
   .event-info {
-
     position: static;
-
     order: -1;
-
   }
-
 }
 
-
-@media (max-width: 650px) {
-
+@media (max-width: 600px) {
   .registro-header {
-
-    padding:
-      25px 20px 75px;
-
+    padding: 25px 18px 70px;
   }
-
 
   .header-title h1 {
-
     font-size: 2rem;
-
   }
 
-
-  .registro-card {
-
-    padding:
-      25px 20px;
-
+  .registro-container {
+    padding: 0 12px;
+    gap: 18px;
   }
 
+  .registro-card,
+  .info-card {
+    padding: 20px 16px;
+  }
 
   .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
 
+  .program-day {
+    padding: 12px;
+  }
+
+  .program-item {
     grid-template-columns: 1fr;
-
-    gap: 0;
-
+    gap: 4px;
   }
-
-
-  .radio-group {
-
-    flex-direction: column;
-
-  }
-
-
-  .radio-option {
-
-    width: 100%;
-
-  }
-
 
   .success-message {
-
     flex-direction: column;
-
+    padding: 20px;
   }
-
 }
-
 </style>
