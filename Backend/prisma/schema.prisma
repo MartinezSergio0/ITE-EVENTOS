@@ -238,4 +238,5 @@ enum rol_general {
   Superadministrador
   Usuario
   Administrador
+  AdministradorArgos
 }
