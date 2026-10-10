@@ -1443,7 +1443,7 @@ import {
   useRouter,
   useRoute
 } from "vue-router";
-import { API_URL } from "../../config/api";
+import { API_URL } from "../config/api";
 
 
 // =====================================================
@@ -1453,7 +1453,6 @@ import { API_URL } from "../../config/api";
 const router = useRouter();
 const route = useRoute();
 
-// IMPORTANTE: cambia este valor por el ID real del evento ARGOS en tu base de datos.
 const EVENTO_ID = Number(import.meta.env.VITE_ARGOS_EVENT_ID || 0);
 
 
