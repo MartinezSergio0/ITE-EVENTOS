@@ -50,6 +50,12 @@ import ComprobantesEscalaView
 import ConstanciasEscalaView
   from "../Views/adminEscala/ConstanciasEscalaView.vue";
 
+// ==========================================
+// ADMINISTRADOR Argos
+// ==========================================
+
+import AdministradorArgosView from "../Views/AdministradorArgosView.vue";
+
 
 // ==========================================
 // RUTAS
@@ -134,6 +140,19 @@ const routes = [
   },
 
 
+// ==========================================
+// ADMINISTRADOR Argos
+// ==========================================
+
+{
+    path: "/admin/argos",
+
+    name: "AdministradorArgos",
+
+    component: AdministradorArgosView,
+    
+  },
+  
   // ========================================
   // ADMINISTRADOR ESCALA
   // ========================================

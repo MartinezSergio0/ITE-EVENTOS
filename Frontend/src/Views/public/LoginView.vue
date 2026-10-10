@@ -251,7 +251,13 @@ async function login() {
       localStorage.setItem('rememberMe', 'true');
     }
 
-    router.push('/admin/escala');
+    const rol = data.usuario.rol;
+
+if (rol === 'AdministradorArgos') {
+  router.push('/admin/argos');
+} else {
+  router.push('/admin/escala');
+}
 
   } catch (e) {
     errorMessage.value = e.message || 'No se pudo iniciar sesión.';
