@@ -78,7 +78,7 @@ export class EventosService {
         capacity: e.capacidad ? `${e.capacidad} participantes` : '',
         cost: costo > 0 ? `$${costo} MXN` : 'Gratuito',
         costoNumero: costo,  
-        tienePago: costo > 0,
+        tienePago: Number(e.validacion) === 2,
         registerRoute: this.registerRouteFor(e.id),
         website: e.sitio_web,
         activities: e.actividad_actividad_eventoToevento?.map((a: any) => a.nombre) ?? [],
