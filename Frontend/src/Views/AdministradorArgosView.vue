@@ -1453,7 +1453,7 @@ import { API_URL } from "../config/api";
 const router = useRouter();
 const route = useRoute();
 
-const EVENTO_ID = Number(import.meta.env.VITE_ARGOS_EVENT_ID || 0);
+const EVENTO_ID = 5;
 
 
 // =====================================================
