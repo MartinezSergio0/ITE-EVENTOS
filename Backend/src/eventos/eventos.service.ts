@@ -90,8 +90,8 @@ export class EventosService {
     }
 
   private registerRouteFor(id: number): string {
-    // Por ahora solo ESCALA tiene formulario de registro propio
     if (id === 4) return '/registro-escala';
+    else if (id === 5) return '/registro-argos';
     return '';
   }
 
