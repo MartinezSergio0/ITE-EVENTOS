@@ -13,6 +13,30 @@ const CODIGO_TIPO: Record<string, number> = {
   'Docente': 3,
 };
 
+//  - congreso:    ESCALA (genera referencia bancaria)
+//  - estudiantil: ARGOS  (sin referencia bancaria)
+type Perfil = 'congreso' | 'estudiantil';
+const PERFIL_POR_EVENTO: Record<number, Perfil> = {
+  4: 'congreso',
+  5: 'estudiantil',
+};
+
+// iguales no importar de que formulario vengan
+interface DatosInscripcion {
+  nombre: string;
+  institucion: string;
+  carrera: string;
+  tipoCodigo: number;
+  estadoProcedencia: string | null;
+  contactoNombre: string | null;
+  contactoTelefono: string | null;
+  medioDifusion: string | null;
+  tallaCamisa: string | null;
+  semestre: string | null;
+  taller: string | null;
+  visitaEmpresa: string | null;
+}
+
 @Injectable()
 export class InscripcionesService {
   constructor(
@@ -33,16 +57,15 @@ export class InscripcionesService {
     return contador.ultimo;
   }
 
-  private construirReferencia(tipoParticipacion: string, anioCompleto: number, consecutivo: number): string {
+  private construirReferencia(tipoCodigo: number, anioCompleto: number, consecutivo: number): string {
     const anio = anioCompleto.toString().slice(-2);
     const ite = '1';
-    const tipo = CODIGO_TIPO[tipoParticipacion].toString();
     const consecutivoStr = consecutivo.toString().padStart(6, '0');
-    return `${anio}${ite}${tipo}${consecutivoStr}`;
+    return `${anio}${ite}${tipoCodigo}${consecutivoStr}`;
   }
 
   // =====================================================
-  // HELPERS - numero 
+  // HELPERS — validación y normalización
   // =====================================================
 
   private sanitizarTelefono(valor: string, maxLength: number, nombreCampo: string): string {
@@ -57,6 +80,77 @@ export class InscripcionesService {
     return soloDigitos;
   }
 
+  private requerir(valor: string | undefined, campo: string): string {
+    const limpio = valor?.trim();
+    if (!limpio) throw new BadRequestException(`El campo "${campo}" es obligatorio.`);
+    return limpio;
+  }
+
+  private nombreCompleto(dto: CreateInscripcionDto): string {
+    return [dto.nombre, dto.apellidoPaterno, dto.apellidoMaterno]
+      .map((s) => s?.trim())
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  private institucionFinal(dto: CreateInscripcionDto): string {
+    return dto.institucion === 'Otro'
+      ? dto.otraInstitucion?.trim() || 'Otro'
+      : dto.institucion;
+  }
+
+  private carreraFinal(dto: CreateInscripcionDto): string {
+    return dto.carrera === 'Otro'
+      ? dto.otraCarrera?.trim() || 'Otro'
+      : dto.carrera;
+  }
+
+  private normalizarCongreso(dto: CreateInscripcionDto): DatosInscripcion {
+    const tipo = this.requerir(dto.tipoParticipacion, 'tipo de participación');
+    const medio = this.requerir(dto.comoSeEntero, 'cómo se enteró');
+    this.requerir(dto.apellidoMaterno, 'apellido materno');
+
+    if (!(tipo in CODIGO_TIPO)) {
+      throw new BadRequestException('Tipo de participación inválido.');
+    }
+
+    return {
+      nombre: this.nombreCompleto(dto),
+      institucion: this.institucionFinal(dto),
+      carrera: this.carreraFinal(dto),
+      tipoCodigo: CODIGO_TIPO[tipo],
+      estadoProcedencia: this.requerir(dto.estado, 'estado de procedencia'),
+      contactoNombre: this.requerir(dto.contactoEmergenciaNombre, 'contacto de emergencia'),
+      contactoTelefono: this.sanitizarTelefono(
+        this.requerir(dto.contactoEmergenciaTelefono, 'teléfono de emergencia'),
+        15,
+        'El teléfono del contacto de emergencia',
+      ),
+      medioDifusion: medio === 'Otro' ? dto.otroMedio?.trim() || 'Otro' : medio,
+      tallaCamisa: null,
+      semestre: null,
+      taller: null,
+      visitaEmpresa: null,
+    };
+  }
+
+  private normalizarEstudiantil(dto: CreateInscripcionDto): DatosInscripcion {
+    return {
+      nombre: this.nombreCompleto(dto),
+      institucion: this.institucionFinal(dto),
+      carrera: this.carreraFinal(dto),
+      tipoCodigo: CODIGO_TIPO['Estudiante'],
+      estadoProcedencia: null,
+      contactoNombre: null,
+      contactoTelefono: null,
+      medioDifusion: null,
+      tallaCamisa: this.requerir(dto.tallaPlayera, 'talla de playera'),
+      semestre: this.requerir(dto.semestre, 'semestre'),
+      taller: this.requerir(dto.taller, 'taller'),
+      visitaEmpresa: this.requerir(dto.visitaEmpresa, 'visita industrial'),
+    };
+  }
+
   // =====================================================
   // PÚBLICO — registro
   // =====================================================
@@ -66,10 +160,15 @@ export class InscripcionesService {
       throw new BadRequestException('Debes aceptar el consentimiento para registrarte.');
     }
 
-    const anioCompleto = new Date().getFullYear();
+    const perfil = PERFIL_POR_EVENTO[eventoId] ?? 'congreso';
+    const datos =
+      perfil === 'estudiantil'
+        ? this.normalizarEstudiantil(dto)
+        : this.normalizarCongreso(dto);
 
-    const [consecutivoRef, genero, estadoPendiente, evento] = await Promise.all([
-      this.siguienteConsecutivoAnual(anioCompleto),
+    const telefonoLimpio = this.sanitizarTelefono(dto.telefono, 10, 'El teléfono');
+
+    const [genero, estadoPendiente, evento] = await Promise.all([
       this.prisma.genero.findFirst({ where: { nombre: dto.sexo } }),
       this.prisma.estado.findFirst({ where: { nombre: 'Pendiente' } }),
       this.prisma.evento.findUnique({ where: { id: eventoId } }),
@@ -79,37 +178,37 @@ export class InscripcionesService {
     if (!estadoPendiente) throw new NotFoundException('No existe el estado "Pendiente" en el catálogo');
     if (!evento) throw new NotFoundException('El evento no existe');
 
-    const referencia = this.construirReferencia(dto.tipoParticipacion, anioCompleto, consecutivoRef);
-    const nombreCompleto = [dto.nombre, dto.apellidoPaterno, dto.apellidoMaterno].filter(Boolean).join(' ');
-    const institucionFinal = dto.institucion === 'Otro' ? (dto.otraInstitucion || 'Otro') : dto.institucion;
-    const carreraFinal = dto.carrera === 'Otro' ? (dto.otraCarrera || 'Otro') : dto.carrera;
-    const medioFinal = dto.comoSeEntero === 'Otro' ? (dto.otroMedio || 'Otro') : dto.comoSeEntero;
-
-    const telefonoLimpio = this.sanitizarTelefono(dto.telefono, 10, 'El teléfono');
-    const contactoEmergenciaTelefonoLimpio = this.sanitizarTelefono(
-      dto.contactoEmergenciaTelefono,
-      15,
-      'El teléfono del contacto de emergencia',
-    );
+    // Solo ESCALA genera referencia bancaria. Se hace después de validar
+    // todo para no "quemar" un consecutivo si el registro falla.
+    let referencia: string | null = null;
+    if (perfil === 'congreso') {
+      const anioCompleto = new Date().getFullYear();
+      const consecutivo = await this.siguienteConsecutivoAnual(anioCompleto);
+      referencia = this.construirReferencia(datos.tipoCodigo, anioCompleto, consecutivo);
+    }
 
     return this.prisma.participantes.create({
       data: {
         evento: eventoId,
-        nombre: nombreCompleto,
+        nombre: datos.nombre,
         genero: genero.id,
         edad: dto.edad,
         correo_electronico: dto.email,
         telefono: telefonoLimpio,
         matricula: dto.numeroControl?.trim() || '0',
-        institucion: institucionFinal,
-        carrera: carreraFinal,
-        tipo_participacion: CODIGO_TIPO[dto.tipoParticipacion],
+        institucion: datos.institucion,
+        carrera: datos.carrera,
+        tipo_participacion: datos.tipoCodigo,
         referencia_bancaria: referencia,
         estado: estadoPendiente.id,
-        estado_procedencia: dto.estado,
-        contacto_emergencia_nombre: dto.contactoEmergenciaNombre,
-        contacto_emergencia_telefono: contactoEmergenciaTelefonoLimpio,
-        medio_difusion: medioFinal,
+        estado_procedencia: datos.estadoProcedencia,
+        contacto_emergencia_nombre: datos.contactoNombre,
+        contacto_emergencia_telefono: datos.contactoTelefono,
+        medio_difusion: datos.medioDifusion,
+        talla_camisa: datos.tallaCamisa,
+        semestre: datos.semestre,
+        taller: datos.taller,
+        visita_empresa: datos.visitaEmpresa,
         consentimiento: dto.consentimiento,
         monto: evento.costo ?? 0,
       },
@@ -117,7 +216,7 @@ export class InscripcionesService {
   }
 
   // =====================================================
-  // PÚBLICO — consultas del participante
+  // PUBLICO — consultas del participante
   // =====================================================
 
   async buscarPorCorreo(eventoId: number, correo: string) {
@@ -197,7 +296,7 @@ export class InscripcionesService {
   }
 
   // =====================================================
-  // PÚBLICO — comprobante de pago
+  // PUBLICO — comprobante de pago
   // =====================================================
 
   async subirComprobante(eventoId: number, dto: SubirComprobanteDto, file: Express.Multer.File) {
@@ -351,6 +450,12 @@ export class InscripcionesService {
         ? new Date(p.fecha_comprobante).toLocaleDateString('es-MX')
         : null,
       certificate: false,
+
+      // Solo Argos (en ESCALA salen null)
+      shirtSize: p.talla_camisa ?? null,
+      semester: p.semestre ?? null,
+      workshop: p.taller ?? null,
+      industrialVisit: p.visita_empresa ?? null,
     };
   }
 

@@ -666,12 +666,12 @@ async function registrar() {
         },
         body: JSON.stringify({
           nombre: form.nombre.trim(),
-          apellidos: form.apellidos.trim(),
+          apellidoPaterno: form.apellidos.trim(),   // todos los apellidos juntos
           numeroControl: form.numeroControl.trim(),
           edad: Number(form.edad),
           sexo: form.sexo,
           tallaPlayera: form.tallaPlayera,
-          tecnologico:
+          institucion:
             form.tecnologico === "Otro tecnológico" ||
             form.tecnologico === "Otra institución"
               ? form.otroTecnologico.trim()
