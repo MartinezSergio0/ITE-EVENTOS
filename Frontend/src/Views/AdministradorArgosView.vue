@@ -84,6 +84,16 @@
           </b>
         </button>
 
+        
+        <button
+          :class="{ active: currentSection === 'asistencia' }"
+          @click="changeSection('asistencia')"
+        >
+          <span>📋</span>
+          Pasar lista
+        </button>
+
+
 
         <span class="menu-label event-label">
           EVENTO
@@ -1034,6 +1044,272 @@
       </section>
 
 
+      
+      <!-- =====================================================
+           ASISTENCIA
+      ====================================================== -->
+
+      <section
+        v-if="currentSection === 'asistencia'"
+        class="page"
+      >
+
+        <div class="section-header">
+          <div>
+            <h2>Pasar lista</h2>
+            <p>
+              Registra la asistencia de los estudiantes por evento,
+              taller o visita a empresa.
+            </p>
+          </div>
+        </div>
+
+        <!-- SELECCION DE ACTIVIDAD -->
+
+        <div class="card attendance-config">
+          <div class="card-header">
+            <div>
+              <h3>Configuración de la lista</h3>
+              <p>Selecciona la actividad y la fecha de asistencia.</p>
+            </div>
+          </div>
+
+          <div class="attendance-fields">
+
+            <div>
+              <label for="attendanceType">Tipo de actividad</label>
+              <select
+                id="attendanceType"
+                v-model="attendanceType"
+              >
+                <option value="evento">Evento general</option>
+                <option value="taller">Taller</option>
+                <option value="visita">Visita a empresa</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="attendanceActivity">Actividad</label>
+              <select
+                id="attendanceActivity"
+                v-model="attendanceActivity"
+              >
+                <option
+                  v-for="activity in attendanceActivities"
+                  :key="activity"
+                  :value="activity"
+                >
+                  {{ activity }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label for="attendanceDate">Fecha</label>
+              <input
+                id="attendanceDate"
+                v-model="attendanceDate"
+                type="date"
+              />
+            </div>
+
+          </div>
+        </div>
+
+        <!-- RESUMEN -->
+
+        <div class="attendance-stats">
+
+          <div class="attendance-stat">
+            <span>Participantes</span>
+            <strong>{{ attendanceParticipants.length }}</strong>
+          </div>
+
+          <div class="attendance-stat">
+            <span>Presentes</span>
+            <strong>{{ attendancePresentCount }}</strong>
+          </div>
+
+          <div class="attendance-stat">
+            <span>Ausentes</span>
+            <strong>{{ attendanceAbsentCount }}</strong>
+          </div>
+
+          <div class="attendance-stat">
+            <span>Sin marcar</span>
+            <strong>{{ attendanceUnmarkedCount }}</strong>
+          </div>
+
+        </div>
+
+        <!-- BUSCADOR Y ACCIONES -->
+
+        <div class="filters attendance-filters">
+
+          <input
+            v-model="searchAttendance"
+            type="search"
+            placeholder="Buscar estudiante por nombre o folio..."
+            aria-label="Buscar estudiante por nombre o folio"
+          />
+
+          <button
+            type="button"
+            class="attendance-secondary"
+            @click="markAllPresent"
+          >
+            Marcar todos presentes
+          </button>
+
+          <button
+            type="button"
+            class="attendance-secondary"
+            @click="clearAttendanceMarks"
+          >
+            Limpiar marcas
+          </button>
+
+        </div>
+
+        <!-- TABLA DE ASISTENCIA -->
+
+        <div class="card">
+
+          <div class="card-header">
+            <div>
+              <h3>{{ attendanceActivity }}</h3>
+              <p>
+                Fecha:
+                {{ attendanceDate || 'Selecciona una fecha' }}
+              </p>
+            </div>
+
+            <span class="attendance-total">
+              {{ attendancePresentCount }} presentes
+            </span>
+          </div>
+
+          <div class="table-container">
+
+            <table class="attendance-table">
+
+              <thead>
+                <tr>
+                  <th>Nombre del estudiante</th>
+                  <th>Folio</th>
+                  <th>Control</th>
+                  <th>Asistencia</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                <tr
+                  v-for="participant in filteredAttendanceParticipants"
+                  :key="participant.id"
+                >
+
+                  <td>
+                    <div class="table-user">
+                      <div class="avatar">
+                        {{ getInitials(participant.name || '') }}
+                      </div>
+
+                      <div>
+                        <strong>
+                          {{ participant.name || 'Sin nombre' }}
+                        </strong>
+
+                        <span>
+                          {{ participant.email || 'Sin correo' }}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>
+                    <strong class="student-folio">
+                      {{ getStudentFolio(participant) }}
+                    </strong>
+                  </td>
+
+                  <td>
+                    {{ participant.control || 'No registrado' }}
+                  </td>
+
+                  <td>
+                    <div class="attendance-actions">
+
+                      <button
+                        type="button"
+                        class="attendance-mark present-mark"
+                        :class="{
+                          selected:
+                            attendanceMarks[String(participant.id)] === 'presente'
+                        }"
+                        @click="setAttendance(participant, 'presente')"
+                      >
+                        ✓ Presente
+                      </button>
+
+                      <button
+                        type="button"
+                        class="attendance-mark absent-mark"
+                        :class="{
+                          selected:
+                            attendanceMarks[String(participant.id)] === 'ausente'
+                        }"
+                        @click="setAttendance(participant, 'ausente')"
+                      >
+                        ✕ Ausente
+                      </button>
+
+                    </div>
+                  </td>
+
+                </tr>
+
+                <tr v-if="filteredAttendanceParticipants.length === 0">
+                  <td colspan="4" class="empty-table">
+                    {{
+                      participants.length === 0
+                        ? 'No hay participantes cargados. Revisa la conexión con el backend.'
+                        : 'No se encontraron estudiantes con esa búsqueda.'
+                    }}
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+          <!-- GUARDAR -->
+
+          <div class="attendance-footer">
+
+            <span>
+              Se guardará la lista de esta actividad y fecha
+              en este navegador.
+            </span>
+
+            <button
+              type="button"
+              class="attendance-save"
+              @click="saveAttendance"
+            >
+              💾 Guardar lista
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
       <!-- =====================================================
            CONSTANCIAS
       ====================================================== -->
@@ -1479,12 +1755,21 @@ const eventInfo = ref({
 
 const currentSection = ref("dashboard");
 
+
 function syncSectionWithRoute(path) {
-  if (path.endsWith("/participantes")) currentSection.value = "participantes";
-  else if (path.endsWith("/comprobantes")) currentSection.value = "comprobantes";
-  else if (path.endsWith("/constancias")) currentSection.value = "constancias";
-  else currentSection.value = "dashboard";
+  if (path.endsWith("/participantes")) {
+    currentSection.value = "participantes";
+  } else if (path.endsWith("/comprobantes")) {
+    currentSection.value = "comprobantes";
+  } else if (path.endsWith("/asistencia")) {
+    currentSection.value = "asistencia";
+  } else if (path.endsWith("/constancias")) {
+    currentSection.value = "constancias";
+  } else {
+    currentSection.value = "dashboard";
+  }
 }
+
 
 watch(() => route.path, syncSectionWithRoute, { immediate: true });
 
@@ -1524,6 +1809,156 @@ const certificateTemplate = ref(null);
 // =====================================================
 
 const participants = ref([]);
+
+
+
+
+// =====================================================
+// ASISTENCIA
+// =====================================================
+
+// Opciones de actividades. Cambia estos nombres por los reales.
+const attendanceActivities = computed(() => {
+  if (attendanceType.value === "evento") {
+    return ["Congreso ARGOS"];
+  }
+
+  if (attendanceType.value === "taller") {
+    return [
+      "Taller 1",
+      "Taller 2",
+      "Taller 3"
+    ];
+  }
+
+  return [
+    "Visita a empresa 1",
+    "Visita a empresa 2",
+    "Visita a empresa 3"
+  ];
+});
+
+const attendanceType = ref("evento");
+const attendanceActivity = ref("Congreso ARGOS");
+const attendanceDate = ref(new Date().toLocaleDateString("en-CA"));
+const searchAttendance = ref("");
+const attendanceMarks = ref({});
+
+const attendanceStorageKey = computed(() => {
+  return [
+    "argos_attendance",
+    attendanceType.value,
+    attendanceActivity.value,
+    attendanceDate.value
+  ].join("_");
+});
+
+const attendanceParticipants = computed(() => {
+  return participants.value;
+});
+
+const filteredAttendanceParticipants = computed(() => {
+  return attendanceParticipants.value.filter(participant =>
+    matchesStudentSearch(participant, searchAttendance.value)
+  );
+});
+
+const attendancePresentCount = computed(() => {
+  return attendanceParticipants.value.filter(
+    participant =>
+      attendanceMarks.value[String(participant.id)] === "presente"
+  ).length;
+});
+
+const attendanceAbsentCount = computed(() => {
+  return attendanceParticipants.value.filter(
+    participant =>
+      attendanceMarks.value[String(participant.id)] === "ausente"
+  ).length;
+});
+
+const attendanceUnmarkedCount = computed(() => {
+  return attendanceParticipants.value.length -
+    attendancePresentCount.value -
+    attendanceAbsentCount.value;
+});
+
+// Cambiar de actividad o fecha carga su propia lista.
+watch(
+  attendanceStorageKey,
+  (key) => {
+    try {
+      const saved = localStorage.getItem(key);
+      attendanceMarks.value = saved ? JSON.parse(saved) : {};
+    } catch (error) {
+      console.error("Error al cargar la asistencia:", error);
+      attendanceMarks.value = {};
+    }
+  },
+  { immediate: true }
+);
+
+// Al cambiar el tipo, seleccionar la primera actividad de ese tipo.
+watch(attendanceType, () => {
+  attendanceActivity.value = attendanceActivities.value[0];
+});
+
+function setAttendance(participant, status) {
+  attendanceMarks.value = {
+    ...attendanceMarks.value,
+    [String(participant.id)]: status
+  };
+}
+
+function markAllPresent() {
+  const updated = { ...attendanceMarks.value };
+
+  attendanceParticipants.value.forEach(participant => {
+    updated[String(participant.id)] = "presente";
+  });
+
+  attendanceMarks.value = updated;
+}
+
+function clearAttendanceMarks() {
+  if (!confirm("¿Quieres quitar todas las marcas de esta lista?")) {
+    return;
+  }
+
+  attendanceMarks.value = {};
+}
+
+function saveAttendance() {
+  if (!attendanceDate.value) {
+    alert("Selecciona la fecha de la asistencia.");
+    return;
+  }
+
+  if (attendanceParticipants.value.length === 0) {
+    alert("No hay participantes para guardar la lista.");
+    return;
+  }
+
+  try {
+    localStorage.setItem(
+      attendanceStorageKey.value,
+      JSON.stringify(attendanceMarks.value)
+    );
+
+    alert(
+      `Lista guardada.\n` +
+      `Actividad: ${attendanceActivity.value}\n` +
+      `Fecha: ${attendanceDate.value}\n` +
+      `Presentes: ${attendancePresentCount.value}\n` +
+      `Ausentes: ${attendanceAbsentCount.value}\n` +
+      `Sin marcar: ${attendanceUnmarkedCount.value}`
+    );
+  } catch (error) {
+    console.error("Error al guardar la asistencia:", error);
+    alert("No se pudo guardar la lista en el navegador.");
+  }
+}
+
 
 
 // =====================================================
@@ -1664,6 +2099,9 @@ const sectionTitle = computed(() => {
 
     comprobantes:
       "Comprobantes de pago",
+    
+    asistencia: 
+      "Pasar lista",
 
     constancias:
       "Constancias"
@@ -1698,6 +2136,9 @@ function changeSection(section) {
 
     comprobantes:
       "/admin/argos/comprobantes",
+
+    asistencia: 
+      "/admin/argos/asistencia",
 
     constancias:
       "/admin/argos/constancias"
@@ -3698,6 +4139,207 @@ td {
 
   color: #90a4ae;
 
+}
+
+
+/* =====================================================
+   ASISTENCIA
+===================================================== */
+
+.attendance-config {
+  margin-bottom: 20px;
+}
+
+.attendance-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 22px;
+}
+
+.attendance-fields > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attendance-fields label {
+  color: #37474f;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.attendance-fields select,
+.attendance-fields input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #dfe5eb;
+  border-radius: 9px;
+  background: white;
+  color: #263238;
+  outline: none;
+}
+
+.attendance-fields select:focus,
+.attendance-fields input:focus {
+  border-color: #0066b3;
+}
+
+.attendance-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.attendance-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, .04);
+}
+
+.attendance-stat span {
+  color: #78909c;
+  font-size: 12px;
+}
+
+.attendance-stat strong {
+  color: #003366;
+  font-size: 27px;
+}
+
+.attendance-filters {
+  grid-template-columns: minmax(180px, 2fr) 1fr 1fr;
+  align-items: center;
+}
+
+.attendance-secondary {
+  padding: 12px;
+  border: 1px solid #dfe5eb;
+  border-radius: 9px;
+  background: #f8fafc;
+  color: #003366;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.attendance-secondary:hover {
+  background: #e3f2fd;
+}
+
+.attendance-total {
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.attendance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attendance-mark {
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: .75;
+}
+
+.present-mark {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.absent-mark {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.attendance-mark.selected {
+  opacity: 1;
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+
+.attendance-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-top: 1px solid #edf0f3;
+}
+
+.attendance-footer > span {
+  color: #78909c;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.attendance-save {
+  flex-shrink: 0;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9px;
+  background: #003366;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attendance-save:hover {
+  background: #005b96;
+}
+
+.attendance-table {
+  min-width: 850px;
+}
+
+@media(max-width: 900px) {
+  .attendance-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media(max-width: 600px) {
+  .attendance-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .attendance-save {
+    width: 100%;
+  }
+
+  .attendance-stats {
+    gap: 10px;
+  }
+
+  .attendance-stat {
+    padding: 15px;
+  }
 }
 
 

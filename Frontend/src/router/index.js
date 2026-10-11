@@ -140,18 +140,38 @@ const routes = [
   },
 
 
-// ==========================================
-// ADMINISTRADOR Argos
-// ==========================================
 
-{
-    path: "/admin/argos",
-
-    name: "AdministradorArgos",
-
-    component: AdministradorArgosView,
-    
+  // ==========================================
+  // ADMINISTRADOR ARGOS
+  
+  // ARGOS: todas las pantallas usan el mismo componente
+  {
+    path: '/admin/argos',
+    name: 'AdministradorArgos',
+    component: AdministradorArgosView
   },
+  {
+    path: '/admin/argos/participantes',
+    name: 'ParticipantesArgos',
+    component: AdministradorArgosView
+  },
+  {
+    path: '/admin/argos/comprobantes',
+    name: 'ComprobantesArgos',
+    component: AdministradorArgosView
+  },
+  {
+    path: '/admin/argos/asistencia',
+    name: 'AsistenciaArgos',
+    component: AdministradorArgosView
+  },
+  {
+    path: '/admin/argos/constancias',
+    name: 'ConstanciasArgos',
+    component: AdministradorArgosView
+  },
+
+
   
   // ========================================
   // ADMINISTRADOR ESCALA
