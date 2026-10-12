@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Put,
   Param,
   ParseIntPipe,
   Post,
@@ -16,6 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { InscripcionesService } from './inscripciones.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { SubirComprobanteDto } from './dto/subir-comprobante.dto';
+import { GuardarAsistenciaDto } from './dto/guardar-asistencia.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('eventos/:eventoId/inscripciones')
@@ -104,5 +106,33 @@ export class InscripcionesController {
     @Param('folio') folio: string,
   ) {
     return this.service.rechazarPago(eventoId, folio);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('admin/asistencia/opciones')
+  opcionesAsistencia(@Param('eventoId', ParseIntPipe) eventoId: number) {
+    return this.service.opcionesAsistencia(eventoId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('admin/asistencia')
+  obtenerAsistencia(
+    @Param('eventoId', ParseIntPipe) eventoId: number,
+    @Query('tipo') tipo: string,
+    @Query('fecha') fecha: string,
+    @Query('actividadId') actividadId?: string,
+  ) {
+    return this.service.obtenerAsistencia(
+      eventoId, tipo, actividadId ? Number(actividadId) : undefined, fecha,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('admin/asistencia')
+  guardarAsistencia(
+    @Param('eventoId', ParseIntPipe) eventoId: number,
+    @Body() dto: GuardarAsistenciaDto,
+  ) {
+    return this.service.guardarAsistencia(eventoId, dto);
   }
 }

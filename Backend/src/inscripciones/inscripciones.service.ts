@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { SubirComprobanteDto } from './dto/subir-comprobante.dto';
+import { GuardarAsistenciaDto } from './dto/guardar-asistencia.dto';
 
 const CODIGO_TIPO: Record<string, number> = {
   'Participante general': 1,
@@ -21,7 +22,7 @@ const PERFIL_POR_EVENTO: Record<number, Perfil> = {
   5: 'estudiantil',
 };
 
-// iguales no importar de que formulario vengan
+// iguales no importa de que formulario vengan
 interface DatosInscripcion {
   nombre: string;
   institucion: string;
@@ -178,8 +179,8 @@ export class InscripcionesService {
     if (!estadoPendiente) throw new NotFoundException('No existe el estado "Pendiente" en el catálogo');
     if (!evento) throw new NotFoundException('El evento no existe');
 
-    // Solo ESCALA genera referencia bancaria. Se hace después de validar
-    // todo para no "quemar" un consecutivo si el registro falla.
+    // genera referencia bancaria. Se hace después de validar
+    // pa no gastar un consecutivo si registro falla.
     let referencia: string | null = null;
     if (perfil === 'congreso') {
       const anioCompleto = new Date().getFullYear();
@@ -409,10 +410,15 @@ export class InscripcionesService {
       orderBy: { participante_num: 'asc' },
     });
 
-    return Promise.all(participantes.map((p) => this.mapParticipante(p)));
+    const conAsistencia = await this.foliosConAsistencia(
+      eventoId,
+      participantes.map((p) => p.folio),
+    );
+
+    return Promise.all(participantes.map((p) => this.mapParticipante(p, conAsistencia)));
   }
 
-  private async mapParticipante(p: any) {
+  private async mapParticipante(p: any, conAsistencia: Set<string>) {
     const estadoNombre = p.estado_participantes_estadoToestado?.nombre ?? '';
 
     let payment = 'pending';
@@ -437,12 +443,13 @@ export class InscripcionesService {
 
     return {
       id: p.folio,
+      folio: p.folio,                         
       name: p.nombre,
       control: p.matricula,
       type: p.tipo_participante?.nombre ?? '',
       email: p.correo_electronico,
       payment,
-      attended: false,
+      attended: conAsistencia.has(p.folio),    
       reference: p.referencia_bancaria,
       receiptName,
       receiptUrl,
@@ -450,8 +457,7 @@ export class InscripcionesService {
         ? new Date(p.fecha_comprobante).toLocaleDateString('es-MX')
         : null,
       certificate: false,
-
-      // Solo Argos (en ESCALA salen null)
+      //ARGOOS  
       shirtSize: p.talla_camisa ?? null,
       semester: p.semestre ?? null,
       workshop: p.taller ?? null,
@@ -488,5 +494,145 @@ export class InscripcionesService {
     });
 
     return { folio, estado: nombreEstado };
+  }
+  
+  // =====================================================
+  // ADMIN — asistencia
+  // =====================================================
+
+  private rangoDia(fecha: string) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha ?? '')) {
+      throw new BadRequestException('Fecha inválida (usa AAAA-MM-DD).');
+    }
+    const inicio = new Date(`${fecha}T00:00:00.000Z`);
+    if (isNaN(inicio.getTime())) throw new BadRequestException('Fecha inválida.');
+    return { inicio, fin: new Date(inicio.getTime() + 86_400_000) };
+  }
+
+  private async objetivoAsistencia(eventoId: number, tipo: string, actividadId?: number) {
+    if (tipo === 'evento') {
+      return { evento: eventoId, taller: null, actividad: null };
+    }
+    if (tipo !== 'taller' && tipo !== 'actividad') {
+      throw new BadRequestException('Tipo de asistencia inválido.');
+    }
+    if (!actividadId) throw new BadRequestException('Selecciona la actividad.');
+
+    const id = BigInt(actividadId);
+
+    if (tipo === 'taller') {
+      const existe = await this.prisma.taller.findFirst({ where: { id, evento: eventoId } });
+      if (!existe) throw new NotFoundException('El taller no existe en este evento.');
+      return { evento: null, taller: id, actividad: null };
+    }
+
+    const existe = await this.prisma.actividad.findFirst({ where: { id, evento: eventoId } });
+    if (!existe) throw new NotFoundException('La actividad no existe en este evento.');
+    return { evento: null, taller: null, actividad: id };
+  }
+
+  async opcionesAsistencia(eventoId: number) {
+    const [evento, talleres, actividades] = await Promise.all([
+      this.prisma.evento.findUnique({ where: { id: eventoId } }),
+      this.prisma.taller.findMany({ where: { evento: eventoId }, orderBy: { inicio: 'asc' } }),
+      this.prisma.actividad.findMany({ where: { evento: eventoId }, orderBy: { inicio: 'asc' } }),
+    ]);
+
+    if (!evento) throw new NotFoundException('El evento no existe');
+
+    // Los ids son BigInt: hay que convertirlos o JSON.stringify truena
+    return {
+      evento: { id: eventoId, nombre: evento.nombre },
+      talleres: talleres.map((t) => ({ id: Number(t.id), nombre: t.nombre })),
+      actividades: actividades.map((a) => ({ id: Number(a.id), nombre: a.nombre })),
+    };
+  }
+
+  async obtenerAsistencia(
+    eventoId: number,
+    tipo: string,
+    actividadId: number | undefined,
+    fecha: string,
+  ) {
+    const objetivo = await this.objetivoAsistencia(eventoId, tipo, actividadId);
+    const { inicio, fin } = this.rangoDia(fecha);
+
+    const filas = await this.prisma.asistencia.findMany({
+      where: { ...objetivo, fecha: { gte: inicio, lt: fin } },
+      select: { participante: true },
+    });
+
+    return { presentes: filas.map((f) => f.participante.trim()) };
+  }
+
+  // Aplica solo los cambios de este dispositivo (agregar / quitar),
+  // así varias pistolas pueden guardar sin pisarse entre sí.
+  async guardarAsistencia(eventoId: number, dto: GuardarAsistenciaDto) {
+    const objetivo = await this.objetivoAsistencia(eventoId, dto.tipo, dto.actividadId);
+    const { inicio, fin } = this.rangoDia(dto.fecha);
+
+    // Solo folios que pertenecen a este evento
+    const validos = await this.prisma.participantes.findMany({
+      where: { evento: eventoId, folio: { in: dto.agregar } },
+      select: { folio: true },
+    });
+    const agregar = new Set(validos.map((p) => p.folio));
+    const quitar = new Set(
+      dto.quitar.map((f) => f.trim()).filter((f) => !agregar.has(f)),
+    );
+
+    return this.prisma.$transaction(async (tx) => {
+      const existentes = await tx.asistencia.findMany({
+        where: {
+          ...objetivo,
+          fecha: { gte: inicio, lt: fin },
+          participante: { in: [...agregar, ...quitar] },
+        },
+        select: { id: true, participante: true },
+      });
+
+      const yaMarcados = new Set(existentes.map((e) => e.participante.trim()));
+      const idsBorrar = existentes
+        .filter((e) => quitar.has(e.participante.trim()))
+        .map((e) => e.id);
+      const nuevos = [...agregar].filter((f) => !yaMarcados.has(f));
+
+      if (idsBorrar.length) {
+        await tx.asistencia.deleteMany({ where: { id: { in: idsBorrar } } });
+      }
+      if (nuevos.length) {
+        await tx.asistencia.createMany({
+          data: nuevos.map((folio) => ({ participante: folio, fecha: inicio, ...objetivo })),
+          skipDuplicates: true,
+        });
+      }
+
+      return { agregados: nuevos.length, quitados: idsBorrar.length };
+    });
+  }
+
+  // Folios con al menos una asistencia en este evento (general, taller o actividad)
+  private async foliosConAsistencia(eventoId: number, folios: string[]): Promise<Set<string>> {
+    if (!folios.length) return new Set();
+
+    const [talleres, actividades] = await Promise.all([
+      this.prisma.taller.findMany({ where: { evento: eventoId }, select: { id: true } }),
+      this.prisma.actividad.findMany({ where: { evento: eventoId }, select: { id: true } }),
+    ]);
+
+    const filas = await this.prisma.asistencia.findMany({
+      where: {
+        participante: { in: folios },
+        OR: [
+          { evento: eventoId },
+          { taller: { in: talleres.map((t) => t.id) } },
+          { actividad: { in: actividades.map((a) => a.id) } },
+        ],
+      },
+      select: { participante: true },
+      distinct: ['participante'],
+    });
+
+    return new Set(filas.map((f) => f.participante.trim()));
   }
 }

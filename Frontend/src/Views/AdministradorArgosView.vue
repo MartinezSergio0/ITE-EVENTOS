@@ -1058,14 +1058,13 @@
           <div>
             <h2>Pasar lista</h2>
             <p>
-              Registra la asistencia de los estudiantes por evento,
-              taller o visita a empresa.
+              Registra la asistencia por evento, taller o actividad.
+              Con la pistola lectora, escanea el código de cada alumno.
             </p>
           </div>
         </div>
 
-        <!-- SELECCION DE ACTIVIDAD -->
-
+        <!-- CONFIGURACIÓN -->
         <div class="card attendance-config">
           <div class="card-header">
             <div>
@@ -1078,13 +1077,10 @@
 
             <div>
               <label for="attendanceType">Tipo de actividad</label>
-              <select
-                id="attendanceType"
-                v-model="attendanceType"
-              >
+              <select id="attendanceType" v-model="attendanceType">
                 <option value="evento">Evento general</option>
                 <option value="taller">Taller</option>
-                <option value="visita">Visita a empresa</option>
+                <option value="actividad">Actividad / visita a empresa</option>
               </select>
             </div>
 
@@ -1092,32 +1088,28 @@
               <label for="attendanceActivity">Actividad</label>
               <select
                 id="attendanceActivity"
-                v-model="attendanceActivity"
+                v-model="attendanceActivityId"
+                :disabled="attendanceType === 'evento'"
               >
                 <option
-                  v-for="activity in attendanceActivities"
-                  :key="activity"
-                  :value="activity"
+                  v-for="a in attendanceActivities"
+                  :key="a.id"
+                  :value="a.id"
                 >
-                  {{ activity }}
+                  {{ a.nombre }}
                 </option>
               </select>
             </div>
 
             <div>
               <label for="attendanceDate">Fecha</label>
-              <input
-                id="attendanceDate"
-                v-model="attendanceDate"
-                type="date"
-              />
+              <input id="attendanceDate" v-model="attendanceDate" type="date" />
             </div>
 
           </div>
         </div>
 
         <!-- RESUMEN -->
-
         <div class="attendance-stats">
 
           <div class="attendance-stat">
@@ -1135,22 +1127,28 @@
             <strong>{{ attendanceAbsentCount }}</strong>
           </div>
 
-          <div class="attendance-stat">
-            <span>Sin marcar</span>
-            <strong>{{ attendanceUnmarkedCount }}</strong>
-          </div>
-
         </div>
 
-        <!-- BUSCADOR Y ACCIONES -->
+        <!-- AVISO DEL ESCÁNER -->
+        <div
+          v-if="scanFeedback"
+          class="scan-feedback"
+          :class="scanFeedback.type"
+        >
+          {{ scanFeedback.text }}
+        </div>
 
+        <!-- BUSCADOR / ESCÁNER Y ACCIONES -->
         <div class="filters attendance-filters">
 
           <input
+            ref="attendanceSearchInput"
             v-model="searchAttendance"
-            type="search"
-            placeholder="Buscar estudiante por nombre o folio..."
-            aria-label="Buscar estudiante por nombre o folio"
+            type="text"
+            autocomplete="off"
+            placeholder="Escanea el código o busca por nombre o folio..."
+            aria-label="Escanear código o buscar estudiante por nombre o folio"
+            @keydown.enter.prevent="handleScan"
           />
 
           <button
@@ -1166,22 +1164,18 @@
             class="attendance-secondary"
             @click="clearAttendanceMarks"
           >
-            Limpiar marcas
+            Quitar todas
           </button>
 
         </div>
 
-        <!-- TABLA DE ASISTENCIA -->
-
+        <!-- TABLA -->
         <div class="card">
 
           <div class="card-header">
             <div>
-              <h3>{{ attendanceActivity }}</h3>
-              <p>
-                Fecha:
-                {{ attendanceDate || 'Selecciona una fecha' }}
-              </p>
+              <h3>{{ attendanceActivityName }}</h3>
+              <p>Fecha: {{ attendanceDate || 'Selecciona una fecha' }}</p>
             </div>
 
             <span class="attendance-total">
@@ -1216,13 +1210,8 @@
                       </div>
 
                       <div>
-                        <strong>
-                          {{ participant.name || 'Sin nombre' }}
-                        </strong>
-
-                        <span>
-                          {{ participant.email || 'Sin correo' }}
-                        </span>
+                        <strong>{{ participant.name || 'Sin nombre' }}</strong>
+                        <span>{{ participant.email || 'Sin correo' }}</span>
                       </div>
                     </div>
                   </td>
@@ -1234,37 +1223,18 @@
                   </td>
 
                   <td>
-                    {{ participant.control || 'No registrado' }}
+                    {{ participant.control && participant.control !== '0' ? participant.control : 'No registrado' }}
                   </td>
 
                   <td>
-                    <div class="attendance-actions">
-
-                      <button
-                        type="button"
-                        class="attendance-mark present-mark"
-                        :class="{
-                          selected:
-                            attendanceMarks[String(participant.id)] === 'presente'
-                        }"
-                        @click="setAttendance(participant, 'presente')"
-                      >
-                        ✓ Presente
-                      </button>
-
-                      <button
-                        type="button"
-                        class="attendance-mark absent-mark"
-                        :class="{
-                          selected:
-                            attendanceMarks[String(participant.id)] === 'ausente'
-                        }"
-                        @click="setAttendance(participant, 'ausente')"
-                      >
-                        ✕ Ausente
-                      </button>
-
-                    </div>
+                    <button
+                      type="button"
+                      class="attendance-mark"
+                      :class="isPresent(participant) ? 'present-mark' : 'absent-mark'"
+                      @click="toggleAttendance(participant)"
+                    >
+                      {{ isPresent(participant) ? '✓ Presente' : 'Marcar presente' }}
+                    </button>
                   </td>
 
                 </tr>
@@ -1274,7 +1244,9 @@
                     {{
                       participants.length === 0
                         ? 'No hay participantes cargados. Revisa la conexión con el backend.'
-                        : 'No se encontraron estudiantes con esa búsqueda.'
+                        : attendanceParticipants.length === 0
+                          ? 'Nadie está inscrito en esta actividad.'
+                          : 'No se encontraron estudiantes con esa búsqueda.'
                     }}
                   </td>
                 </tr>
@@ -1286,20 +1258,28 @@
           </div>
 
           <!-- GUARDAR -->
-
           <div class="attendance-footer">
 
-            <span>
-              Se guardará la lista de esta actividad y fecha
-              en este navegador.
+            <span
+              v-if="hasUnsavedAttendance"
+              class="unsaved"
+            >
+              Cambios sin guardar:
+              {{ attendanceAdds.length }} nuevos,
+              {{ attendanceRemovals.length }} quitados.
+            </span>
+
+            <span v-else>
+              Los cambios se guardan en el sistema al presionar "Guardar lista".
             </span>
 
             <button
               type="button"
               class="attendance-save"
+              :disabled="savingAttendance || !hasUnsavedAttendance"
               @click="saveAttendance"
             >
-              💾 Guardar lista
+              {{ savingAttendance ? 'Guardando...' : '💾 Guardar lista' }}
             </button>
 
           </div>
@@ -1712,6 +1692,7 @@ import {
   ref,
   computed,
   onMounted,
+  onBeforeUnmount,
   watch
 } from "vue";
 
@@ -1817,148 +1798,278 @@ const participants = ref([]);
 // ASISTENCIA
 // =====================================================
 
-// Opciones de actividades. Cambia estos nombres por los reales.
-const attendanceActivities = computed(() => {
-  if (attendanceType.value === "evento") {
-    return ["Congreso ARGOS"];
-  }
-
-  if (attendanceType.value === "taller") {
-    return [
-      "Taller 1",
-      "Taller 2",
-      "Taller 3"
-    ];
-  }
-
-  return [
-    "Visita a empresa 1",
-    "Visita a empresa 2",
-    "Visita a empresa 3"
-  ];
-});
-
+const attendanceOptions = ref({ evento: null, talleres: [], actividades: [] });
 const attendanceType = ref("evento");
-const attendanceActivity = ref("Congreso ARGOS");
+const attendanceActivityId = ref(null);
 const attendanceDate = ref(new Date().toLocaleDateString("en-CA"));
 const searchAttendance = ref("");
-const attendanceMarks = ref({});
+const attendanceSearchInput = ref(null);
+const savingAttendance = ref(false);
 
-const attendanceStorageKey = computed(() => {
-  return [
-    "argos_attendance",
-    attendanceType.value,
-    attendanceActivity.value,
-    attendanceDate.value
-  ].join("_");
+const attendanceMarks = ref({});
+const savedPresentes = ref([]);
+
+const scanFeedback = ref(null);
+let scanFeedbackTimer = null;
+
+function authHeaders() {
+  return { Authorization: `Bearer ${localStorage.getItem("token")}` };
+}
+
+const attendanceActivities = computed(() => {
+  if (attendanceType.value === "taller") return attendanceOptions.value.talleres;
+  if (attendanceType.value === "actividad") return attendanceOptions.value.actividades;
+  return [];
 });
 
+const attendanceActivityName = computed(() => {
+  if (attendanceType.value === "evento") return "Congreso ARGOS";
+  const actividad = attendanceActivities.value.find(
+    a => a.id === attendanceActivityId.value
+  );
+  return actividad ? actividad.nombre : "Selecciona una actividad";
+});
+
+// Quien aparece en la lista
 const attendanceParticipants = computed(() => {
+  const nombre = attendanceActivityName.value;
+
+  if (attendanceType.value === "taller") {
+    return participants.value.filter(p => p.workshop === nombre);
+  }
+
+  if (attendanceType.value === "actividad") {
+    const inscritos = participants.value.filter(p => p.industrialVisit === nombre);
+    return inscritos.length ? inscritos : participants.value;
+  }
+
   return participants.value;
 });
 
-const filteredAttendanceParticipants = computed(() => {
-  return attendanceParticipants.value.filter(participant =>
-    matchesStudentSearch(participant, searchAttendance.value)
-  );
+const filteredAttendanceParticipants = computed(() =>
+  attendanceParticipants.value.filter(p =>
+    matchesStudentSearch(p, searchAttendance.value)
+  )
+);
+
+function isPresent(participant) {
+  return Boolean(attendanceMarks.value[String(participant.id)]);
+}
+
+const attendancePresentCount = computed(() =>
+  attendanceParticipants.value.filter(isPresent).length
+);
+
+const attendanceAbsentCount = computed(() =>
+  attendanceParticipants.value.length - attendancePresentCount.value
+);
+
+// Cambios respecto a lo guardado
+const attendanceAdds = computed(() =>
+  Object.keys(attendanceMarks.value).filter(
+    folio => !savedPresentes.value.includes(folio)
+  )
+);
+
+const attendanceRemovals = computed(() =>
+  savedPresentes.value.filter(folio => !attendanceMarks.value[folio])
+);
+
+const hasUnsavedAttendance = computed(() =>
+  attendanceAdds.value.length > 0 || attendanceRemovals.value.length > 0
+);
+
+async function cargarOpcionesAsistencia() {
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/asistencia/opciones`,
+      { headers: authHeaders() }
+    );
+    if (response.ok) attendanceOptions.value = await response.json();
+  } catch (e) {
+    console.error("Error al cargar las actividades:", e);
+  }
+}
+
+async function cargarAsistencia() {
+  attendanceMarks.value = {};
+  savedPresentes.value = [];
+
+  if (!attendanceDate.value) return;
+  if (attendanceType.value !== "evento" && !attendanceActivityId.value) return;
+
+  const params = new URLSearchParams({
+    tipo: attendanceType.value,
+    fecha: attendanceDate.value
+  });
+  if (attendanceType.value !== "evento") {
+    params.set("actividadId", String(attendanceActivityId.value));
+  }
+
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/asistencia?${params}`,
+      { headers: authHeaders() }
+    );
+    if (!response.ok) return;
+
+    const data = await response.json();
+    savedPresentes.value = data.presentes;
+    attendanceMarks.value = Object.fromEntries(
+      data.presentes.map(folio => [folio, true])
+    );
+  } catch (e) {
+    console.error("Error al cargar la asistencia:", e);
+  }
+}
+
+watch(attendanceType, () => {
+  attendanceActivityId.value = attendanceActivities.value[0]?.id ?? null;
 });
 
-const attendancePresentCount = computed(() => {
-  return attendanceParticipants.value.filter(
-    participant =>
-      attendanceMarks.value[String(participant.id)] === "presente"
-  ).length;
-});
-
-const attendanceAbsentCount = computed(() => {
-  return attendanceParticipants.value.filter(
-    participant =>
-      attendanceMarks.value[String(participant.id)] === "ausente"
-  ).length;
-});
-
-const attendanceUnmarkedCount = computed(() => {
-  return attendanceParticipants.value.length -
-    attendancePresentCount.value -
-    attendanceAbsentCount.value;
-});
-
-// Cambiar de actividad o fecha carga su propia lista.
 watch(
-  attendanceStorageKey,
-  (key) => {
-    try {
-      const saved = localStorage.getItem(key);
-      attendanceMarks.value = saved ? JSON.parse(saved) : {};
-    } catch (error) {
-      console.error("Error al cargar la asistencia:", error);
-      attendanceMarks.value = {};
-    }
-  },
+  [attendanceType, attendanceActivityId, attendanceDate],
+  cargarAsistencia,
   { immediate: true }
 );
 
-// Al cambiar el tipo, seleccionar la primera actividad de ese tipo.
-watch(attendanceType, () => {
-  attendanceActivity.value = attendanceActivities.value[0];
-});
+function toggleAttendance(participant) {
+  const marks = { ...attendanceMarks.value };
+  const key = String(participant.id);
 
-function setAttendance(participant, status) {
-  attendanceMarks.value = {
-    ...attendanceMarks.value,
-    [String(participant.id)]: status
-  };
+  if (marks[key]) delete marks[key];
+  else marks[key] = true;
+
+  attendanceMarks.value = marks;
 }
 
 function markAllPresent() {
-  const updated = { ...attendanceMarks.value };
-
-  attendanceParticipants.value.forEach(participant => {
-    updated[String(participant.id)] = "presente";
+  const marks = { ...attendanceMarks.value };
+  attendanceParticipants.value.forEach(p => {
+    marks[String(p.id)] = true;
   });
-
-  attendanceMarks.value = updated;
+  attendanceMarks.value = marks;
 }
 
 function clearAttendanceMarks() {
-  if (!confirm("¿Quieres quitar todas las marcas de esta lista?")) {
+  if (!confirm("Se quitarán todas las asistencias de esta lista al guardar. ¿Continuar?")) {
     return;
   }
-
   attendanceMarks.value = {};
 }
 
-function saveAttendance() {
+// Pistola 
+
+function showScanFeedback(type, text) {
+  scanFeedback.value = { type, text };
+  clearTimeout(scanFeedbackTimer);
+  scanFeedbackTimer = setTimeout(() => {
+    scanFeedback.value = null;
+  }, 3500);
+}
+
+// si pistola escribe el folio y manda Enter (se debe probar o algo :c)
+function handleScan() {
+  const code = searchAttendance.value.trim();
+  if (!code) return;
+
+  const buscado = code.toLowerCase();
+  const mismoFolio = p => getStudentFolio(p).toLowerCase() === buscado;
+
+  const enLista = attendanceParticipants.value.find(mismoFolio);
+
+  if (enLista) {
+    if (isPresent(enLista)) {
+      showScanFeedback("warn", `${enLista.name} ya estaba registrado.`);
+    } else {
+      attendanceMarks.value = {
+        ...attendanceMarks.value,
+        [String(enLista.id)]: true
+      };
+      showScanFeedback("ok", `✓ ${enLista.name}`);
+    }
+    searchAttendance.value = "";
+    return;
+  }
+
+  const existe = participants.value.find(mismoFolio);
+
+  if (existe) {
+    showScanFeedback(
+      "warn",
+      `${existe.name} no está inscrito en esta actividad.`
+    );
+    searchAttendance.value = "";
+    return;
+  }
+
+  // para detextar si es un folio
+  if (/^\d{6,}$/.test(code)) {
+    showScanFeedback("error", `Folio ${code} no encontrado.`);
+    searchAttendance.value = "";
+  }
+}
+
+async function saveAttendance() {
   if (!attendanceDate.value) {
     alert("Selecciona la fecha de la asistencia.");
     return;
   }
 
-  if (attendanceParticipants.value.length === 0) {
-    alert("No hay participantes para guardar la lista.");
+  if (attendanceType.value !== "evento" && !attendanceActivityId.value) {
+    alert("Selecciona la actividad.");
     return;
   }
 
+  if (!hasUnsavedAttendance.value) return;
+
+  savingAttendance.value = true;
+
   try {
-    localStorage.setItem(
-      attendanceStorageKey.value,
-      JSON.stringify(attendanceMarks.value)
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/asistencia`,
+      {
+        method: "PUT",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tipo: attendanceType.value,
+          actividadId:
+            attendanceType.value === "evento" ? undefined : attendanceActivityId.value,
+          fecha: attendanceDate.value,
+          agregar: attendanceAdds.value,
+          quitar: attendanceRemovals.value
+        })
+      }
     );
 
-    alert(
-      `Lista guardada.\n` +
-      `Actividad: ${attendanceActivity.value}\n` +
-      `Fecha: ${attendanceDate.value}\n` +
-      `Presentes: ${attendancePresentCount.value}\n` +
-      `Ausentes: ${attendanceAbsentCount.value}\n` +
-      `Sin marcar: ${attendanceUnmarkedCount.value}`
-    );
-  } catch (error) {
-    console.error("Error al guardar la asistencia:", error);
-    alert("No se pudo guardar la lista en el navegador.");
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      alert(err.message || "No se pudo guardar la lista.");
+      return;
+    }
+
+    await cargarAsistencia();
+    await cargarParticipantes();
+
+    showScanFeedback("ok", "Lista guardada correctamente.");
+  } catch (e) {
+    console.error("Error al guardar la asistencia:", e);
+    alert("Ocurrió un error al guardar la lista.");
+  } finally {
+    savingAttendance.value = false;
   }
 }
 
+// cerrar la pestaña con cambios sin guardar
+function warnUnsavedAttendance(event) {
+  if (hasUnsavedAttendance.value) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+}
+
+onMounted(() => window.addEventListener("beforeunload", warnUnsavedAttendance));
+onBeforeUnmount(() => window.removeEventListener("beforeunload", warnUnsavedAttendance));
 
 
 // =====================================================
@@ -2509,6 +2620,7 @@ onMounted(async () => {
 
   await cargarParticipantes();
   await cargarEvento();
+  await cargarOpcionesAsistencia();
 
 });
 
@@ -4186,9 +4298,11 @@ td {
   border-color: #0066b3;
 }
 
+/* ESTADÍSTICAS DE ASISTENCIA */
+
 .attendance-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 15px;
   margin-bottom: 20px;
 }
@@ -4212,6 +4326,8 @@ td {
   color: #003366;
   font-size: 27px;
 }
+
+/* FILTROS */
 
 .attendance-filters {
   grid-template-columns: minmax(180px, 2fr) 1fr 1fr;
@@ -4242,6 +4358,8 @@ td {
   font-weight: 700;
 }
 
+/* ACCIONES DE ASISTENCIA */
+
 .attendance-actions {
   display: flex;
   flex-wrap: wrap;
@@ -4249,30 +4367,58 @@ td {
 }
 
 .attendance-mark {
-  padding: 8px 10px;
+  min-width: 130px;
+  padding: 9px 12px;
   border: 1px solid transparent;
   border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  opacity: .75;
 }
 
 .present-mark {
   background: #e8f5e9;
   color: #2e7d32;
+  border-color: #a5d6a7;
 }
 
 .absent-mark {
+  background: #f1f5f8;
+  color: #546e7a;
+  border-color: #dfe5eb;
+}
+
+.absent-mark:hover {
+  background: #e3f2fd;
+  color: #0066b3;
+}
+
+/* MENSAJES DEL ESCÁNER */
+
+.scan-feedback {
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.scan-feedback.ok {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.scan-feedback.warn {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.scan-feedback.error {
   background: #ffebee;
   color: #c62828;
 }
 
-.attendance-mark.selected {
-  opacity: 1;
-  outline: 2px solid currentColor;
-  outline-offset: 1px;
-}
+/* PIE Y GUARDADO */
 
 .attendance-footer {
   display: flex;
@@ -4287,6 +4433,11 @@ td {
   color: #78909c;
   font-size: 11px;
   line-height: 1.5;
+}
+
+.attendance-footer .unsaved {
+  color: #ef6c00;
+  font-weight: 600;
 }
 
 .attendance-save {
@@ -4305,11 +4456,21 @@ td {
   background: #005b96;
 }
 
+.attendance-save:disabled {
+  background: #cfd8dc;
+  color: #78909c;
+  cursor: not-allowed;
+}
+
+/* TABLA */
+
 .attendance-table {
   min-width: 850px;
 }
 
-@media(max-width: 900px) {
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
   .attendance-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -4323,7 +4484,7 @@ td {
   }
 }
 
-@media(max-width: 600px) {
+@media (max-width: 600px) {
   .attendance-footer {
     align-items: stretch;
     flex-direction: column;

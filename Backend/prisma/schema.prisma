@@ -35,6 +35,8 @@ model asistencia {
   actividad_asistencia_actividadToactividad actividad? @relation("asistencia_actividadToactividad", fields: [actividad], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asistencia_actividad")
   evento_asistencia_eventoToevento          evento?    @relation("asistencia_eventoToevento", fields: [evento], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asistencia_evento")
   taller_asistencia_tallerTotaller          taller?    @relation("asistencia_tallerTotaller", fields: [taller], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asistencia_taller")
+
+  @@unique([participante, fecha, evento, taller, actividad], map: "asistencia_unica")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
