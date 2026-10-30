@@ -534,8 +534,8 @@ export class InscripcionesService {
   async opcionesAsistencia(eventoId: number) {
     const [evento, talleres, actividades] = await Promise.all([
       this.prisma.evento.findUnique({ where: { id: eventoId } }),
-      this.prisma.taller.findMany({ where: { evento: eventoId }, orderBy: { inicio: 'asc' } }),
-      this.prisma.actividad.findMany({ where: { evento: eventoId }, orderBy: { inicio: 'asc' } }),
+      this.prisma.taller.findMany({ where: { evento: eventoId }, orderBy: { id: 'asc' } }),
+      this.prisma.actividad.findMany({ where: { evento: eventoId }, orderBy: { id: 'asc' } }),
     ]);
 
     if (!evento) throw new NotFoundException('El evento no existe');
