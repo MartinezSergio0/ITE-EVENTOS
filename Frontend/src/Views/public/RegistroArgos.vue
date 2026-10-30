@@ -250,79 +250,145 @@
             </div>
           </section>
 
-          <!-- TALLER -->
-          <section class="form-section">
-            <div class="section-header">
-              <div class="section-icon">🛠️</div>
-              <div>
-                <h2>Selección de taller</h2>
-                <p>
-                  Selecciona el taller al que deseas asistir el jueves 5
-                  de noviembre.
-                </p>
-              </div>
-            </div>
+          
+<!-- TALLER -->
+<section class="form-section">
+  <div class="section-header">
+    <div class="section-icon">🛠️</div>
+    <div>
+      <h2>Selección de taller</h2>
+      <p>
+        Selecciona el taller al que deseas asistir el jueves 5
+        de noviembre.
+      </p>
+    </div>
+  </div>
 
-            <div class="schedule-note">
-              <strong>Horario de talleres</strong>
-              <p>11:00 a 14:00 y 16:00 a 19:00.</p>
-              <p>La asignación final dependerá del cupo disponible.</p>
-            </div>
+  <div class="schedule-note">
+    <strong>Horario de talleres</strong>
+    <p>Escoge uno de los talleres en uno de los horarios disponibles.</p>
+    <p>
+      Si el taller es durante el turno matutino, tu visita industrial
+      deberá ser en el turno vespertino.
+    </p>
+    <p>
+      Si el taller es en horario vespertino, tu visita industrial
+      deberá ser en el turno matutino.
+    </p>
+  </div>
 
-            <div class="form-group">
-              <label>Taller al que deseas asistir <span>*</span></label>
-              <select v-model="form.taller" required>
-                <option value="">Selecciona un taller</option>
-                <option
-                  v-for="taller in talleres"
-                  :key="taller"
-                  :value="taller"
-                >
-                  {{ taller }}
-                </option>
-              </select>
-            </div>
-          </section>
+  <div class="form-group">
+    <label>Taller al que deseas asistir <span>*</span></label>
 
-          <!-- VISITA INDUSTRIAL -->
-          <section class="form-section">
-            <div class="section-header">
-              <div class="section-icon">🏭</div>
-              <div>
-                <h2>Visita industrial</h2>
-                <p>
-                  Indica la empresa que te interesa visitar el jueves
-                  5 de noviembre.
-                </p>
-              </div>
-            </div>
+    <select v-model="form.taller" required>
+      <option value="">Selecciona un taller</option>
 
-            <div class="schedule-note">
-              <strong>Horario de visitas industriales</strong>
-              <p>09:00 a 14:00 y 16:00 a 20:00.</p>
-              <p>
-                Las empresas y los horarios definitivos deberán ser
-                confirmados por el comité organizador.
-              </p>
-            </div>
+      <optgroup label=" TURNO MATUTINO">
+        <option
+          v-for="taller in talleresMatutinos"
+          :key="taller.id"
+          :value="taller.nombre"
+          :disabled="taller.capacidadDisponible === 0"
+        >
+          {{ taller.nombre }}
+          | {{ taller.horario }}
+          | Capacidad: {{ taller.capacidad }}
+          | Disponibles: {{
+            taller.capacidadDisponible ?? 'Por consultar'
+          }}
+        </option>
+      </optgroup>
 
-            <div class="form-group">
-              <label>Empresa que deseas visitar <span>*</span></label>
-              <select v-model="form.visitaEmpresa" required>
-                <option value="">Selecciona una opción</option>
-                <option
-                  v-for="empresa in empresas"
-                  :key="empresa"
-                  :value="empresa"
-                >
-                  {{ empresa }}
-                </option>
-              </select>
-              <small>
-                Las opciones pendientes de confirmación son provisionales.
-              </small>
-            </div>
-          </section>
+      <optgroup label=" TURNO VESPERTINO">
+        <option
+          v-for="taller in talleresVespertinos"
+          :key="taller.id"
+          :value="taller.nombre"
+          :disabled="taller.capacidadDisponible === 0"
+        >
+          {{ taller.nombre }}
+          | {{ taller.horario }}
+          | Capacidad: {{ taller.capacidad }}
+          | Disponibles: {{
+            taller.capacidadDisponible ?? 'Por consultar'
+          }}
+        </option>
+      </optgroup>
+    </select>
+
+    <small>
+      Los horarios y la capacidad corresponden a cada grupo
+      de taller.
+    </small>
+  </div>
+</section>
+
+
+          
+<!-- VISITA INDUSTRIAL -->
+<section class="form-section">
+  <div class="section-header">
+    <div class="section-icon">🏭</div>
+    <div>
+      <h2>Visita industrial</h2>
+      <p>
+        Indica la empresa que te interesa visitar el jueves
+        5 de noviembre.
+      </p>
+    </div>
+  </div>
+
+  <div class="schedule-note">
+    <strong>Horario de visitas industriales</strong>
+    <p>Escoge una de las visitas en uno de los horarios disponibles.</p>
+    <p>
+      Si tu visita industrial es durante el turno matutino, el taller
+      deberá ser en el turno vespertino.
+    </p>
+    <p>
+      Si tu visita industrial es en horario vespertino, el taller industrial
+      deberá ser en el turno matutino.
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label>Empresa que deseas visitar <span>*</span></label>
+
+    <select v-model="form.visitaEmpresa" required>
+      <option value="">Selecciona una empresa</option>
+
+      <optgroup label="TURNO MATUTINO">
+        <option
+          v-for="empresa in empresasMatutinas"
+          :key="empresa.id"
+          :value="empresa.nombre"
+        >
+          {{ empresa.nombre }}
+          | Salida: {{ empresa.horario }}
+          | Capacidad: {{ empresa.capacidad }} personas
+        </option>
+      </optgroup>
+
+      <optgroup label="TURNO VESPERTINO">
+        <option
+          v-for="empresa in empresasVespertinas"
+          :key="empresa.id"
+          :value="empresa.nombre"
+        >
+          {{ empresa.nombre }}
+          | Salida: {{ empresa.horario }}
+          | Capacidad: {{ empresa.capacidad }} personas
+        </option>
+      </optgroup>
+    </select>
+
+    <small>
+      Selecciona la visita industrial correspondiente al turno contrario
+      de tu taller.
+    </small>
+  </div>
+</section>
+
 
           <!-- PROGRAMA -->
           <section class="form-section">
@@ -337,7 +403,7 @@
             <div class="program-day">
               <h3>Martes 3 de noviembre</h3>
               <div class="program-item">
-                <span class="program-time">18:00 - 21:00</span>
+                <span class="program-time">17:00 - 20:00</span>
                 <div>
                   <strong>Preregistro</strong>
                   <p>Recepción y preregistro de participantes.</p>
@@ -366,7 +432,7 @@
               <h3>Jueves 5 de noviembre</h3>
 
               <div class="program-item">
-                <span class="program-time">09:00 - 14:00</span>
+                <span class="program-time">Horarios según programación</span>
                 <div>
                   <strong>Visitas industriales</strong>
                   <p>Recorridos por empresas participantes.</p>
@@ -374,7 +440,7 @@
               </div>
 
               <div class="program-item">
-                <span class="program-time">11:00 - 14:00</span>
+                <span class="program-time">Horarios según programación</span>
                 <div>
                   <strong>Talleres</strong>
                   <p>Primera parte de las actividades prácticas.</p>
@@ -387,7 +453,7 @@
               </div>
 
               <div class="program-item">
-                <span class="program-time">16:00 - 19:00</span>
+                <span class="program-time">Horarios según programación</span>
                 <div>
                   <strong>Talleres</strong>
                   <p>Segunda parte de las actividades prácticas.</p>
@@ -395,7 +461,7 @@
               </div>
 
               <div class="program-item">
-                <span class="program-time">16:00 - 20:00</span>
+                <span class="program-time">Horarios según programación</span>
                 <div>
                   <strong>Visitas industriales</strong>
                   <p>Continuación de los recorridos empresariales.</p>
@@ -421,12 +487,18 @@
 
               <div class="program-item">
                 <span class="program-time">18:00 - 19:00</span>
-                <div><strong>Conferencia Plenimex</strong></div>
+                <div>
+                  <strong>Conferencia</strong>
+                  <p>Mario Espinoza. Auditorio.</p>
+                </div>
               </div>
 
               <div class="program-item">
                 <span class="program-time">19:00 - 20:00</span>
-                <div><strong>Conferencia ICU / Hutchinson</strong></div>
+                <div>
+                  <strong>Conferencia</strong>
+                  <p>Brenda Cardenas. Auditorio.</p>
+                </div>
               </div>
             </div>
           </section>
@@ -533,27 +605,345 @@ import { API_URL } from "../../config/api";
 // Cambia este ID por el ID real del evento Argos en tu base de datos.
 const eventId = 5;
 
+
 const talleres = [
-  "Taller 1: Diseño de experimentos",
-  "Taller 2: Promodel básico",
-  "Taller 3: Manufactura aditiva / impresión 3D",
-  "Taller 4: Diseño con Solidworks nivel básico",
-  "Taller 5: Propiedad Industrial",
-  "Taller 6: Corrosión",
-  "Taller 7: Seguridad e higiene",
-  "Taller 8: Taller de inteligencia artificial (por confirmar)",
-  "Taller 9: Taller de moldeo (por confirmar)"
+  // TURNO MATUTINO (ID 1 AL 10)
+  {
+    id: 1,
+    nombre: "DISEÑO SOLID WORD BASICO (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 2,
+    nombre: "MANUFACTURA ADITIVA (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 3,
+    nombre: "DISEÑO DE EXPERIMENTOS (matutino)",
+    horario: "10:00 - 14:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 4,
+    nombre: "CORROCIÓN (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 5,
+    nombre: "REDISEÑO DE LA SEGURIDAD E HIGIENE INDUSTRIAL (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 6,
+    nombre: "TALLER DE IA (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 7,
+    nombre: "ERGONOMIA + IA (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 8,
+    nombre: "IMPACTO DE CAMBIOS DE INGENIERIA EN LAS CADENAS DE SUMINISTROS (matutino)",
+    horario: "10:00 - 12:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 9,
+    nombre: "USABILIDAD EN INGENIERIA INDUSTRIAL (matutino)",
+    horario: "10:00 - 14:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 10,
+    nombre: "TALLER DE EXCEL PARA OPTIMIZAR LOS PROCESOS (matutino)",
+    horario: "10:00 - 14:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+
+  // TURNO VESPERTINO (ID 11 AL 19)
+  {
+    id: 11,
+    nombre: "PROMODEL BASICO (vespertino)",
+    horario: "16:00 - 18:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 12,
+    nombre: "PROMODEL BASICO (vespertino II)",
+    horario: "18:00 - 20:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 13,
+    nombre: "DISEÑO SOLID WORD BASICO (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 14,
+    nombre: "MANUFACTURA ADITIVA (vespertino)",
+    horario: "16:00 - 20:00",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 15,
+    nombre: "DISEÑO DE EXPERIMENTOS (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 16,
+    nombre: "AUTOMATIZACION + IA: DOS FORMAS DE RESOLVER EL PROCESO (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 16,
+    turno: "Vespertino"
+  },
+  {
+    id: 17,
+    nombre: "DISEÑO DE TUTORES DE IA PARA ING. INDUSTRIAL (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 18,
+    nombre: "ERGONOMIA + IA (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 19,
+    nombre: "TALLER DE METROLOGIA Y CALIBRACION (vespertino)",
+    horario: "16:00 - 20:00",
+    capacidad: 20,
+    turno: "Vespertino"
+  }
 ];
 
-// Reemplaza estas opciones provisionales por los nombres reales
-// de las empresas cuando el comité organizador los confirme.
+const talleresMatutinos = talleres.filter(
+  taller => taller.turno === "Matutino"
+);
+
+const talleresVespertinos = talleres.filter(
+  taller => taller.turno === "Vespertino"
+);
+
+
+
 const empresas = [
-  "Empresa industrial 1 (por confirmar)",
-  "Empresa industrial 2 (por confirmar)",
-  "Empresa industrial 3 (por confirmar)",
-  "Empresa industrial 4 (por confirmar)",
-  "No deseo asistir a una visita industrial"
+  // TURNO MATUTINO
+  {
+    id: 20,
+    nombre: "INSTRUMENTOS MUSICALES FENDER S.A. DE C.V. (matutino)",
+    horario: "8:30",
+    capacidad: 15,
+    turno: "Matutino"
+  },
+  {
+    id: 22,
+    nombre: "BAJA TACKLE (matutino)",
+    horario: "8:30",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 24,
+    nombre: "SCHLAGE DE MEXICO S.A. DE C.V. (matutino)",
+    horario: "8:30",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 25,
+    nombre: "PLENIMEX S.A. DE C.V. (matutino)",
+    horario: "9:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 26,
+    nombre: "GRUPO ZAPATA (matutino)",
+    horario: "9:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 28,
+    nombre: "ZIRCON DE MEXICO S.A. DE C.V. (matutino)",
+    horario: "8:00",
+    capacidad: 12,
+    turno: "Matutino"
+  },
+  {
+    id: 30,
+    nombre: "DIALIGHT S.A DE C.V. (matutino)",
+    horario: "8:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 32,
+    nombre: "FABRICAS MONTERREY S.A. DE C.V. (matutino)",
+    horario: "8:00",
+    capacidad: 30,
+    turno: "Matutino"
+  },
+  {
+    id: 34,
+    nombre: "CSI EN ENSENADA, S. DE R.L. DE C.V. (matutino)",
+    horario: "8:30",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 36,
+    nombre: "VINOS KRUGER (matutino)",
+    horario: "8:30",
+    capacidad: 30,
+    turno: "Matutino"
+  },
+  {
+    id: 37,
+    nombre: "ICU MEDICAL (matutino)",
+    horario: "9:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 39,
+    nombre: "DOVINTO VINICOLA (matutino)",
+    horario: "8:30",
+    capacidad: 50,
+    turno: "Matutino"
+  },
+  {
+    id: 41,
+    nombre: "VINOS BIBAYOFF (matutino)",
+    horario: "8:30",
+    capacidad: 30,
+    turno: "Matutino"
+  },
+  {
+    id: 43,
+    nombre: "VINOS PALAFOX (matutino)",
+    horario: "9:00",
+    capacidad: 30,
+    turno: "Matutino"
+  },
+
+  // TURNO VESPERTINO
+  {
+    id: 21,
+    nombre: "INSTRUMENTOS MUSICALES FENDER S.A. DE C.V. (vespertino)",
+    horario: "13:30",
+    capacidad: 15,
+    turno: "Vespertino"
+  },
+  {
+    id: 23,
+    nombre: "BAJA TACKLE (vespertino)",
+    horario: "13:30",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 27,
+    nombre: "GRUPO ZAPATA (vespertino)",
+    horario: "14:00",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 29,
+    nombre: "ZIRCON DE MEXICO S.A. DE C.V. (vespertino)",
+    horario: "12:15",
+    capacidad: 12,
+    turno: "Vespertino"
+  },
+  {
+    id: 31,
+    nombre: "DIALIGHT S.A DE C.V. (vespertino)",
+    horario: "12:15",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 33,
+    nombre: "FABRICAS MONTERREY S.A. DE C.V. (vespertino)",
+    horario: "12:15",
+    capacidad: 30,
+    turno: "Vespertino"
+  },
+  {
+    id: 35,
+    nombre: "CSI EN ENSENADA, S. DE R.L. DE C.V. (vespertino)",
+    horario: "13:30",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 38,
+    nombre: "ICU MEDICAL (vespertino)",
+    horario: "14:00",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 40,
+    nombre: "DOVINTO VINICOLA (vespertino)",
+    horario: "13:30",
+    capacidad: 50,
+    turno: "Vespertino"
+  },
+  {
+    id: 42,
+    nombre: "VINOS BIBAYOFF (vespertino)",
+    horario: "13:30",
+    capacidad: 30,
+    turno: "Vespertino"
+  },
+  {
+    id: 44,
+    nombre: "VINOS PALAFOX (vespertino)",
+    horario: "13:00",
+    capacidad: 30,
+    turno: "Vespertino"
+  }
 ];
+
+const empresasMatutinas = empresas.filter(
+  empresa => empresa.turno === "Matutino"
+);
+
+const empresasVespertinas = empresas.filter(
+  empresa => empresa.turno === "Vespertino"
+);
+
 
 const programaMiercoles = [
   {
@@ -564,12 +954,12 @@ const programaMiercoles = [
   {
     hora: "10:00 - 11:00",
     nombre: "Conferencia Magna",
-    detalle: "Dr. Eduardo Durazo Watanabe"
+    detalle: "Dr. Eduardo Durazo Watanabe - Gimnasio"
   },
   {
-    hora: "11:00 - 14:00",
+    hora: "11:00 - 12:00",
     nombre: "Conferencia 2",
-    detalle: "Gustavo Montaño"
+    detalle: "Gustavo Montaño - Gimnasio"
   },
   {
     hora: "14:00 - 16:00",
@@ -579,11 +969,11 @@ const programaMiercoles = [
   {
     hora: "16:00 - 17:00",
     nombre: "Conferencia 3",
-    detalle: "Haydee Venegas López"
+    detalle: "Haydee Venegas López - Gimnasio"
   },
   {
     hora: "17:00 - 20:00",
-    nombre: "Ponencias"
+    nombre: "Ponencias - Aulas 600"
   },
   {
     hora: "20:00 - 21:00",

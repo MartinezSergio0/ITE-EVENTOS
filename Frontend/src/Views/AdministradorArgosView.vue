@@ -1079,8 +1079,7 @@
               <label for="attendanceType">Tipo de actividad</label>
               <select id="attendanceType" v-model="attendanceType">
                 <option value="evento">Evento general</option>
-                <option value="taller">Taller</option>
-                <option value="actividad">Actividad / visita a empresa</option>
+                <option value="combinado">Taller / visita a empresa</option>
               </select>
             </div>
 
@@ -1093,8 +1092,8 @@
               >
                 <option
                   v-for="a in attendanceActivities"
-                  :key="a.id"
-                  :value="a.id"
+                  :key="a.clave"
+                  :value="a.clave"
                 >
                   {{ a.nombre }}
                 </option>
@@ -1103,7 +1102,11 @@
 
             <div>
               <label for="attendanceDate">Fecha</label>
-              <input id="attendanceDate" v-model="attendanceDate" type="date" />
+              <input
+                id="attendanceDate"
+                v-model="attendanceDate"
+                type="date"
+              />
             </div>
 
           </div>
@@ -1816,29 +1819,49 @@ function authHeaders() {
   return { Authorization: `Bearer ${localStorage.getItem("token")}` };
 }
 
+// Une talleres y visitas a empresas en una sola lista.
+// Se usa una clave compuesta para evitar conflictos si dos IDs coinciden.
 const attendanceActivities = computed(() => {
-  if (attendanceType.value === "taller") return attendanceOptions.value.talleres;
-  if (attendanceType.value === "actividad") return attendanceOptions.value.actividades;
-  return [];
+  const talleres = (attendanceOptions.value.talleres || []).map(a => ({
+    ...a,
+    tipo: "taller",
+    clave: `taller:${a.id}`
+  }));
+
+  const actividades = (attendanceOptions.value.actividades || []).map(a => ({
+    ...a,
+    tipo: "actividad",
+    clave: `actividad:${a.id}`
+  }));
+
+  return [...talleres, ...actividades];
+});
+
+// Actividad elegida en el segundo desplegable.
+const selectedAttendanceActivity = computed(() =>
+  attendanceActivities.value.find(a => a.clave === attendanceActivityId.value) || null
+);
+
+// El backend sigue recibiendo los tipos originales: evento, taller o actividad.
+const attendanceBackendType = computed(() => {
+  if (attendanceType.value === "evento") return "evento";
+  return selectedAttendanceActivity.value?.tipo ?? null;
 });
 
 const attendanceActivityName = computed(() => {
   if (attendanceType.value === "evento") return "Congreso ARGOS";
-  const actividad = attendanceActivities.value.find(
-    a => a.id === attendanceActivityId.value
-  );
-  return actividad ? actividad.nombre : "Selecciona una actividad";
+  return selectedAttendanceActivity.value?.nombre ?? "Selecciona una actividad";
 });
 
-// Quien aparece en la lista
+// Quien aparece en la lista.
 const attendanceParticipants = computed(() => {
   const nombre = attendanceActivityName.value;
 
-  if (attendanceType.value === "taller") {
+  if (attendanceBackendType.value === "taller") {
     return participants.value.filter(p => p.workshop === nombre);
   }
 
-  if (attendanceType.value === "actividad") {
+  if (attendanceBackendType.value === "actividad") {
     const inscritos = participants.value.filter(p => p.industrialVisit === nombre);
     return inscritos.length ? inscritos : participants.value;
   }
@@ -1896,14 +1919,17 @@ async function cargarAsistencia() {
   savedPresentes.value = [];
 
   if (!attendanceDate.value) return;
-  if (attendanceType.value !== "evento" && !attendanceActivityId.value) return;
+
+  const tipoReal = attendanceBackendType.value;
+  if (attendanceType.value !== "evento" && (!attendanceActivityId.value || !tipoReal)) return;
 
   const params = new URLSearchParams({
-    tipo: attendanceType.value,
+    tipo: tipoReal,
     fecha: attendanceDate.value
   });
-  if (attendanceType.value !== "evento") {
-    params.set("actividadId", String(attendanceActivityId.value));
+
+  if (tipoReal !== "evento") {
+    params.set("actividadId", String(selectedAttendanceActivity.value.id));
   }
 
   try {
@@ -1923,8 +1949,20 @@ async function cargarAsistencia() {
   }
 }
 
+// Al cambiar entre evento general y la lista combinada, selecciona la primera actividad.
 watch(attendanceType, () => {
-  attendanceActivityId.value = attendanceActivities.value[0]?.id ?? null;
+  attendanceActivityId.value =
+    attendanceType.value === "combinado"
+      ? attendanceActivities.value[0]?.clave ?? null
+      : null;
+});
+
+// Cuando llegan las opciones desde el backend, establece una selección inicial.
+watch(attendanceOptions, () => {
+  if (attendanceType.value === "combinado" &&
+      !attendanceActivities.value.some(a => a.clave === attendanceActivityId.value)) {
+    attendanceActivityId.value = attendanceActivities.value[0]?.clave ?? null;
+  }
 });
 
 watch(
@@ -2016,7 +2054,10 @@ async function saveAttendance() {
     return;
   }
 
-  if (attendanceType.value !== "evento" && !attendanceActivityId.value) {
+  const tipoReal = attendanceBackendType.value;
+
+  if (attendanceType.value !== "evento" &&
+      (!attendanceActivityId.value || !selectedAttendanceActivity.value || !tipoReal)) {
     alert("Selecciona la actividad.");
     return;
   }
@@ -2032,9 +2073,10 @@ async function saveAttendance() {
         method: "PUT",
         headers: { ...authHeaders(), "Content-Type": "application/json" },
         body: JSON.stringify({
-          tipo: attendanceType.value,
-          actividadId:
-            attendanceType.value === "evento" ? undefined : attendanceActivityId.value,
+          tipo: tipoReal,
+          actividadId: tipoReal === "evento"
+            ? undefined
+            : selectedAttendanceActivity.value.id,
           fecha: attendanceDate.value,
           agregar: attendanceAdds.value,
           quitar: attendanceRemovals.value
