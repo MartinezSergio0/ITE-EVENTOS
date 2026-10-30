@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { createWorker } from 'tesseract.js';
 import sharp from 'sharp';
 import 'multer';
@@ -153,6 +153,48 @@ export class InscripcionesService {
   }
 
   // =====================================================
+  // HELPERS — cupo de talleres y visitas (ARGOS)
+  // =====================================================
+  // Los talleres y las visitas viven en la misma tabla "taller".
+  // Un lugar cuenta a toda persona registrada (sin importar el estado
+  // de su pago) que tenga ese nombre en "taller" o en "visita_empresa".
+  // Si "capacidad" viene vacía, el lugar no tiene límite.
+
+  private async verificarCupo(
+    db: Pick<PrismaService, 'taller' | 'participantes'>,
+    eventoId: number,
+    nombre: string,
+    tipo: 'taller' | 'visita',
+  ): Promise<void> {
+    const lugar = await db.taller.findFirst({ where: { evento: eventoId, nombre } });
+
+    if (!lugar) {
+      throw new BadRequestException(
+        tipo === 'taller'
+          ? `El taller "${nombre}" no existe.`
+          : `La visita industrial "${nombre}" no existe.`,
+      );
+    }
+
+    if (lugar.capacidad == null) return;
+
+    const ocupados = await db.participantes.count({
+      where: {
+        evento: eventoId,
+        OR: [{ taller: nombre }, { visita_empresa: nombre }],
+      },
+    });
+
+    if (ocupados >= lugar.capacidad) {
+      throw new ConflictException(
+        tipo === 'taller'
+          ? `El taller "${nombre}" ya no tiene cupo. Elige otro taller.`
+          : `La visita industrial "${nombre}" ya no tiene cupo. Elige otra visita.`,
+      );
+    }
+  }
+
+  // =====================================================
   // PÚBLICO — registro
   // =====================================================
 
@@ -188,31 +230,80 @@ export class InscripcionesService {
       referencia = this.construirReferencia(datos.tipoCodigo, anioCompleto, consecutivo);
     }
 
-    return this.prisma.participantes.create({
-      data: {
-        evento: eventoId,
-        nombre: datos.nombre,
-        genero: genero.id,
-        edad: dto.edad,
-        correo_electronico: dto.email,
-        telefono: telefonoLimpio,
-        matricula: dto.numeroControl?.trim() || '0',
-        institucion: datos.institucion,
-        carrera: datos.carrera,
-        tipo_participacion: datos.tipoCodigo,
-        referencia_bancaria: referencia,
-        estado: estadoPendiente.id,
-        estado_procedencia: datos.estadoProcedencia,
-        contacto_emergencia_nombre: datos.contactoNombre,
-        contacto_emergencia_telefono: datos.contactoTelefono,
-        medio_difusion: datos.medioDifusion,
-        talla_camisa: datos.tallaCamisa,
-        semestre: datos.semestre,
-        taller: datos.taller,
-        visita_empresa: datos.visitaEmpresa,
-        consentimiento: dto.consentimiento,
-        monto: evento.costo ?? 0,
-      },
+    const crearRegistro = (db: Pick<PrismaService, 'participantes'>) =>
+      db.participantes.create({
+        data: {
+          evento: eventoId,
+          nombre: datos.nombre,
+          genero: genero.id,
+          edad: dto.edad,
+          correo_electronico: dto.email,
+          telefono: telefonoLimpio,
+          matricula: dto.numeroControl?.trim() || '0',
+          institucion: datos.institucion,
+          carrera: datos.carrera,
+          tipo_participacion: datos.tipoCodigo,
+          referencia_bancaria: referencia,
+          estado: estadoPendiente.id,
+          estado_procedencia: datos.estadoProcedencia,
+          contacto_emergencia_nombre: datos.contactoNombre,
+          contacto_emergencia_telefono: datos.contactoTelefono,
+          medio_difusion: datos.medioDifusion,
+          talla_camisa: datos.tallaCamisa,
+          semestre: datos.semestre,
+          taller: datos.taller,
+          visita_empresa: datos.visitaEmpresa,
+          consentimiento: dto.consentimiento,
+          monto: evento.costo ?? 0,
+        },
+      });
+
+    // ARGOS: se revisa el cupo del taller y de la visita justo antes de
+    // inscribir. El candado evita que dos personas tomen el último lugar
+    // al mismo tiempo (se libera solo al terminar la transacción).
+    if (perfil === 'estudiantil') {
+      return this.prisma.$transaction(async (tx) => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(${eventoId}::bigint)`;
+        await this.verificarCupo(tx, eventoId, datos.taller!, 'taller');
+        await this.verificarCupo(tx, eventoId, datos.visitaEmpresa!, 'visita');
+        return crearRegistro(tx);
+      });
+    }
+
+    return crearRegistro(this.prisma);
+  }
+
+  // =====================================================
+  // PUBLICO — cupos disponibles (talleres y visitas)
+  // =====================================================
+
+  async obtenerCupos(eventoId: number) {
+    const [lugares, inscritos] = await Promise.all([
+      this.prisma.taller.findMany({
+        where: { evento: eventoId },
+        select: { nombre: true, capacidad: true },
+      }),
+      this.prisma.participantes.findMany({
+        where: { evento: eventoId },
+        select: { taller: true, visita_empresa: true },
+      }),
+    ]);
+
+    const ocupados = new Map<string, number>();
+    for (const p of inscritos) {
+      for (const nombre of [p.taller, p.visita_empresa]) {
+        if (nombre) ocupados.set(nombre, (ocupados.get(nombre) ?? 0) + 1);
+      }
+    }
+
+    return lugares.map((l) => {
+      const usados = ocupados.get(l.nombre) ?? 0;
+      return {
+        nombre: l.nombre,
+        capacidad: l.capacidad,
+        ocupados: usados,
+        disponibles: l.capacidad == null ? null : Math.max(l.capacidad - usados, 0),
+      };
     });
   }
 

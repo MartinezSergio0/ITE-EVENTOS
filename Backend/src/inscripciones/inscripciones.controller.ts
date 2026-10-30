@@ -36,6 +36,12 @@ export class InscripcionesController {
     return this.service.crear(dto, eventoId);
   }
 
+  // Cupos de talleres y visitas (nombre, capacidad, ocupados, disponibles)
+  @Get('cupos')
+  obtenerCupos(@Param('eventoId', ParseIntPipe) eventoId: number) {
+    return this.service.obtenerCupos(eventoId);
+  }
+
   @Get('buscar')
   buscarPorFolio(
     @Param('eventoId', ParseIntPipe) eventoId: number,

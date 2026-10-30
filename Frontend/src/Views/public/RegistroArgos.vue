@@ -1,4 +1,3 @@
-
 <template>
   <div class="registro-page">
     <!-- HEADER -->
@@ -346,9 +345,14 @@
                     <span class="option-details">
                       <span>🕒 {{ taller.horario }}</span>
                       <span>Capacidad: {{ taller.capacidad }}</span>
-                      <span>
-                        Disponibles:
-                        {{ taller.capacidadDisponible ?? 'Por consultar' }}
+                      <span
+                        :class="{ 'option-full': taller.capacidadDisponible === 0 }"
+                      >
+                        {{
+                          taller.capacidadDisponible === 0
+                            ? 'Sin cupo'
+                            : `Disponibles: ${taller.capacidadDisponible ?? 'Por consultar'}`
+                        }}
                       </span>
                     </span>
 
@@ -384,9 +388,14 @@
                     <span class="option-details">
                       <span>🕒 {{ taller.horario }}</span>
                       <span>Capacidad: {{ taller.capacidad }}</span>
-                      <span>
-                        Disponibles:
-                        {{ taller.capacidadDisponible ?? 'Por consultar' }}
+                      <span
+                        :class="{ 'option-full': taller.capacidadDisponible === 0 }"
+                      >
+                        {{
+                          taller.capacidadDisponible === 0
+                            ? 'Sin cupo'
+                            : `Disponibles: ${taller.capacidadDisponible ?? 'Por consultar'}`
+                        }}
                       </span>
                     </span>
 
@@ -479,6 +488,10 @@
                     :key="empresa.id"
                     type="button"
                     class="dropdown-option"
+                    :class="{
+                      'option-disabled': empresa.capacidadDisponible === 0
+                    }"
+                    :disabled="empresa.capacidadDisponible === 0"
                     @click="seleccionarEmpresa(empresa)"
                   >
                     <span class="option-name">
@@ -489,6 +502,15 @@
                       <span>🕒 Salida: {{ empresa.horario }}</span>
                       <span>
                         Capacidad: {{ empresa.capacidad }} personas
+                      </span>
+                      <span
+                        :class="{ 'option-full': empresa.capacidadDisponible === 0 }"
+                      >
+                        {{
+                          empresa.capacidadDisponible === 0
+                            ? 'Sin cupo'
+                            : `Disponibles: ${empresa.capacidadDisponible ?? 'Por consultar'}`
+                        }}
                       </span>
                     </span>
 
@@ -511,6 +533,10 @@
                     :key="empresa.id"
                     type="button"
                     class="dropdown-option"
+                    :class="{
+                      'option-disabled': empresa.capacidadDisponible === 0
+                    }"
+                    :disabled="empresa.capacidadDisponible === 0"
                     @click="seleccionarEmpresa(empresa)"
                   >
                     <span class="option-name">
@@ -521,6 +547,15 @@
                       <span>🕒 Salida: {{ empresa.horario }}</span>
                       <span>
                         Capacidad: {{ empresa.capacidad }} personas
+                      </span>
+                      <span
+                        :class="{ 'option-full': empresa.capacidadDisponible === 0 }"
+                      >
+                        {{
+                          empresa.capacidadDisponible === 0
+                            ? 'Sin cupo'
+                            : `Disponibles: ${empresa.capacidadDisponible ?? 'Por consultar'}`
+                        }}
                       </span>
                     </span>
 
@@ -773,7 +808,7 @@
 
 
 <script setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, computed, onMounted } from "vue";
 import { API_URL } from "../../config/api";
 
 // IMPORTANTE:
@@ -920,12 +955,54 @@ const talleres = [
   }
 ];
 
-const talleresMatutinos = talleres.filter(
-  taller => taller.turno === "Matutino"
+
+// ==========================================
+// CUPOS 
+// ==========================================
+
+// { [nombre]: { nombre, capacidad, ocupados, disponibles } }
+const cupos = ref({});
+
+function conCupo(item) {
+  const cupo = cupos.value[item.nombre];
+
+  if (!cupo) {
+    return { ...item, capacidadDisponible: null };
+  }
+
+  return {
+    ...item,
+    capacidad: cupo.capacidad ?? item.capacidad,
+    capacidadDisponible: cupo.disponibles
+  };
+}
+
+async function cargarCupos() {
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${eventId}/inscripciones/cupos`
+    );
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+
+    cupos.value = Object.fromEntries(
+      data.map(cupo => [cupo.nombre, cupo])
+    );
+  } catch (e) {
+    console.error("Error al cargar los cupos:", e);
+  }
+}
+
+onMounted(cargarCupos);
+
+const talleresMatutinos = computed(() =>
+  talleres.filter(taller => taller.turno === "Matutino").map(conCupo)
 );
 
-const talleresVespertinos = talleres.filter(
-  taller => taller.turno === "Vespertino"
+const talleresVespertinos = computed(() =>
+  talleres.filter(taller => taller.turno === "Vespertino").map(conCupo)
 );
 
 
@@ -1111,12 +1188,12 @@ const empresas = [
   }
 ];
 
-const empresasMatutinas = empresas.filter(
-  empresa => empresa.turno === "Matutino"
+const empresasMatutinas = computed(() =>
+  empresas.filter(empresa => empresa.turno === "Matutino").map(conCupo)
 );
 
-const empresasVespertinas = empresas.filter(
-  empresa => empresa.turno === "Vespertino"
+const empresasVespertinas = computed(() =>
+  empresas.filter(empresa => empresa.turno === "Vespertino").map(conCupo)
 );
 
 
@@ -1186,11 +1263,13 @@ const form = reactive(crearFormulario());
 const dropdownAbierto = ref("");
 
 // Abrir o cerrar una lista desplegable
+// (al abrirla se actualizan los cupos)
 function toggleDropdown(tipo) {
   if (dropdownAbierto.value === tipo) {
     dropdownAbierto.value = "";
   } else {
     dropdownAbierto.value = tipo;
+    cargarCupos();
   }
 }
 
@@ -1316,6 +1395,19 @@ async function registrar() {
 
     error.value =
       e.message || "Ocurrió un error. Intenta nuevamente.";
+
+    // Si el taller o la visita se llenaron mientras llenabas el
+    // formulario, se actualizan los cupos y se limpia esa selección
+    // para que elijas otra opción.
+    await cargarCupos();
+
+    if (cupos.value[form.taller]?.disponibles === 0) {
+      form.taller = "";
+    }
+
+    if (cupos.value[form.visitaEmpresa]?.disponibles === 0) {
+      form.visitaEmpresa = "";
+    }
   } finally {
     loading.value = false;
   }
@@ -1326,6 +1418,8 @@ function nuevoRegistro() {
   folio.value = "";
   error.value = "";
   registroExitoso.value = false;
+
+  cargarCupos();
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -2073,6 +2167,23 @@ function nuevoRegistro() {
 .dropdown-option:hover {
   background: #f0f6ff;
   border-color: #93bce9;
+}
+
+/* Taller o visita sin cupo */
+.option-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
+.option-disabled:hover {
+  background: #f1f5f9;
+  border-color: #e5eaf1;
+}
+
+.option-full {
+  color: #b91c1c;
+  font-weight: 700;
 }
 
 .option-name {
