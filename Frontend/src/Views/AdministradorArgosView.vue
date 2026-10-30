@@ -1858,7 +1858,7 @@ const attendanceParticipants = computed(() => {
   const nombre = attendanceActivityName.value;
 
   if (attendanceBackendType.value === "taller") {
-    return participants.value.filter(p => p.workshop === nombre);
+    return participants.value.filter(p => p.workshop === nombre || p.industrialVisit === nombre);
   }
 
   if (attendanceBackendType.value === "actividad") {
