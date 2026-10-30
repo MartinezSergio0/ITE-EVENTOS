@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { createWorker } from 'tesseract.js';
 import sharp from 'sharp';
+import QRCode from 'qrcode';
 import 'multer';
 import { PrismaService } from '../prisma/prisma.service';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -37,6 +38,14 @@ interface DatosInscripcion {
   taller: string | null;
   visitaEmpresa: string | null;
 }
+
+// Opciones del código QR del folio. Nivel de corrección "M" (aguanta
+// ~15% de daño) y margen de 2 módulos para que la pistola lo lea fácil.
+const OPCIONES_QR = {
+  errorCorrectionLevel: 'M',
+  margin: 2,
+  width: 320,
+} as const;
 
 @Injectable()
 export class InscripcionesService {
@@ -261,16 +270,21 @@ export class InscripcionesService {
     // ARGOS: se revisa el cupo del taller y de la visita justo antes de
     // inscribir. El candado evita que dos personas tomen el último lugar
     // al mismo tiempo (se libera solo al terminar la transacción).
-    if (perfil === 'estudiantil') {
-      return this.prisma.$transaction(async (tx) => {
-        await tx.$executeRaw`SELECT pg_advisory_xact_lock(${eventoId}::bigint)`;
-        await this.verificarCupo(tx, eventoId, datos.taller!, 'taller');
-        await this.verificarCupo(tx, eventoId, datos.visitaEmpresa!, 'visita');
-        return crearRegistro(tx);
-      });
-    }
+    const participante =
+      perfil === 'estudiantil'
+        ? await this.prisma.$transaction(async (tx) => {
+            await tx.$executeRaw`SELECT pg_advisory_xact_lock(${eventoId}::bigint)`;
+            await this.verificarCupo(tx, eventoId, datos.taller!, 'taller');
+            await this.verificarCupo(tx, eventoId, datos.visitaEmpresa!, 'visita');
+            return crearRegistro(tx);
+          })
+        : await crearRegistro(this.prisma);
 
-    return crearRegistro(this.prisma);
+    // El QR contiene únicamente el folio. Si falla al generarse, el
+    // registro ya quedó guardado, así que se responde con qr: null.
+    const qr = await this.generarQrDataUrl(participante.folio);
+
+    return { ...participante, qr };
   }
 
   // =====================================================
@@ -305,6 +319,38 @@ export class InscripcionesService {
         disponibles: l.capacidad == null ? null : Math.max(l.capacidad - usados, 0),
       };
     });
+  }
+
+  // =====================================================
+  // PUBLICO — código QR del folio
+  // =====================================================
+  // El QR codifica solo el folio, como texto plano. Así la pistola lo
+  // "escribe" igual que si lo tecleara y handleScan lo compara con el folio.
+
+  // Imagen en base64 (data URL) para usar directo en <img :src="...">
+  private async generarQrDataUrl(folio: string): Promise<string | null> {
+    try {
+      return await QRCode.toDataURL(folio.trim(), OPCIONES_QR);
+    } catch (e) {
+      const mensaje = e instanceof Error ? e.message : String(e);
+      console.error('No se pudo generar el QR del folio:', mensaje);
+      return null;
+    }
+  }
+
+  // PNG para el endpoint GET .../qr/:folio. Solo genera QR de folios que
+  // existen en este evento, para que no sirva como generador de QR en general.
+  async obtenerQrPng(eventoId: number, folio: string): Promise<Buffer> {
+    const participante = await this.prisma.participantes.findFirst({
+      where: { evento: eventoId, folio },
+      select: { folio: true },
+    });
+
+    if (!participante) {
+      throw new NotFoundException('No se encontró una inscripción con ese folio.');
+    }
+
+    return QRCode.toBuffer(participante.folio.trim(), OPCIONES_QR);
   }
 
   // =====================================================

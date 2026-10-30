@@ -12,6 +12,8 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  Header,
+  StreamableFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { InscripcionesService } from './inscripciones.service';
@@ -40,6 +42,17 @@ export class InscripcionesController {
   @Get('cupos')
   obtenerCupos(@Param('eventoId', ParseIntPipe) eventoId: number) {
     return this.service.obtenerCupos(eventoId);
+  }
+
+  // QR del folio como imagen PNG: GET /eventos/5/inscripciones/qr/<folio>
+  @Header('Cache-Control', 'private, max-age=86400')
+  @Get('qr/:folio')
+  async obtenerQr(
+    @Param('eventoId', ParseIntPipe) eventoId: number,
+    @Param('folio') folio: string,
+  ) {
+    const png = await this.service.obtenerQrPng(eventoId, folio);
+    return new StreamableFile(png, { type: 'image/png' });
   }
 
   @Get('buscar')
