@@ -1621,6 +1621,168 @@ function nuevoRegistro() {
   background: #0052a3;
 }
 
+
+/* ==========================================
+   MEJORA VISUAL DE LOS SELECTORES
+========================================== */
+
+/* Apariencia general de las listas */
+.form-group select {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 42px 12px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Cuando se selecciona una lista */
+.form-group select:focus {
+  border-color: #2563eb;
+  background-color: #ffffff;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+/* Cuando pasas el mouse sobre el selector */
+.form-group select:hover {
+  border-color: #3b82f6;
+  background-color: #ffffff;
+}
+
+/* Opciones de los selectores */
+.form-group select option {
+  padding: 12px;
+  background-color: #ffffff;
+  color: #334155;
+  font-size: 14px;
+  line-height: 2;
+}
+
+/* Títulos de los grupos: matutino y vespertino */
+.form-group select optgroup {
+  background-color: #eaf2fc;
+  color: #003366;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Opciones deshabilitadas */
+.form-group select option:disabled {
+  color: #94a3b8;
+  background-color: #f1f5f9;
+}
+
+/* ==========================================
+   MEJORA VISUAL DE LAS SECCIONES
+========================================== */
+
+.form-section {
+  padding: 28px;
+  margin-bottom: 28px;
+  background: #ffffff;
+  border: 1px solid #e8edf4;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.035);
+}
+
+/* Encabezados de cada sección */
+.section-header {
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+/* Iconos de las secciones */
+.section-icon {
+  background: linear-gradient(135deg, #e0edff, #eff6ff);
+  color: #003366;
+  box-shadow: 0 3px 8px rgba(0, 51, 102, 0.08);
+}
+
+/* Etiquetas */
+.form-group label {
+  margin-bottom: 10px;
+  font-size: 0.92rem;
+  color: #1e293b;
+}
+
+/* Espacio entre los campos */
+.form-grid {
+  column-gap: 22px;
+  row-gap: 24px;
+}
+
+/* ==========================================
+   NOTAS DE HORARIOS
+========================================== */
+
+.schedule-note {
+  background: linear-gradient(135deg, #eff6ff, #f8fbff);
+  border: 1px solid #dbeafe;
+  border-left: 5px solid #2563eb;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.schedule-note strong {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #003366;
+}
+
+.schedule-note p {
+  line-height: 1.7;
+  margin-top: 7px;
+}
+
+/* ==========================================
+   MEJORA DE LAS TARJETAS DEL PROGRAMA
+========================================== */
+
+.program-day {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  transition: box-shadow 0.2s ease;
+}
+
+.program-day:hover {
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
+}
+
+.program-day h3 {
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eaf2fc;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 600px) {
+  .form-section {
+    padding: 20px 15px;
+  }
+
+  .form-group select {
+    font-size: 13px;
+    min-height: 50px;
+  }
+
+  .section-header {
+    align-items: flex-start;
+  }
+}
+
+
 @media (max-width: 900px) {
   .registro-container {
     grid-template-columns: minmax(0, 1fr);
