@@ -16,7 +16,7 @@
             Completa tus datos y selecciona el taller y la visita
             industrial a los que deseas asistir.
           </p>
-      
+
         </div>
       
       </div>
@@ -28,9 +28,11 @@
     
       <!-- FORMULARIO -->
       <div class="registro-card">
+
         <!-- MENSAJE DE EXITO -->
         <div v-if="registroExitoso" class="success-message">
           <div class="success-icon">✓</div>
+
           <div class="success-content">
             <h2>¡Registro realizado correctamente!</h2>
             <p>Tu información fue enviada para el Congreso Argos.</p>
@@ -48,27 +50,32 @@
               Realizar otro registro
             </button>
           </div>
-    
+
         </div>
 
-        <form v-else class="registro-form" @submit.prevent="registrar">
+        <form
+          v-else
+          class="registro-form"
+          @submit.prevent="registrar"
+        >
+
           <!-- DATOS DEL ESTUDIANTE -->
           <section class="form-section">
-    
+
             <div class="section-header">
-    
+            
               <div class="section-icon">👨‍🎓</div>
-    
+            
               <div>
                 <h2>Datos del estudiante</h2>
                 <p>Ingresa tus datos personales y escolares.</p>
               </div>
-    
+            
             </div>
 
 
             <div class="form-grid">
-    
+
               <div class="form-group">
                 <label>Nombre(s) <span>*</span></label>
                 <input
@@ -78,7 +85,7 @@
                   placeholder="Escribe tu nombre"
                   required
                 />
-            
+
               </div>
 
 
@@ -91,7 +98,7 @@
                   placeholder="Escribe tus apellidos"
                   required
                 />
-              
+
               </div>
 
               <div class="form-group">
@@ -177,8 +184,10 @@
             </div>
 
             <div
-              v-if="form.tecnologico === 'Otro tecnológico' ||
-                    form.tecnologico === 'Otra institución'"
+              v-if="
+                form.tecnologico === 'Otro tecnológico' ||
+                form.tecnologico === 'Otra institución'
+              "
               class="form-group"
             >
               <label>Nombre de tu institución <span>*</span></label>
@@ -207,7 +216,11 @@
                 <label>Semestre <span>*</span></label>
                 <select v-model="form.semestre" required>
                   <option value="">Selecciona tu semestre</option>
-                  <option v-for="n in 12" :key="n" :value="String(n)">
+                  <option
+                    v-for="n in 12"
+                    :key="n"
+                    :value="String(n)"
+                  >
                     {{ n }}° semestre
                   </option>
                 </select>
@@ -250,145 +263,283 @@
             </div>
           </section>
 
-          
-<!-- TALLER -->
-<section class="form-section">
-  <div class="section-header">
-    <div class="section-icon">🛠️</div>
-    <div>
-      <h2>Selección de taller</h2>
-      <p>
-        Selecciona el taller al que deseas asistir el jueves 5
-        de noviembre.
-      </p>
-    </div>
-  </div>
+          <!-- TALLER -->
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">🛠️</div>
+              <div>
+                <h2>Selección de taller</h2>
+                <p>
+                  Selecciona el taller al que deseas asistir el jueves 5
+                  de noviembre.
+                </p>
+              </div>
+            </div>
 
-  <div class="schedule-note">
-    <strong>Horario de talleres</strong>
-    <p>Escoge uno de los talleres en uno de los horarios disponibles.</p>
-    <p>
-      Si el taller es durante el turno matutino, tu visita industrial
-      deberá ser en el turno vespertino.
-    </p>
-    <p>
-      Si el taller es en horario vespertino, tu visita industrial
-      deberá ser en el turno matutino.
-    </p>
-  </div>
+            <div class="schedule-note">
+              <strong>Horario de talleres</strong>
+              <p>
+                Escoge uno de los talleres en uno de los horarios disponibles.
+              </p>
+              <p>
+                Si el taller es durante el turno matutino, tu visita industrial
+                deberá ser en el turno vespertino.
+              </p>
+              <p>
+                Si el taller es en horario vespertino, tu visita industrial
+                deberá ser en el turno matutino.
+              </p>
+            </div>
 
-  <div class="form-group">
-    <label>Taller al que deseas asistir <span>*</span></label>
+            <div class="form-group">
+              <label>Taller al que deseas asistir <span>*</span></label>
 
-    <select v-model="form.taller" required>
-      <option value="">Selecciona un taller</option>
+              <div class="custom-dropdown">
+                <button
+                  type="button"
+                  class="dropdown-trigger"
+                  :class="{
+                    'dropdown-active': dropdownAbierto === 'taller'
+                  }"
+                  @click="toggleDropdown('taller')"
+                  :aria-expanded="dropdownAbierto === 'taller'"
+                >
+                  <span
+                    :class="{ 'dropdown-placeholder': !form.taller }"
+                  >
+                    {{ form.taller || "Selecciona un taller" }}
+                  </span>
 
-      <optgroup label=" TURNO MATUTINO">
-        <option
-          v-for="taller in talleresMatutinos"
-          :key="taller.id"
-          :value="taller.nombre"
-          :disabled="taller.capacidadDisponible === 0"
-        >
-          {{ taller.nombre }}
-          | {{ taller.horario }}
-          | Capacidad: {{ taller.capacidad }}
-          | Disponibles: {{
-            taller.capacidadDisponible ?? 'Por consultar'
-          }}
-        </option>
-      </optgroup>
+                  <span
+                    class="dropdown-arrow"
+                    :class="{ rotated: dropdownAbierto === 'taller' }"
+                  >
+                    ▼
+                  </span>
+                </button>
 
-      <optgroup label=" TURNO VESPERTINO">
-        <option
-          v-for="taller in talleresVespertinos"
-          :key="taller.id"
-          :value="taller.nombre"
-          :disabled="taller.capacidadDisponible === 0"
-        >
-          {{ taller.nombre }}
-          | {{ taller.horario }}
-          | Capacidad: {{ taller.capacidad }}
-          | Disponibles: {{
-            taller.capacidadDisponible ?? 'Por consultar'
-          }}
-        </option>
-      </optgroup>
-    </select>
+                <div
+                  v-if="dropdownAbierto === 'taller'"
+                  class="dropdown-menu"
+                >
+                  <!-- TURNO MATUTINO -->
+                  <div class="dropdown-group-title">
+                    <span>☀️</span>
+                    TURNO MATUTINO
+                  </div>
 
-    <small>
-      Los horarios y la capacidad corresponden a cada grupo
-      de taller.
-    </small>
-  </div>
-</section>
+                  <button
+                    v-for="taller in talleresMatutinos"
+                    :key="taller.id"
+                    type="button"
+                    class="dropdown-option"
+                    :class="{
+                      'option-disabled': taller.capacidadDisponible === 0
+                    }"
+                    :disabled="taller.capacidadDisponible === 0"
+                    @click="seleccionarTaller(taller)"
+                  >
+                    <span class="option-name">
+                      {{ taller.nombre }}
+                    </span>
 
+                    <span class="option-details">
+                      <span>🕒 {{ taller.horario }}</span>
+                      <span>Capacidad: {{ taller.capacidad }}</span>
+                      <span>
+                        Disponibles:
+                        {{ taller.capacidadDisponible ?? 'Por consultar' }}
+                      </span>
+                    </span>
 
-          
-<!-- VISITA INDUSTRIAL -->
-<section class="form-section">
-  <div class="section-header">
-    <div class="section-icon">🏭</div>
-    <div>
-      <h2>Visita industrial</h2>
-      <p>
-        Indica la empresa que te interesa visitar el jueves
-        5 de noviembre.
-      </p>
-    </div>
-  </div>
+                    <span
+                      v-if="form.taller === taller.nombre"
+                      class="option-check"
+                    >
+                      ✓
+                    </span>
+                  </button>
 
-  <div class="schedule-note">
-    <strong>Horario de visitas industriales</strong>
-    <p>Escoge una de las visitas en uno de los horarios disponibles.</p>
-    <p>
-      Si tu visita industrial es durante el turno matutino, el taller
-      deberá ser en el turno vespertino.
-    </p>
-    <p>
-      Si tu visita industrial es en horario vespertino, el taller industrial
-      deberá ser en el turno matutino.
-    </p>
-  </div>
+                  <!-- TURNO VESPERTINO -->
+                  <div class="dropdown-group-title">
+                    <span>🌙</span>
+                    TURNO VESPERTINO
+                  </div>
 
-  <div class="form-group">
-    <label>Empresa que deseas visitar <span>*</span></label>
+                  <button
+                    v-for="taller in talleresVespertinos"
+                    :key="taller.id"
+                    type="button"
+                    class="dropdown-option"
+                    :class="{
+                      'option-disabled': taller.capacidadDisponible === 0
+                    }"
+                    :disabled="taller.capacidadDisponible === 0"
+                    @click="seleccionarTaller(taller)"
+                  >
+                    <span class="option-name">
+                      {{ taller.nombre }}
+                    </span>
 
-    <select v-model="form.visitaEmpresa" required>
-      <option value="">Selecciona una empresa</option>
+                    <span class="option-details">
+                      <span>🕒 {{ taller.horario }}</span>
+                      <span>Capacidad: {{ taller.capacidad }}</span>
+                      <span>
+                        Disponibles:
+                        {{ taller.capacidadDisponible ?? 'Por consultar' }}
+                      </span>
+                    </span>
 
-      <optgroup label="TURNO MATUTINO">
-        <option
-          v-for="empresa in empresasMatutinas"
-          :key="empresa.id"
-          :value="empresa.nombre"
-        >
-          {{ empresa.nombre }}
-          | Salida: {{ empresa.horario }}
-          | Capacidad: {{ empresa.capacidad }} personas
-        </option>
-      </optgroup>
+                    <span
+                      v-if="form.taller === taller.nombre"
+                      class="option-check"
+                    >
+                      ✓
+                    </span>
+                  </button>
+                </div>
+              </div>
 
-      <optgroup label="TURNO VESPERTINO">
-        <option
-          v-for="empresa in empresasVespertinas"
-          :key="empresa.id"
-          :value="empresa.nombre"
-        >
-          {{ empresa.nombre }}
-          | Salida: {{ empresa.horario }}
-          | Capacidad: {{ empresa.capacidad }} personas
-        </option>
-      </optgroup>
-    </select>
+              <small>
+                Los horarios y la capacidad corresponden a cada grupo
+                de taller.
+              </small>
+            </div>
+          </section>
 
-    <small>
-      Selecciona la visita industrial correspondiente al turno contrario
-      de tu taller.
-    </small>
-  </div>
-</section>
+          <!-- VISITA INDUSTRIAL -->
+          <section class="form-section">
+            <div class="section-header">
+              <div class="section-icon">🏭</div>
+              <div>
+                <h2>Visita industrial</h2>
+                <p>
+                  Indica la empresa que te interesa visitar el jueves
+                  5 de noviembre.
+                </p>
+              </div>
+            </div>
 
+            <div class="schedule-note">
+              <strong>Horario de visitas industriales</strong>
+              <p>
+                Escoge una de las visitas en uno de los horarios disponibles.
+              </p>
+              <p>
+                Si tu visita industrial es durante el turno matutino,
+                el taller deberá ser en el turno vespertino.
+              </p>
+              <p>
+                Si tu visita industrial es en horario vespertino,
+                el taller deberá ser en el turno matutino.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label>Empresa que deseas visitar <span>*</span></label>
+
+              <div class="custom-dropdown">
+                <button
+                  type="button"
+                  class="dropdown-trigger"
+                  :class="{
+                    'dropdown-active': dropdownAbierto === 'empresa'
+                  }"
+                  @click="toggleDropdown('empresa')"
+                  :aria-expanded="dropdownAbierto === 'empresa'"
+                >
+                  <span
+                    :class="{
+                      'dropdown-placeholder': !form.visitaEmpresa
+                    }"
+                  >
+                    {{ form.visitaEmpresa || "Selecciona una empresa" }}
+                  </span>
+
+                  <span
+                    class="dropdown-arrow"
+                    :class="{ rotated: dropdownAbierto === 'empresa' }"
+                  >
+                    ▼
+                  </span>
+                </button>
+
+                <div
+                  v-if="dropdownAbierto === 'empresa'"
+                  class="dropdown-menu"
+                >
+                  <!-- TURNO MATUTINO -->
+                  <div class="dropdown-group-title">
+                    <span>☀️</span>
+                    TURNO MATUTINO
+                  </div>
+
+                  <button
+                    v-for="empresa in empresasMatutinas"
+                    :key="empresa.id"
+                    type="button"
+                    class="dropdown-option"
+                    @click="seleccionarEmpresa(empresa)"
+                  >
+                    <span class="option-name">
+                      {{ empresa.nombre }}
+                    </span>
+
+                    <span class="option-details">
+                      <span>🕒 Salida: {{ empresa.horario }}</span>
+                      <span>
+                        Capacidad: {{ empresa.capacidad }} personas
+                      </span>
+                    </span>
+
+                    <span
+                      v-if="form.visitaEmpresa === empresa.nombre"
+                      class="option-check"
+                    >
+                      ✓
+                    </span>
+                  </button>
+
+                  <!-- TURNO VESPERTINO -->
+                  <div class="dropdown-group-title">
+                    <span>🌙</span>
+                    TURNO VESPERTINO
+                  </div>
+
+                  <button
+                    v-for="empresa in empresasVespertinas"
+                    :key="empresa.id"
+                    type="button"
+                    class="dropdown-option"
+                    @click="seleccionarEmpresa(empresa)"
+                  >
+                    <span class="option-name">
+                      {{ empresa.nombre }}
+                    </span>
+
+                    <span class="option-details">
+                      <span>🕒 Salida: {{ empresa.horario }}</span>
+                      <span>
+                        Capacidad: {{ empresa.capacidad }} personas
+                      </span>
+                    </span>
+
+                    <span
+                      v-if="form.visitaEmpresa === empresa.nombre"
+                      class="option-check"
+                    >
+                      ✓
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <small>
+                Selecciona la visita industrial correspondiente al turno
+                contrario de tu taller.
+              </small>
+            </div>
+          </section>
 
           <!-- PROGRAMA -->
           <section class="form-section">
@@ -402,6 +553,7 @@
 
             <div class="program-day">
               <h3>Martes 3 de noviembre</h3>
+
               <div class="program-item">
                 <span class="program-time">17:00 - 20:00</span>
                 <div>
@@ -420,10 +572,15 @@
                 class="program-item"
                 :class="{ comida: actividad.tipo === 'comida' }"
               >
-                <span class="program-time">{{ actividad.hora }}</span>
+                <span class="program-time">
+                  {{ actividad.hora }}
+                </span>
+
                 <div>
                   <strong>{{ actividad.nombre }}</strong>
-                  <p v-if="actividad.detalle">{{ actividad.detalle }}</p>
+                  <p v-if="actividad.detalle">
+                    {{ actividad.detalle }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -432,7 +589,9 @@
               <h3>Jueves 5 de noviembre</h3>
 
               <div class="program-item">
-                <span class="program-time">Horarios según programación</span>
+                <span class="program-time">
+                  Horarios según programación
+                </span>
                 <div>
                   <strong>Visitas industriales</strong>
                   <p>Recorridos por empresas participantes.</p>
@@ -440,7 +599,9 @@
               </div>
 
               <div class="program-item">
-                <span class="program-time">Horarios según programación</span>
+                <span class="program-time">
+                  Horarios según programación
+                </span>
                 <div>
                   <strong>Talleres</strong>
                   <p>Primera parte de las actividades prácticas.</p>
@@ -449,11 +610,15 @@
 
               <div class="program-item comida">
                 <span class="program-time">14:00 - 16:00</span>
-                <div><strong>COMIDA</strong></div>
+                <div>
+                  <strong>COMIDA</strong>
+                </div>
               </div>
 
               <div class="program-item">
-                <span class="program-time">Horarios según programación</span>
+                <span class="program-time">
+                  Horarios según programación
+                </span>
                 <div>
                   <strong>Talleres</strong>
                   <p>Segunda parte de las actividades prácticas.</p>
@@ -461,7 +626,9 @@
               </div>
 
               <div class="program-item">
-                <span class="program-time">Horarios según programación</span>
+                <span class="program-time">
+                  Horarios según programación
+                </span>
                 <div>
                   <strong>Visitas industriales</strong>
                   <p>Continuación de los recorridos empresariales.</p>
@@ -482,7 +649,9 @@
 
               <div class="program-item comida">
                 <span class="program-time">14:00 - 16:00</span>
-                <div><strong>COMIDA</strong></div>
+                <div>
+                  <strong>COMIDA</strong>
+                </div>
               </div>
 
               <div class="program-item">
@@ -509,7 +678,9 @@
               <div class="section-icon">🔐</div>
               <div>
                 <h2>Consentimiento</h2>
-                <p>Confirma que la información proporcionada es correcta.</p>
+                <p>
+                  Confirma que la información proporcionada es correcta.
+                </p>
               </div>
             </div>
 
@@ -527,10 +698,12 @@
             </label>
           </section>
 
+          <!-- ERROR -->
           <div v-if="error" class="error-message">
             ⚠️ {{ error }}
           </div>
 
+          <!-- BOTON DE REGISTRO -->
           <div class="submit-area">
             <p class="required-note">
               <span>*</span> Campos obligatorios
@@ -554,6 +727,7 @@
       <aside class="event-info">
         <div class="info-card">
           <div class="info-icon">🎓</div>
+
           <h3>Congreso Argos</h3>
           <p>Consulta el programa y completa tu inscripción.</p>
 
@@ -596,6 +770,7 @@
     </main>
   </div>
 </template>
+
 
 <script setup>
 import { reactive, ref } from "vue";
@@ -1002,6 +1177,39 @@ function crearFormulario() {
 }
 
 const form = reactive(crearFormulario());
+
+// ==========================================
+// LISTAS DESPLEGABLES PERSONALIZADAS
+// ==========================================
+
+// Indica cuál lista está abierta
+const dropdownAbierto = ref("");
+
+// Abrir o cerrar una lista desplegable
+function toggleDropdown(tipo) {
+  if (dropdownAbierto.value === tipo) {
+    dropdownAbierto.value = "";
+  } else {
+    dropdownAbierto.value = tipo;
+  }
+}
+
+// Seleccionar un taller
+function seleccionarTaller(taller) {
+  form.taller = taller.nombre;
+  dropdownAbierto.value = "";
+}
+
+// Seleccionar una visita industrial
+function seleccionarEmpresa(empresa) {
+  form.visitaEmpresa = empresa.nombre;
+  dropdownAbierto.value = "";
+}
+
+// Cerrar las listas desplegables
+function cerrarDropdown() {
+  dropdownAbierto.value = "";
+}
 
 const loading = ref(false);
 const registroExitoso = ref(false);
@@ -1764,21 +1972,166 @@ function nuevoRegistro() {
 }
 
 /* ==========================================
-   RESPONSIVE
+   LISTAS DESPLEGABLES PERSONALIZADAS
 ========================================== */
 
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  min-height: 54px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border: 1px solid #d7dee8;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 0.92rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-trigger:hover,
+.dropdown-trigger.dropdown-active {
+  border-color: #0052a3;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 82, 163, 0.09);
+}
+
+.dropdown-placeholder {
+  color: #94a3b8;
+}
+
+.dropdown-arrow {
+  flex-shrink: 0;
+  color: #0052a3;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  max-height: 380px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  background: white;
+  border: 1px solid #dbe3ed;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+  z-index: 100;
+}
+
+.dropdown-group-title {
+  position: sticky;
+  top: -10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 12px;
+  margin: 0 -10px 8px;
+  background: #eaf2fc;
+  border-bottom: 1px solid #d5e5f8;
+  color: #003366;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+.dropdown-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 14px 38px 14px 13px;
+  margin-bottom: 7px;
+  border: 1px solid #e5eaf1;
+  border-radius: 10px;
+  background: white;
+  color: #334155;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dropdown-option:hover {
+  background: #f0f6ff;
+  border-color: #93bce9;
+}
+
+.option-name {
+  display: block;
+  color: #003366;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.option-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.option-check {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #15803d;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.dropdown-menu::-webkit-scrollbar {
+  width: 7px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: #b8cbe0;
+  border-radius: 10px;
+}
+
 @media (max-width: 600px) {
-  .form-section {
-    padding: 20px 15px;
+  .dropdown-menu {
+    max-height: 320px;
   }
 
-  .form-group select {
-    font-size: 13px;
-    min-height: 50px;
+  .dropdown-option {
+    padding: 13px 35px 13px 10px;
   }
 
-  .section-header {
-    align-items: flex-start;
+  .option-name {
+    font-size: 0.82rem;
+  }
+
+  .option-details {
+    font-size: 0.72rem;
   }
 }
 
