@@ -161,6 +161,7 @@ model participantes {
   semestre                            String?            @db.VarChar(2)
   taller                              String?
   visita_empresa                      String?
+  nss                                 String?            @unique
   estado_participantes_estadoToestado estado?            @relation("participantes_estadoToestado", fields: [estado], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_estado")
   evento_participantes_eventoToevento evento             @relation("participantes_eventoToevento", fields: [evento], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_evento")
   genero_participantes_generoTogenero genero?            @relation("participantes_generoTogenero", fields: [genero], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_participante_genero")

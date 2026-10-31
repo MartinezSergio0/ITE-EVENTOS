@@ -29,4 +29,5 @@ export class CreateInscripcionDto {
   @IsOptional() @IsString() @MaxLength(2) semestre?: string;
   @IsOptional() @IsString() taller?: string;
   @IsOptional() @IsString() visitaEmpresa?: string;
+  @IsOptional() @IsString() @MaxLength(20) nss?: string;
 }

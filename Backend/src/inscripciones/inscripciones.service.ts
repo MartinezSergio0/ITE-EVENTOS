@@ -37,10 +37,10 @@ interface DatosInscripcion {
   semestre: string | null;
   taller: string | null;
   visitaEmpresa: string | null;
+  nss: string | null;
 }
 
-// Opciones del código QR del folio. Nivel de corrección "M" (aguanta
-// ~15% de daño) y margen de 2 módulos para que la pistola lo lea fácil.
+// Opciones del QR. Nivel de corrección "M"  y margen de 2 modulos
 const OPCIONES_QR = {
   errorCorrectionLevel: 'M',
   margin: 2,
@@ -141,10 +141,32 @@ export class InscripcionesService {
       semestre: null,
       taller: null,
       visitaEmpresa: null,
+      nss: null,
     };
   }
 
+  private turnoDe(nombre: string): 'matutino' | 'vespertino' | null {
+    const match = /\((matutino|vespertino)/i.exec(nombre);
+    return match ? (match[1].toLowerCase() as 'matutino' | 'vespertino') : null;
+  }
+
   private normalizarEstudiantil(dto: CreateInscripcionDto): DatosInscripcion {
+    const taller = this.requerir(dto.taller, 'taller');
+    const visitaEmpresa = this.requerir(dto.visitaEmpresa, 'visita industrial');
+
+    const turnoTaller = this.turnoDe(taller);
+    if (turnoTaller && turnoTaller === this.turnoDe(visitaEmpresa)) {
+      throw new BadRequestException(
+        'El taller y la visita industrial no pueden estar en el mismo turno. ' +
+          'Si tu taller es matutino, elige una visita vespertina, y viceversa.',
+      );
+    }
+
+    const nss = this.requerir(dto.nss, 'NSS').replace(/[\s-]/g, '');
+    if (!/^\d{11}$/.test(nss)) {
+      throw new BadRequestException('El NSS debe tener exactamente 11 dígitos.');
+    }
+
     return {
       nombre: this.nombreCompleto(dto),
       institucion: this.institucionFinal(dto),
@@ -156,18 +178,15 @@ export class InscripcionesService {
       medioDifusion: null,
       tallaCamisa: this.requerir(dto.tallaPlayera, 'talla de playera'),
       semestre: this.requerir(dto.semestre, 'semestre'),
-      taller: this.requerir(dto.taller, 'taller'),
-      visitaEmpresa: this.requerir(dto.visitaEmpresa, 'visita industrial'),
+      taller,
+      visitaEmpresa,
+      nss,
     };
   }
 
   // =====================================================
   // HELPERS — cupo de talleres y visitas (ARGOS)
   // =====================================================
-  // Los talleres y las visitas viven en la misma tabla "taller".
-  // Un lugar cuenta a toda persona registrada (sin importar el estado
-  // de su pago) que tenga ese nombre en "taller" o en "visita_empresa".
-  // Si "capacidad" viene vacía, el lugar no tiene límite.
 
   private async verificarCupo(
     db: Pick<PrismaService, 'taller' | 'participantes'>,
@@ -199,6 +218,22 @@ export class InscripcionesService {
         tipo === 'taller'
           ? `El taller "${nombre}" ya no tiene cupo. Elige otro taller.`
           : `La visita industrial "${nombre}" ya no tiene cupo. Elige otra visita.`,
+      );
+    }
+  }
+
+  private async verificarNssLibre(
+    db: Pick<PrismaService, 'participantes'>,
+    nss: string,
+  ): Promise<void> {
+    const existe = await db.participantes.findFirst({
+      where: { nss },
+      select: { folio: true },
+    });
+
+    if (existe) {
+      throw new ConflictException(
+        'Ese NSS ya está registrado', //Mensaje a cambiar
       );
     }
   }
@@ -262,29 +297,32 @@ export class InscripcionesService {
           semestre: datos.semestre,
           taller: datos.taller,
           visita_empresa: datos.visitaEmpresa,
+          nss: datos.nss,
           consentimiento: dto.consentimiento,
           monto: evento.costo ?? 0,
         },
       });
 
-    // ARGOS: se revisa el cupo del taller y de la visita justo antes de
-    // inscribir. El candado evita que dos personas tomen el último lugar
-    // al mismo tiempo (se libera solo al terminar la transacción).
+    // revisa el cupo del taller/visita  antes de
+    // inscribir evita que dos personas tomen el último lugar
+    // al mismo tiempo (se libera solo al terminar la transaccion).
     const participante =
       perfil === 'estudiantil'
         ? await this.prisma.$transaction(async (tx) => {
             await tx.$executeRaw`SELECT pg_advisory_xact_lock(${eventoId}::bigint)`;
+            await this.verificarNssLibre(tx, datos.nss!);
             await this.verificarCupo(tx, eventoId, datos.taller!, 'taller');
             await this.verificarCupo(tx, eventoId, datos.visitaEmpresa!, 'visita');
             return crearRegistro(tx);
           })
         : await crearRegistro(this.prisma);
 
-    // El QR contiene únicamente el folio. Si falla al generarse, el
-    // registro ya quedó guardado, así que se responde con qr: null.
     const qr = await this.generarQrDataUrl(participante.folio);
 
-    return { ...participante, qr };
+    // El NSS no se devuelve en la respuesta publica del registro.
+    const { nss: _nss, ...registro } = participante;
+
+    return { ...registro, qr };
   }
 
   // =====================================================
@@ -322,12 +360,10 @@ export class InscripcionesService {
   }
 
   // =====================================================
-  // PUBLICO — código QR del folio
+  // PUBLICO — codigo QR del folio
   // =====================================================
-  // El QR codifica solo el folio, como texto plano. Así la pistola lo
-  // "escribe" igual que si lo tecleara y handleScan lo compara con el folio.
+  // El QR codifica solo el folio, como texto plano. 
 
-  // Imagen en base64 (data URL) para usar directo en <img :src="...">
   private async generarQrDataUrl(folio: string): Promise<string | null> {
     try {
       return await QRCode.toDataURL(folio.trim(), OPCIONES_QR);
@@ -338,8 +374,6 @@ export class InscripcionesService {
     }
   }
 
-  // PNG para el endpoint GET .../qr/:folio. Solo genera QR de folios que
-  // existen en este evento, para que no sirva como generador de QR en general.
   async obtenerQrPng(eventoId: number, folio: string): Promise<Buffer> {
     const participante = await this.prisma.participantes.findFirst({
       where: { evento: eventoId, folio },
@@ -599,6 +633,7 @@ export class InscripcionesService {
       semester: p.semestre ?? null,
       workshop: p.taller ?? null,
       industrialVisit: p.visita_empresa ?? null,
+      nss: p.nss ?? null,
     };
   }
 
@@ -677,7 +712,7 @@ export class InscripcionesService {
 
     if (!evento) throw new NotFoundException('El evento no existe');
 
-    // Los ids son BigInt: hay que convertirlos o JSON.stringify truena
+    // Los ids son BigInt convertirlos o JSON.stringify truena
     return {
       evento: { id: eventoId, nombre: evento.nombre },
       talleres: talleres.map((t) => ({ id: Number(t.id), nombre: t.nombre })),
@@ -702,8 +737,8 @@ export class InscripcionesService {
     return { presentes: filas.map((f) => f.participante.trim()) };
   }
 
-  // Aplica solo los cambios de este dispositivo (agregar / quitar),
-  // así varias pistolas pueden guardar sin pisarse entre sí.
+  // Aplica solo los cambios de este locales (agregar / quitar),
+  //  varios  pueden guardar sin pisarse
   async guardarAsistencia(eventoId: number, dto: GuardarAsistenciaDto) {
     const objetivo = await this.objetivoAsistencia(eventoId, dto.tipo, dto.actividadId);
     const { inicio, fin } = this.rangoDia(dto.fecha);
