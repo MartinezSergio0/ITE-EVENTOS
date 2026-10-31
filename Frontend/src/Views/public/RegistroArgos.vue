@@ -233,7 +233,7 @@
                  <!-- !!!!!!!!!! -->
                  <!-- LO PUSE PARA PROBAR SI QUIERES CAMBIALO --> 
               <div class="form-group">
-                <label>NSS (número de seguro social) <span>*</span></label>
+                <label>NSS (número de seguro social Facultativo) <span>*</span></label>
                 <input
                   v-model.trim="form.nss"
                   type="text"
@@ -242,7 +242,14 @@
                   placeholder="11 dígitos"
                   required
                 />
-                <small>Numero de seguridad social del IMSS (seguro facultativo) CAMBIAR MSJ!!!.</small>
+                <div class="aviso-nss">
+                  <span class="aviso-icono">ⓘ</span>
+                  <p>
+                    <strong>Importante:</strong>
+                    El número de seguridad social que debes ingresar es el
+                    <strong>facultativo</strong>.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
@@ -2366,6 +2373,37 @@ function nuevoRegistro() {
   border-radius: 10px;
 }
 
+/* MENSAJE DEL SEGURO FACULTATIVO */
+
+.aviso-nss {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 12px 15px;
+  background: #eff6ff;
+  border-left: 4px solid #0052a3;
+  border-radius: 8px;
+}
+
+.aviso-icono {
+  color: #0052a3;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.3;
+}
+
+.aviso-nss p {
+  margin: 0;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.aviso-nss strong {
+  color: #003366;
+  font-weight: 700;
+}
 
 /* ==========================================
    ACREDITACION DIGITAL - CONGRESO ARGOS
@@ -2774,4 +2812,240 @@ function nuevoRegistro() {
     padding: 20px;
   }
 }
+
+
+/* ==========================================
+   DISENO PREMIUM - CREDENCIAL QR ARGOS
+   Solo modifica apariencia visual
+========================================== */
+
+.qr-ticket {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  padding: 30px;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(217, 189, 130, 0.16),
+      transparent 35%
+    ),
+    linear-gradient(145deg, #0b1d36, #102d50 65%, #0b1d36);
+  border: 1px solid rgba(217, 189, 130, 0.45);
+  border-radius: 22px;
+  box-shadow:
+    0 20px 45px rgba(0, 20, 45, 0.20),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  text-align: center;
+}
+
+/* Detalle dorado superior */
+.qr-ticket::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    #9b793e,
+    #f3dfad,
+    #b38b4b,
+    #f3dfad
+  );
+}
+
+/* ENCABEZADO */
+
+.qr-ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  text-align: left;
+}
+
+.qr-overline {
+  color: #e3c88e;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.qr-ticket-header h3 {
+  color: #ffffff;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 7px 0;
+}
+
+.qr-ticket-header p {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+}
+
+.qr-ticket-logo {
+  width: 58px;
+  height: 58px;
+  min-width: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #f0d9a5, #b18a4d);
+  color: #0b1d36;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 15px;
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* SEPARADOR */
+
+.qr-divider {
+  height: 1px;
+  margin: 24px 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(217,189,130,0.8),
+    transparent
+  );
+}
+
+/* CONTENEDOR DEL CODIGO QR */
+
+.qr-image-container {
+  position: relative;
+  width: 275px;
+  height: 275px;
+  max-width: 100%;
+  margin: 0 auto 23px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 4px solid #e3c88e;
+  border-radius: 20px;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.25),
+    0 0 0 7px rgba(217,189,130,0.10);
+}
+
+/* IMPORTANTE: no alterar el patron del QR */
+
+.qr-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #ffffff;
+  image-rendering: auto;
+}
+
+/* TITULO E INSTRUCCIONES */
+
+.qr-ticket h4 {
+  color: #f0d9a5;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  letter-spacing: 0.4px;
+}
+
+.qr-instructions {
+  max-width: 390px;
+  margin: 0 auto;
+  color: #d0dae7;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+/* PIE DE CREDENCIAL */
+
+.qr-ticket-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 25px;
+  padding-top: 18px;
+  border-top: 1px dashed rgba(217,189,130,0.55);
+  color: #e3c88e;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* BOTON DE DESCARGA */
+
+.download-qr-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  margin-top: 24px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #f0d9a5, #c49b5c);
+  color: #0b1d36;
+  border: 1px solid #f3dfad;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow: 0 7px 18px rgba(0,0,0,0.18);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.download-qr-button:hover {
+  background: linear-gradient(135deg, #f7e8c3, #d9bd82);
+  color: #0b1d36;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+}
+
+.download-qr-button span {
+  font-size: 1.3rem;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  .qr-ticket {
+    padding: 20px 15px;
+    border-radius: 17px;
+  }
+
+  .qr-ticket-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .qr-ticket-logo {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+  }
+
+  .qr-image-container {
+    width: 235px;
+    height: 235px;
+    padding: 12px;
+  }
+
+  .qr-ticket-footer {
+    font-size: 0.56rem;
+  }
+}
+
+
 </style>
