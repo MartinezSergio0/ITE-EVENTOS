@@ -254,6 +254,7 @@
                     <strong>Importante:</strong>
                     El número de seguridad social que debes ingresar es el
                     <strong>facultativo</strong>.
+                    https://serviciosdigitales.imss.gob.mx/gestionAsegurados-web-externo/vigencia
                   </p>
                 </div>
               </div>
