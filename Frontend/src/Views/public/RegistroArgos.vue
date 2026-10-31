@@ -40,6 +40,9 @@
               <span>Folio de registro</span>
               <strong>{{ folio }}</strong>
             </div>
+            <!-- QR QR QR AQUIIII SUHEEEY CON H -->
+            <img v-if="qr" :src="qr" alt="Código QR de tu folio" width="200" height="200" />
+              <a v-if="qr" :href="qr" :download="`qr-${folio}.png`">Descargar QR</a>
 
             <p class="success-note">
               Guarda tu folio para consultar posteriormente tu registro.
@@ -592,7 +595,7 @@
               <div class="program-item">
                 <span class="program-time">17:00 - 20:00</span>
                 <div>
-                  <strong>Preregistro</strong>
+                  <strong>Registro</strong>
                   <p>Recepción y preregistro de participantes.</p>
                 </div>
               </div>
@@ -814,7 +817,7 @@ import { API_URL } from "../../config/api";
 // IMPORTANTE:
 // Cambia este ID por el ID real del evento Argos en tu base de datos.
 const eventId = 5;
-
+const qr = ref("");
 
 const talleres = [
   // TURNO MATUTINO (ID 1 AL 10)
@@ -835,7 +838,7 @@ const talleres = [
   {
     id: 3,
     nombre: "DISEÑO DE EXPERIMENTOS (matutino)",
-    horario: "10:00 - 14:00",
+    horario: "10:00 - 13:00",
     capacidad: 25,
     turno: "Matutino"
   },
@@ -1199,6 +1202,11 @@ const empresasVespertinas = computed(() =>
 
 const programaMiercoles = [
   {
+    hora: "08:00 - 9:00",
+    nombre: "Inauguración",
+    detalle: "Recepción y preregistro de participantes."
+  },
+  {
     hora: "09:00 - 10:00",
     nombre: "Inauguración",
     detalle: "Gimnasio de usos múltiples"
@@ -1387,6 +1395,7 @@ async function registrar() {
     }
 
     folio.value = data.folio;
+    qr.value = data.qr || `${API_URL}/eventos/${eventId}/inscripciones/qr/${data.folio}`;
     registroExitoso.value = true;
 
     window.scrollTo({ top: 0, behavior: "smooth" });
