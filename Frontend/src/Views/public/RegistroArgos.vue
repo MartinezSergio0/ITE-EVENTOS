@@ -29,31 +29,110 @@
       <div class="registro-card">
 
         <!-- MENSAJE DE EXITO -->
-        <div v-if="registroExitoso" class="success-message">
-          <div class="success-icon">✓</div>
+       
+<!-- MENSAJE DE REGISTRO EXITOSO -->
+<div v-if="registroExitoso" class="success-message">
 
-          <div class="success-content">
-            <h2>¡Registro realizado correctamente!</h2>
-            <p>Tu información fue enviada para el Congreso Argos.</p>
+  <div class="success-content">
 
-            <div class="folio-box">
-              <span>Folio de registro</span>
-              <strong>{{ folio }}</strong>
-            </div>
-            <!-- QR QR QR AQUIIII SUHEEEY CON H -->
-            <img v-if="qr" :src="qr" alt="Código QR de tu folio" width="200" height="200" />
-              <a v-if="qr" :href="qr" :download="`qr-${folio}.png`">Descargar QR</a>
+    <!-- ENCABEZADO -->
+    <div class="success-heading">
+      <div class="success-icon">✓</div>
 
-            <p class="success-note">
-              Guarda tu folio para consultar posteriormente tu registro.
-            </p>
+      <div>
+        <span class="success-label">CONGRESO ARGOS</span>
+        <h2>¡Registro completado!</h2>
+        <p>
+          Tu inscripción se ha realizado correctamente.
+          Ya formas parte de nuestro congreso.
+        </p>
+      </div>
+    </div>
 
-            <button class="new-register-button" @click="nuevoRegistro">
-              Realizar otro registro
-            </button>
-          </div>
+    <!-- FOLIO -->
+    <div class="folio-box">
+      <span>FOLIO DE REGISTRO</span>
+      <strong>{{ folio }}</strong>
+      <small>Identificador único de tu inscripción</small>
+    </div>
 
+    <!-- CREDENCIAL DIGITAL CON QR -->
+    <div v-if="qr" class="qr-ticket">
+
+      <div class="qr-ticket-header">
+        <div>
+          <span class="qr-overline">ACREDITACIÓN DIGITAL</span>
+          <h3>Congreso ARGOS</h3>
+          <p>Comprobante de inscripción</p>
         </div>
+
+        <div class="qr-ticket-logo">AR</div>
+      </div>
+
+      <div class="qr-divider"></div>
+
+      <div class="qr-image-container">
+        <img
+          :src="qr"
+          alt="Código QR de acreditación del Congreso ARGOS"
+          class="qr-image"
+        />
+      </div>
+
+      <h4>Tu acceso al congreso</h4>
+
+      <p class="qr-instructions">
+        Presenta este código QR durante el proceso de
+        acreditación para facilitar la identificación
+        de tu registro.
+      </p>
+
+      <div class="qr-ticket-footer">
+        <span>CONGRESO ARGOS</span>
+        <span>PARTICIPANTE REGISTRADO</span>
+      </div>
+
+      <a
+        :href="qr"
+        :download="`ARGOS-QR-${folio}.png`"
+        class="download-qr-button"
+      >
+        <span>↓</span>
+        Descargar código QR
+      </a>
+
+    </div>
+
+    <!-- SI NO HAY QR -->
+    <div v-else class="qr-error">
+      <p>
+        Tu registro fue realizado, pero no se pudo mostrar
+        el código QR. Conserva tu folio de registro.
+      </p>
+    </div>
+
+    <!-- RECOMENDACION -->
+    <div class="success-reminder">
+      <span class="reminder-icon">ℹ</span>
+      <p>
+        <strong>Importante:</strong>
+        Guarda tu folio y descarga tu código QR.
+        Te recomendamos conservarlo en tu dispositivo
+        para presentarlo el día del evento.
+      </p>
+    </div>
+
+    <!-- NUEVO REGISTRO -->
+    <button
+      class="new-register-button"
+      @click="nuevoRegistro"
+    >
+      Realizar otro registro →
+    </button>
+
+  </div>
+</div>
+
 
         <form
           v-else
@@ -2286,6 +2365,346 @@ function nuevoRegistro() {
   background: #b8cbe0;
   border-radius: 10px;
 }
+
+
+/* ==========================================
+   ACREDITACION DIGITAL - CONGRESO ARGOS
+========================================== */
+
+.success-message {
+  display: block;
+  width: 100%;
+  padding: 35px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+}
+
+.success-content {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+/* ENCABEZADO */
+
+.success-heading {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  margin-bottom: 28px;
+}
+
+.success-icon {
+  width: 55px;
+  height: 55px;
+  min-width: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f5ee;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  border-radius: 50%;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.success-label {
+  color: #0052a3;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.success-content h2 {
+  color: #003366;
+  font-size: 1.65rem;
+  margin: 5px 0;
+}
+
+.success-heading p {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* FOLIO */
+
+.folio-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 22px;
+  margin: 0 0 25px;
+  background: #ffffff;
+  border: 1px solid #dbe5f0;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.folio-box span {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.folio-box strong {
+  color: #003366;
+  font-size: 1.7rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.folio-box small {
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+
+/* TARJETA DEL QR */
+
+.qr-ticket {
+  width: 100%;
+  padding: 25px;
+  background: #ffffff;
+  border: 1px solid #dce5ef;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.07);
+  text-align: center;
+}
+
+/* CABECERA DEL PASE */
+
+.qr-ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+}
+
+.qr-overline {
+  color: #0052a3;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.qr-ticket-header h3 {
+  color: #003366;
+  font-size: 1.3rem;
+  margin: 5px 0;
+}
+
+.qr-ticket-header p {
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.qr-ticket-logo {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #003366;
+  color: white;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* SEPARADOR */
+
+.qr-divider {
+  height: 1px;
+  margin: 20px 0;
+  background: #e2e8f0;
+}
+
+/* IMAGEN QR */
+
+.qr-image-container {
+  width: 245px;
+  height: 245px;
+  max-width: 100%;
+  margin: 0 auto 18px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.qr-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* TEXTO DEL QR */
+
+.qr-ticket h4 {
+  color: #003366;
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+
+.qr-instructions {
+  max-width: 390px;
+  margin: 0 auto;
+  color: #64748b;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* PIE DE TARJETA */
+
+.qr-ticket-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 15px;
+  border-top: 1px dashed #cbd5e1;
+  color: #64748b;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+/* DESCARGAR QR */
+
+.download-qr-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  margin-top: 20px;
+  padding: 12px 18px;
+  background: #003366;
+  color: #ffffff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.download-qr-button:hover {
+  background: #0052a3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 51, 102, 0.18);
+}
+
+.download-qr-button span {
+  font-size: 1.3rem;
+}
+
+/* RECORDATORIO */
+
+.success-reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 15px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 11px;
+}
+
+.reminder-icon {
+  color: #0052a3;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.success-reminder p {
+  color: #475569;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.success-reminder strong {
+  color: #003366;
+}
+
+/* ERROR QR */
+
+.qr-error {
+  padding: 18px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 10px;
+  color: #9a3412;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* NUEVO REGISTRO */
+
+.new-register-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 22px;
+  padding: 12px 20px;
+  background: #ffffff;
+  color: #003366;
+  border: 1px solid #003366;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.new-register-button:hover {
+  background: #003366;
+  color: #ffffff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  .success-message {
+    padding: 18px;
+  }
+
+  .success-heading {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .success-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .qr-ticket {
+    padding: 18px;
+  }
+
+  .qr-image-container {
+    width: 220px;
+    height: 220px;
+  }
+
+  .qr-ticket-footer {
+    font-size: 0.55rem;
+  }
+
+  .folio-box strong {
+    font-size: 1.35rem;
+  }
+}
+
 
 @media (max-width: 600px) {
   .dropdown-menu {
