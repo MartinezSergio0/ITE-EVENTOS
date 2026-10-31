@@ -151,6 +151,20 @@
                 </select>
                 <small>Selecciona cuidadosamente tu talla.</small>
               </div>
+                 <!-- !!!!!!!!!! -->
+                 <!-- LO PUSE PARA PROBAR SI QUIERES CAMBIALO --> 
+              <div class="form-group">
+                <label>NSS (número de seguro social) <span>*</span></label>
+                <input
+                  v-model.trim="form.nss"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="11"
+                  placeholder="11 dígitos"
+                  required
+                />
+                <small>Numero de seguridad social del IMSS (seguro facultativo) CAMBIAR MSJ!!!.</small>
+              </div>
             </div>
           </section>
 
@@ -416,6 +430,10 @@
                 Los horarios y la capacidad corresponden a cada grupo
                 de taller.
               </small>
+
+              <div v-if="mismoTurno" class="error-message turno-error">
+                ⚠️ {{ MENSAJE_MISMO_TURNO }}
+              </div>
             </div>
           </section>
 
@@ -576,6 +594,10 @@
                 Selecciona la visita industrial correspondiente al turno
                 contrario de tu taller.
               </small>
+
+              <div v-if="mismoTurno" class="error-message turno-error">
+                ⚠️ {{ MENSAJE_MISMO_TURNO }}
+              </div>
             </div>
           </section>
 
@@ -819,6 +841,7 @@ import { API_URL } from "../../config/api";
 const eventId = 5;
 const qr = ref("");
 
+
 const talleres = [
   // TURNO MATUTINO (ID 1 AL 10)
   {
@@ -960,7 +983,7 @@ const talleres = [
 
 
 // ==========================================
-// CUPOS 
+// CUPOS (vienen del backend, tabla "taller")
 // ==========================================
 
 // { [nombre]: { nombre, capacidad, ocupados, disponibles } }
@@ -1203,7 +1226,7 @@ const empresasVespertinas = computed(() =>
 const programaMiercoles = [
   {
     hora: "08:00 - 9:00",
-    nombre: "Inauguración",
+    nombre: "Registro",
     detalle: "Recepción y preregistro de participantes."
   },
   {
@@ -1246,6 +1269,7 @@ function crearFormulario() {
     nombre: "",
     apellidos: "",
     numeroControl: "",
+    nss: "",
     edad: "",
     sexo: "",
     tallaPlayera: "",
@@ -1264,14 +1288,29 @@ function crearFormulario() {
 const form = reactive(crearFormulario());
 
 // ==========================================
+// REGLA: taller y visita en turnos distintos
+// ==========================================
+
+const MENSAJE_MISMO_TURNO =
+  "El taller y la visita industrial no pueden estar en el mismo turno. " +
+  "Si tu taller es matutino, elige una visita vespertina, y viceversa.";
+
+// true cuando ya elige taller y visita y los dos son del mismo turno
+const mismoTurno = computed(() => {
+  const taller = talleres.find(t => t.nombre === form.taller);
+  const empresa = empresas.find(e => e.nombre === form.visitaEmpresa);
+
+  return Boolean(taller && empresa && taller.turno === empresa.turno);
+});
+
+// ==========================================
 // LISTAS DESPLEGABLES PERSONALIZADAS
 // ==========================================
 
-// Indica cuál lista está abierta
+// Indica lista está abierta
 const dropdownAbierto = ref("");
 
 // Abrir o cerrar una lista desplegable
-// (al abrirla se actualizan los cupos)
 function toggleDropdown(tipo) {
   if (dropdownAbierto.value === tipo) {
     dropdownAbierto.value = "";
@@ -1311,6 +1350,11 @@ async function registrar() {
     return;
   }
 
+  if (!/^\d{11}$/.test(form.nss.replace(/[\s-]/g, ""))) {
+    error.value = "El NSS debe tener exactamente 11 dígitos.";
+    return;
+  }
+
   if (!form.tecnologico) {
     error.value = "Selecciona tu tecnológico de procedencia.";
     return;
@@ -1334,6 +1378,11 @@ async function registrar() {
     return;
   }
 
+  if (mismoTurno.value) {
+    error.value = MENSAJE_MISMO_TURNO;
+    return;
+  }
+
   if (!form.consentimiento) {
     error.value = "Debes aceptar el consentimiento para continuar.";
     return;
@@ -1353,6 +1402,7 @@ async function registrar() {
           nombre: form.nombre.trim(),
           apellidoPaterno: form.apellidos.trim(),   // todos los apellidos juntos
           numeroControl: form.numeroControl.trim(),
+          nss: form.nss.replace(/[\s-]/g, ""),
           edad: Number(form.edad),
           sexo: form.sexo,
           tallaPlayera: form.tallaPlayera,
@@ -1405,9 +1455,6 @@ async function registrar() {
     error.value =
       e.message || "Ocurrió un error. Intenta nuevamente.";
 
-    // Si el taller o la visita se llenaron mientras llenabas el
-    // formulario, se actualizan los cupos y se limpia esa selección
-    // para que elijas otra opción.
     await cargarCupos();
 
     if (cupos.value[form.taller]?.disponibles === 0) {
@@ -1729,6 +1776,11 @@ function nuevoRegistro() {
   margin-bottom: 20px;
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+.turno-error {
+  margin-top: 14px;
+  margin-bottom: 0;
 }
 
 .submit-area {
