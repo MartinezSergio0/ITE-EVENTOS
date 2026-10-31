@@ -239,25 +239,45 @@
                  <!-- !!!!!!!!!! -->
                  <!-- LO PUSE PARA PROBAR SI QUIERES CAMBIALO --> 
               <div class="form-group">
-                <label>NSS (número de seguro social Facultativo) <span>*</span></label>
-                <input
-                  v-model.trim="form.nss"
-                  type="text"
-                  inputmode="numeric"
-                  maxlength="11"
-                  placeholder="11 dígitos"
-                  required
-                />
-                <div class="aviso-nss">
-                  <span class="aviso-icono">ⓘ</span>
-                  <p>
-                    <strong>Importante:</strong>
-                    El número de seguridad social que debes ingresar es el
-                    <strong>facultativo</strong>.
-                    https://serviciosdigitales.imss.gob.mx/gestionAsegurados-web-externo/vigencia
-                  </p>
-                </div>
-              </div>
+  <label>
+    NSS (Número de Seguro Social Facultativo) <span>*</span>
+  </label>
+
+  <input
+    v-model.trim="form.nss"
+    type="text"
+    inputmode="numeric"
+    maxlength="11"
+    placeholder="Ingresa tus 11 dígitos"
+    required
+  />
+
+  <div class="aviso-nss">
+    <span class="aviso-icono">ⓘ</span>
+
+    <div class="aviso-contenido">
+      <p>
+        <strong>Importante:</strong>
+        Ingresa tu Número de Seguro Social (NSS) correspondiente
+        al seguro facultativo.
+      </p>
+
+      <a
+        href="https://serviciosdigitales.imss.gob.mx/gestionAsegurados-web-externo/vigencia"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="nss-link"
+      >
+        <span>Consultar NSS en el portal del IMSS</span>
+        <span class="nss-link-icon">↗</span>
+      </a>
+
+      <small>
+        Se abrirá el sitio oficial del IMSS en una nueva pestaña.
+      </small>
+    </div>
+  </div>
+</div>
             </div>
           </section>
 
@@ -3088,5 +3108,85 @@ function nuevoRegistro() {
   }
 }
 
+/* ==========================================
+   AVISO Y ENLACE DEL SEGURO FACULTATIVO
+========================================== */
+
+.aviso-nss {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 16px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-left: 4px solid #0052a3;
+  border-radius: 12px;
+}
+
+.aviso-icono {
+  flex-shrink: 0;
+  color: #0052a3;
+  font-size: 21px;
+  font-weight: bold;
+}
+
+.aviso-contenido {
+  flex: 1;
+  min-width: 0;
+}
+
+.aviso-nss p {
+  margin: 0 0 12px;
+  color: #334155;
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.aviso-nss strong {
+  color: #003366;
+  font-weight: 700;
+}
+
+/* ENLACE AL IMSS */
+
+.nss-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  background: #ffffff;
+  border: 1px solid #bfdbfe;
+  border-radius: 9px;
+  color: #0052a3;
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.nss-link:hover {
+  background: #003366;
+  border-color: #003366;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.15);
+}
+
+.nss-link-icon {
+  font-size: 1.1rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.aviso-contenido small {
+  display: block;
+  margin-top: 9px;
+  color: #64748b;
+  font-size: 0.73rem;
+  line-height: 1.5;
+}
 
 </style>
