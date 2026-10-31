@@ -71,6 +71,12 @@
 
       <div class="qr-divider"></div>
 
+      <!-- FOLIO DE INSCRIPCION -->
+<div class="qr-folio">
+  <span class="qr-folio-label">Tu número de folio</span>
+  <strong class="qr-folio-number">{{ folio }}</strong>
+</div>
+
       <div class="qr-image-container">
         <img
           :src="qr"
@@ -3018,6 +3024,40 @@ function nuevoRegistro() {
   font-size: 1.3rem;
 }
 
+/* ==========================================
+   FOLIO DESTACADO - CREDENCIAL ARGOS
+   Solo mejora su visibilidad
+========================================== */
+
+.qr-folio {
+  margin: 20px auto;
+  padding: 16px 20px;
+  max-width: 350px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(227, 200, 142, 0.65);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.qr-folio-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #e3c88e;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.qr-folio-number {
+  display: block;
+  color: #ffffff;
+  font-size: 1.65rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  overflow-wrap: anywhere;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
 /* RESPONSIVE */
 
 @media (max-width: 600px) {
