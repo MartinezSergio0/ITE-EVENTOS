@@ -26,7 +26,7 @@
           <div>
 
             <span class="header-badge">
-              CONGRESO ESCALA
+              {{ badgeEvento }}
             </span>
 
             <h1>
@@ -79,7 +79,7 @@
 
           <p>
             Ingresa el correo electrónico que utilizaste
-            durante tu registro al Congreso ESCALA.
+            durante tu registro en {{ textoEvento }}.
             Te mostraremos el folio asociado a tu registro.
           </p>
 
@@ -160,7 +160,7 @@
 
               <p>
                 Debes ingresar el correo electrónico que registraste
-                al momento de inscribirte al Congreso ESCALA.
+                al momento de inscribirte en {{ textoEvento }}.
               </p>
 
             </div>
@@ -216,6 +216,10 @@
             <strong>
               {{ resultado.folio }}
             </strong>
+
+            <!-- QR -->
+            <img v-if="qr" :src="qr" alt="Código QR de tu folio" width="200" height="200" />
+            <a v-if="qr" :href="qr" :download="`qr-${resultado.folio}.png`">Descargar QR</a>
 
             <small>
               Conserva este folio para futuras consultas.
@@ -303,7 +307,7 @@
               <p>
                 Te recomendamos guardar o anotar tu folio.
                 Podrás necesitarlo para realizar consultas
-                relacionadas con tu inscripción al Congreso ESCALA.
+                relacionadas con tu inscripción en {{ textoEvento }}.
               </p>
 
             </div>
@@ -490,10 +494,40 @@
 <script setup>
 
 import {
-  ref
+  ref,
+  computed,
+  watch
 } from "vue";
 
+import { useRoute } from "vue-router";
+
 import { API_URL } from "../../config/api";
+
+// ==========================================
+// EVENTO 
+// ==========================================
+
+const route = useRoute();
+
+const eventoId = computed(() => Number(route.params.id));
+
+const eventoValido = computed(
+  () => Number.isInteger(eventoId.value) && eventoId.value > 0
+);
+
+// Nombre del evento
+const nombreEvento = ref("");
+
+
+// Textos 
+const textoEvento = computed(() =>
+  nombreEvento.value ? `el evento ${nombreEvento.value}` : "el evento"
+);
+
+const badgeEvento = computed(() =>
+  nombreEvento.value ? nombreEvento.value.toUpperCase() : "EVENTO"
+);
+
 
 // ==========================================
 // VARIABLES
@@ -507,6 +541,40 @@ const error = ref("");
 
 const consultando = ref(false);
 
+// QR del folio (imagen en base64 que manda el backend)
+const qr = ref("");
+
+
+// CARGAR NOMBRE DEL EVENTO
+
+async function cargarEvento() {
+
+  nombreEvento.value = "";
+
+  if (!eventoValido.value) {
+    return;
+  }
+
+  try {
+
+    const response = await fetch(
+      `${API_URL}/eventos/${eventoId.value}`
+    );
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+
+    nombreEvento.value = data.title || "";
+
+  } catch (e) {
+    console.error("Error al cargar el evento:", e);
+  }
+
+}
+
 
 // ==========================================
 // CONSULTAR FOLIO
@@ -516,11 +584,19 @@ async function consultarFolio() {
 
   error.value = "";
   resultado.value = null;
+  qr.value = "";
 
   correo.value = String(correo.value).trim().toLowerCase();
 
   if (!correo.value) {
     error.value = "Ingresa tu correo electrónico.";
+    return;
+  }
+
+  if (!eventoValido.value) {
+    error.value =
+      "No se indico a qué evento corresponde la consulta. " +
+      "Regresa a la página del evento e intentalo de nuevo.";
     return;
   }
 
@@ -531,7 +607,7 @@ async function consultarFolio() {
     const params = new URLSearchParams({ correo: correo.value });
 
     const response = await fetch(
-      `${API_URL}/eventos/4/inscripciones/folio?${params}`
+      `${API_URL}/eventos/${eventoId.value}/inscripciones/folio?${params}`
     );
 
     if (!response.ok) {
@@ -556,6 +632,8 @@ async function consultarFolio() {
       fechaRegistro: data.fechaRegistro,
     };
 
+    qr.value = data.qr || `${API_URL}/eventos/${eventoId.value}/inscripciones/qr/${encodeURIComponent(data.folio)}`;
+
   } catch (e) {
     error.value = e.message || "No se pudo consultar tu folio.";
   } finally {
@@ -578,6 +656,16 @@ function nuevaConsulta() {
   correo.value = "";
 
 }
+
+
+watch(
+  eventoId,
+  () => {
+    nuevaConsulta();
+    cargarEvento();
+  },
+  { immediate: true }
+);
 
 </script>
 

@@ -347,7 +347,7 @@
 
                 <router-link
                     class="secondary recover-folio-btn"
-                    to="/consultar-folio"
+                    :to="'/consultar-folio/' + event.id"
                 >
                     🔎 Recuperar mi folio
                 </router-link>

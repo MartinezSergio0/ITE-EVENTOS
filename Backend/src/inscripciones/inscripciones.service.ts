@@ -362,8 +362,6 @@ export class InscripcionesService {
   // =====================================================
   // PUBLICO — codigo QR del folio
   // =====================================================
-  // El QR codifica solo el folio, como texto plano. 
-
   private async generarQrDataUrl(folio: string): Promise<string | null> {
     try {
       return await QRCode.toDataURL(folio.trim(), OPCIONES_QR);
@@ -373,17 +371,17 @@ export class InscripcionesService {
       return null;
     }
   }
-
+ 
   async obtenerQrPng(eventoId: number, folio: string): Promise<Buffer> {
     const participante = await this.prisma.participantes.findFirst({
       where: { evento: eventoId, folio },
       select: { folio: true },
     });
-
+ 
     if (!participante) {
       throw new NotFoundException('No se encontró una inscripción con ese folio.');
     }
-
+ 
     return QRCode.toBuffer(participante.folio.trim(), OPCIONES_QR);
   }
 

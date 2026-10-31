@@ -982,9 +982,7 @@ const talleres = [
 ];
 
 
-// ==========================================
-// CUPOS (vienen del backend, tabla "taller")
-// ==========================================
+// CUPOS 
 
 // { [nombre]: { nombre, capacidad, ocupados, disponibles } }
 const cupos = ref({});
