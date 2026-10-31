@@ -288,7 +288,7 @@ const routes = [
   },
 
   {
-  path: "/consultar-folio/id?",
+  path: "/consultar-folio/:id?",
   name: "ConsultarFolio",
   component: ConsultarFolioView
   },
