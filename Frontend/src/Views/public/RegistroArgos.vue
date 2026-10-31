@@ -50,11 +50,11 @@
     </div>
 
     <!-- FOLIO -->
-    <div class="folio-box">
+    <!-- <div class="folio-box">
       <span>FOLIO DE REGISTRO</span>
       <strong>{{ folio }}</strong>
       <small>Identificador único de tu inscripción</small>
-    </div>
+    </div> -->
 
     <!-- CREDENCIAL DIGITAL CON QR -->
     <div v-if="qr" class="qr-ticket">
