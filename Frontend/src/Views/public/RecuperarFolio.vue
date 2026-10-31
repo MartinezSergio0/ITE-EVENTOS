@@ -207,26 +207,87 @@
                FOLIO DESTACADO
           ================================================== -->
 
-          <div class="folio-result">
+          <!-- =================================================
+          CREDENCIAL DIGITAL CON QR
+          ================================================== -->
 
-            <span>
-              Tu folio de registro
-            </span>
+          <div class="qr-ticket">
 
-            <strong>
-              {{ resultado.folio }}
-            </strong>
+            <!-- ENCABEZADO -->
+            <div class="qr-ticket-header">
 
-            <!-- QR -->
-            <img v-if="qr" :src="qr" alt="Código QR de tu folio" width="200" height="200" />
-            <a v-if="qr" :href="qr" :download="`qr-${resultado.folio}.png`">Descargar QR</a>
+              <div class="qr-ticket-logo">
+                AR
+              </div>
 
-            <small>
-              Conserva este folio para futuras consultas.
-            </small>
+              <div class="qr-ticket-title">
+                <span>CONGRESO ARGOS</span>
+                <strong>Credencial digital</strong>
+              </div>
 
-          </div>
+            </div>
 
+
+            <div class="qr-divider"></div>
+
+
+            <!-- FOLIO -->
+            <div class="qr-folio">
+
+              <span class="qr-folio-label">
+                Tu número de folio
+              </span>
+
+              <strong class="qr-folio-number">
+                {{ resultado.folio }}
+              </strong>
+
+            </div>
+
+
+            <!-- CÓDIGO QR -->
+            <div v-if="qr" class="qr-image-container">
+
+              <img
+                :src="qr"
+                alt="Código QR de tu folio"
+                class="qr-image"
+              />
+
+            </div>
+
+            <div v-else class="qr-error">
+              <p>
+                Tu folio fue recuperado, pero no se pudo mostrar el código QR.
+              </p>
+            </div>
+
+
+            <!-- INSTRUCCIONES -->
+            <p class="qr-instructions">
+              Presenta este código QR cuando sea necesario validar tu inscripción.
+            </p>
+
+
+            <!-- DESCARGAR -->
+            <a
+              v-if="qr"
+              :href="qr"
+              :download="`ARGOS-QR-${resultado.folio}.png`"
+              class="download-qr-button"
+            >
+              <span>↓</span>
+              Descargar código QR
+            </a>
+
+
+            <!-- PIE -->
+            <div class="qr-ticket-footer">
+              <span>INSTITUTO TECNOLÓGICO DE ENSENADA</span>
+              <small>Conserva tu credencial digital</small>
+            </div>
+
+</div>
 
           <!-- =================================================
                INFORMACIÓN
@@ -1819,6 +1880,214 @@ watch(
 
   }
 
+}
+
+/* =====================================================
+   CREDENCIAL DIGITAL ARGOS
+===================================================== */
+
+.qr-ticket {
+  max-width: 430px;
+  width: 100%;
+  margin: 25px auto;
+  padding: 28px 25px;
+  background: linear-gradient(145deg, #071b35, #003366);
+  border: 2px solid #c9a75e;
+  border-radius: 22px;
+  box-shadow: 0 15px 35px rgba(0, 30, 65, 0.22);
+  color: white;
+  text-align: center;
+}
+
+/* ENCABEZADO */
+
+.qr-ticket-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.qr-ticket-logo {
+  width: 55px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #e3c88e;
+  border-radius: 14px;
+  color: #e3c88e;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.qr-ticket-title {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 4px;
+}
+
+.qr-ticket-title span {
+  color: #e3c88e;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.qr-ticket-title strong {
+  color: white;
+  font-size: 1.1rem;
+}
+
+/* DIVISOR */
+
+.qr-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(227, 200, 142, 0.5);
+  margin: 20px 0;
+}
+
+/* FOLIO */
+
+.qr-folio {
+  margin: 20px auto;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(227, 200, 142, 0.65);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.qr-folio-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #e3c88e;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.qr-folio-number {
+  display: block;
+  color: #ffffff;
+  font-size: 1.65rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  overflow-wrap: anywhere;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* IMAGEN QR */
+
+.qr-image-container {
+  width: 230px;
+  height: 230px;
+  margin: 22px auto;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 17px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.qr-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ERROR QR */
+
+.qr-error {
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(227, 200, 142, 0.5);
+  border-radius: 12px;
+  color: white;
+}
+
+/* INSTRUCCIONES */
+
+.qr-instructions {
+  max-width: 300px;
+  margin: 15px auto 20px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* DESCARGA */
+
+.download-qr-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #e3c88e, #c9a75e);
+  color: #071b35;
+  border-radius: 11px;
+  text-decoration: none;
+  font-weight: 900;
+  font-size: 0.9rem;
+  transition: 0.3s;
+}
+
+.download-qr-button span {
+  font-size: 1.3rem;
+}
+
+.download-qr-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(201, 167, 94, 0.25);
+}
+
+/* PIE */
+
+.qr-ticket-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 22px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(227, 200, 142, 0.4);
+}
+
+.qr-ticket-footer span {
+  color: #e3c88e;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.qr-ticket-footer small {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.75rem;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  .qr-ticket {
+    padding: 22px 16px;
+  }
+
+  .qr-image-container {
+    width: 210px;
+    height: 210px;
+  }
+
+  .qr-folio-number {
+    font-size: 1.4rem;
+  }
 }
 
 </style>
