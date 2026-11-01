@@ -550,206 +550,168 @@
            PARTICIPANTES
       ====================================================== -->
 
-      <section
-        v-if="currentSection === 'participantes'"
-        class="page"
-      >
-
-        <div class="section-header">
-
-          <div>
-            <h2>Participantes</h2>
-
-            <p>
-              Consulta los participantes registrados en ARGOS.
-            </p>
+        <section
+          v-if="currentSection === 'participantes'"
+          class="page"
+        >
+          <div class="section-header">
+            <div>
+              <h2>Participantes</h2>
+              <p>
+                Consulta los participantes registrados en ARGOS.
+              </p>
+            </div>
           </div>
 
-        </div>
+          <!-- FILTROS -->
+          <div class="filters">
+            <input
+              v-model="searchParticipants"
+              type="text"
+              placeholder="🔎 Buscar estudiante por nombre o folio..."
+            />
 
+            <select v-model="paymentFilter">
+              <option value="all">Todos los pagos</option>
+              <option value="approved">Aprobados</option>
+              <option value="pending">Pendientes</option>
+              <option value="rejected">Rechazados</option>
+            </select>
 
-        <!-- FILTROS -->
+            <select v-model="typeFilter">
+              <option value="all">Todos los tipos</option>
+              <option value="Estudiante">Estudiantes</option>
+              <option value="Docente">Docentes</option>
+              <option value="General">Generales</option>
+            </select>
+          </div>
 
-        <div class="filters">
+          <!-- TABLA -->
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Participante</th>
+                    <th>Control</th>
+                    <th>NSS</th>
+                    <th>Taller</th>
+                    <th>Visita industrial</th>
+                    <th>Tipo</th>
+                    <th>Correo</th>
+                    <th>Pago</th>
+                    <th>Asistencia</th>
+                    <th></th>
+                  </tr>
+                </thead>
 
-          <input
-            v-model="searchParticipants"
-            type="text"
-            placeholder="🔎 Buscar estudiante por nombre o folio..."
-          />
-
-
-          <select v-model="paymentFilter">
-
-            <option value="all">
-              Todos los pagos
-            </option>
-
-            <option value="approved">
-              Aprobados
-            </option>
-
-            <option value="pending">
-              Pendientes
-            </option>
-
-            <option value="rejected">
-              Rechazados
-            </option>
-
-          </select>
-
-
-          <select v-model="typeFilter">
-
-            <option value="all">
-              Todos los tipos
-            </option>
-
-            <option value="Estudiante">
-              Estudiantes
-            </option>
-
-            <option value="Docente">
-              Docentes
-            </option>
-
-            <option value="General">
-              Generales
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <!-- TABLA -->
-
-        <div class="card">
-
-          <div class="table-container">
-
-            <table>
-
-              <thead>
-
-                <tr>
-                  <th>Participante</th>
-                  <th>Control</th>
-                  <th>Tipo</th>
-                  <th>Correo</th>
-                  <th>Pago</th>
-                  <th>Asistencia</th>
-                  <th></th>
-                </tr>
-
-              </thead>
-
-
-              <tbody>
-
-                <tr
-                  v-for="participant in filteredParticipants"
-                  :key="participant.id"
-                >
-
-                  <td>
-
-                    <div class="table-user">
-
-                      <div class="avatar">
-                        {{ getInitials(participant.name) }}
-                      </div>
-
-                      <div>
-                        <strong>{{ participant.name }}</strong>
-                        <small class="student-folio">Folio: {{ getStudentFolio(participant) }}</small>
-                      </div>
-
-                    </div>
-
-                  </td>
-
-
-                  <td>
-                    {{ participant.control }}
-                  </td>
-
-
-                  <td>
-                    {{ participant.type }}
-                  </td>
-
-
-                  <td>
-                    {{ participant.email }}
-                  </td>
-
-
-                  <td>
-
-                    <span
-                      class="payment"
-                      :class="participant.payment"
-                    >
-                      {{ paymentText(participant.payment) }}
-                    </span>
-
-                  </td>
-
-
-                  <td>
-
-                    <span
-                      :class="[
-                        'attendance',
-                        { present: participant.attended }
-                      ]"
-                    >
-                      {{
-                        participant.attended
-                          ? '✓ Presente'
-                          : 'Pendiente'
-                      }}
-                    </span>
-
-                  </td>
-
-
-                  <td>
-
-                    <button
-                      class="view-button"
-                      @click="selectedParticipant = participant"
-                    >
-                      Ver
-                    </button>
-
-                  </td>
-
-                </tr>
-
-
-                <tr v-if="filteredParticipants.length === 0">
-
-                  <td
-                    colspan="7"
-                    class="empty-table"
+                <tbody>
+                  <tr
+                    v-for="participant in filteredParticipants"
+                    :key="participant.id"
                   >
-                    No se encontraron participantes.
-                  </td>
+                    <!-- PARTICIPANTE -->
+                    <td>
+                      <div class="table-user">
+                        <div class="avatar">
+                          {{ getInitials(participant.name) }}
+                        </div>
 
-                </tr>
+                        <div>
+                          <strong>{{ participant.name }}</strong>
+                          <small class="student-folio">
+                            Folio: {{ getStudentFolio(participant) }}
+                          </small>
+                        </div>
+                      </div>
+                    </td>
 
-              </tbody>
+                    <!-- NUMERO DE CONTROL -->
+                    <td>
+                      {{ participant.control || 'Sin registro' }}
+                    </td>
 
-            </table>
+                    <!-- NSS -->
+                    <td>
+                      {{
+                        participant.socialSecurityNumber ||
+                        participant.nss ||
+                        participant.numeroSeguroSocial ||
+                        'Sin NSS'
+                      }}
+                    </td>
 
+                    <!-- TALLER -->
+                    <td>
+                      {{ participant.workshop || 'No seleccionado' }}
+                    </td>
+
+                    <!-- VISITA INDUSTRIAL -->
+                    <td>
+                      {{ participant.industrialVisit || 'No seleccionada' }}
+                    </td>
+
+                    <!-- TIPO -->
+                    <td>
+                      {{ participant.type }}
+                    </td>
+
+                    <!-- CORREO -->
+                    <td>
+                      {{ participant.email }}
+                    </td>
+
+                    <!-- PAGO -->
+                    <td>
+                      <span
+                        class="payment"
+                        :class="participant.payment"
+                      >
+                        {{ paymentText(participant.payment) }}
+                      </span>
+                    </td>
+
+                    <!-- ASISTENCIA -->
+                    <td>
+                      <span
+                        :class="[
+                          'attendance',
+                          { present: participant.attended }
+                        ]"
+                      >
+                        {{
+                          participant.attended
+                            ? '✓ Presente'
+                            : 'Pendiente'
+                        }}
+                      </span>
+                    </td>
+
+                    <!-- ACCIONES -->
+                    <td>
+                      <button
+                        class="view-button"
+                        @click="selectedParticipant = participant"
+                      >
+                        Ver
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- SIN RESULTADOS -->
+                  <tr v-if="filteredParticipants.length === 0">
+                    <td
+                      colspan="10"
+                      class="empty-table"
+                    >
+                      No se encontraron participantes.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-
-        </div>
-
-      </section>
+        </section>
 
 
       <!-- =====================================================
