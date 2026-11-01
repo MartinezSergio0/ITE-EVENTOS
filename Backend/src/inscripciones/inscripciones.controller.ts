@@ -20,6 +20,7 @@ import { InscripcionesService } from './inscripciones.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { SubirComprobanteDto } from './dto/subir-comprobante.dto';
 import { GuardarAsistenciaDto } from './dto/guardar-asistencia.dto';
+import { ActualizarParticipanteDto } from './dto/actualizar-participante.dto';
 import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('eventos/:eventoId/inscripciones')
@@ -125,6 +126,16 @@ export class InscripcionesController {
     @Param('folio') folio: string,
   ) {
     return this.service.rechazarPago(eventoId, folio);
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('admin/:folio')
+  actualizarParticipante(
+    @Param('eventoId', ParseIntPipe) eventoId: number,
+    @Param('folio') folio: string,
+    @Body() dto: ActualizarParticipanteDto,
+  ) {
+    return this.service.actualizarParticipante(eventoId, folio, dto);
   }
 
   @UseGuards(AuthGuard)

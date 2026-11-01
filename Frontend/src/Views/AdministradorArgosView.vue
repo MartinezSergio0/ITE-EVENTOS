@@ -1041,7 +1041,8 @@
               <label for="attendanceType">Tipo de actividad</label>
               <select id="attendanceType" v-model="attendanceType">
                 <option value="evento">Evento general</option>
-                <option value="combinado">Taller / visita a empresa</option>
+                <option value="taller">Taller / visita a empresa</option>
+                <option value="actividad">Actividad</option>
               </select>
             </div>
 
@@ -1157,6 +1158,7 @@
                   <th>Nombre del estudiante</th>
                   <th>Folio</th>
                   <th>Control</th>
+                  <th>NSS</th>
                   <th>Asistencia</th>
                 </tr>
               </thead>
@@ -1192,6 +1194,10 @@
                   </td>
 
                   <td>
+                    {{ participant.nss || 'Sin NSS' }}
+                  </td>
+
+                  <td>
                     <button
                       type="button"
                       class="attendance-mark"
@@ -1205,13 +1211,15 @@
                 </tr>
 
                 <tr v-if="filteredAttendanceParticipants.length === 0">
-                  <td colspan="4" class="empty-table">
+                  <td colspan="5" class="empty-table">
                     {{
                       participants.length === 0
                         ? 'No hay participantes cargados. Revisa la conexión con el backend.'
-                        : attendanceParticipants.length === 0
-                          ? 'Nadie está inscrito en esta actividad.'
-                          : 'No se encontraron estudiantes con esa búsqueda.'
+                        : attendanceType !== 'evento' && !selectedAttendanceActivity
+                          ? 'No hay actividades registradas para este tipo.'
+                          : attendanceParticipants.length === 0
+                            ? 'Nadie está inscrito en esta actividad.'
+                            : 'No se encontraron estudiantes con esa búsqueda.'
                     }}
                   </td>
                 </tr>
@@ -1238,14 +1246,27 @@
               Los cambios se guardan en el sistema al presionar "Guardar lista".
             </span>
 
-            <button
-              type="button"
-              class="attendance-save"
-              :disabled="savingAttendance || !hasUnsavedAttendance"
-              @click="saveAttendance"
-            >
-              {{ savingAttendance ? 'Guardando...' : '💾 Guardar lista' }}
-            </button>
+            <div class="attendance-footer-actions">
+
+              <button
+                type="button"
+                class="attendance-export"
+                :disabled="attendanceParticipants.length === 0"
+                @click="exportAttendance"
+              >
+                📤 Exportar lista
+              </button>
+
+              <button
+                type="button"
+                class="attendance-save"
+                :disabled="savingAttendance || !hasUnsavedAttendance"
+                @click="saveAttendance"
+              >
+                {{ savingAttendance ? 'Guardando...' : '💾 Guardar lista' }}
+              </button>
+
+            </div>
 
           </div>
 
@@ -2741,6 +2762,13 @@ async function startEditingParticipant() {
 
   const participant = selectedParticipant.value;
 
+  // En la BD, "0" significa que no tiene número de control
+  const controlActual =
+    participant.control ||
+    participant.controlNumber ||
+    participant.numeroControl ||
+    "";
+
   participantForm.value = {
     name:
       participant.name ||
@@ -2749,11 +2777,7 @@ async function startEditingParticipant() {
       participant.nombreCompleto ||
       "",
 
-    control:
-      participant.control ||
-      participant.controlNumber ||
-      participant.numeroControl ||
-      "",
+    control: controlActual === "0" ? "" : controlActual,
 
     email:
       participant.email ||
@@ -2827,71 +2851,105 @@ watch(selectedParticipant, (participant) => {
 // =====================================================
 // GUARDAR CAMBIOS
 // =====================================================
+// PATCH /eventos/:id/inscripciones/admin/:folio
+// El backend vuelve a validar NSS, turno y cupo; si algo falla
+// responde con un mensaje que se muestra en el formulario.
 
-// Pendiente de confirmar la ruta PUT con el backend.
-// Mantener comentada hasta que el compañero confirme el endpoint.
+async function saveParticipantChanges() {
 
-/*
-Aquí conserva tu función saveParticipantChanges() comentada.
-
-const guardarCambiosParticipante = async () => {
   if (!selectedParticipant.value) return;
 
+  const datos = participantForm.value;
+
+  if (!datos.name.trim()) {
+    errorActividades.value = "El nombre no puede quedar vacío.";
+    return;
+  }
+
+  if (mismoTurnoEdicion.value) {
+    errorActividades.value =
+      "El taller y la visita industrial no pueden ser del mismo turno. " +
+      "Elige un taller matutino y una visita vespertina, o al contrario.";
+    return;
+  }
+
+  const nss = datos.socialSecurityNumber.replace(/[\s-]/g, "");
+
+  if (nss && !/^\d{11}$/.test(nss)) {
+    errorActividades.value = "El NSS debe tener exactamente 11 dígitos.";
+    return;
+  }
+
+  const folio =
+    selectedParticipant.value.folio ||
+    selectedParticipant.value.id;
+
+  savingParticipant.value = true;
+  errorActividades.value = "";
+
   try {
-    savingParticipant.value = true;
-    errorActividades.value = '';
-
-    const participanteId = selectedParticipant.value.id;
-
-    const datosActualizados = {
-      ...participantForm.value,
-      taller: participantForm.value.workshop || null,
-      visitaIndustrial: participantForm.value.industrialVisit || null
-    };
 
     const response = await fetch(
-      `${API_URL}/participantes/${participanteId}`,
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${encodeURIComponent(folio)}`,
       {
-        method: 'PUT',
+        method: "PATCH",
         headers: {
           ...authHeaders(),
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(datosActualizados)
+        body: JSON.stringify({
+          nombre: datos.name.trim(),
+          matricula: datos.control.trim(),
+          email: datos.email.trim() || undefined,
+          nss: nss || undefined,
+          taller: datos.workshop || undefined,
+          visitaEmpresa: datos.industrialVisit || undefined
+        })
       }
     );
 
+    if (response.status === 401) {
+      router.push("/login");
+      return;
+    }
+
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
+      const err = await response.json().catch(() => ({}));
+
       throw new Error(
-        error.message || 'No se pudieron guardar los cambios.'
+        Array.isArray(err.message)
+          ? err.message.join(" ")
+          : err.message || "No se pudieron guardar los cambios."
       );
     }
 
     await cargarParticipantes();
+    await cargarCuposEdicion();
 
-    // Actualizar el participante seleccionado con los datos del formulario
-    const participanteActualizado = participants.value.find(
-      participante => participante.id === participanteId
+    // Actualiza la ficha abierta con los datos que ya guardó el backend
+    const actualizado = participants.value.find(
+      participante => participante.id === folio
     );
 
-    if (participanteActualizado) {
-      selectedParticipant.value = participanteActualizado;
+    if (actualizado) {
+      selectedParticipant.value = actualizado;
     }
 
     editingParticipant.value = false;
 
-    alert('Los cambios se guardaron correctamente.');
+    alert("Los cambios se guardaron correctamente.");
 
-  } catch (error) {
-    console.error('Error al guardar participante:', error);
-    errorActividades.value = error.message || 'Ocurrio un error al guardar los cambios.';
+  } catch (e) {
+    console.error("Error al guardar participante:", e);
+
+    errorActividades.value =
+      e.message || "Ocurrió un error al guardar los cambios.";
 
   } finally {
     savingParticipant.value = false;
   }
-};
-*/
+
+}
 
 // =====================================================
 // INFORMACION COMPLETA DEL PARTICIPANTE
@@ -3031,6 +3089,8 @@ const participants = ref([]);
 // =====================================================
 
 const attendanceOptions = ref({ evento: null, talleres: [], actividades: [] });
+
+// "evento" (general), "taller" (talleres y visitas) o "actividad"
 const attendanceType = ref("evento");
 const attendanceActivityId = ref(null);
 const attendanceDate = ref(new Date().toLocaleDateString("en-CA"));
@@ -3048,22 +3108,28 @@ function authHeaders() {
   return { Authorization: `Bearer ${localStorage.getItem("token")}` };
 }
 
-// Une talleres y visitas a empresas en una sola lista.
+// Opciones del segundo desplegable según el tipo elegido:
+//  - "taller":    talleres y visitas a empresas (tabla "taller")
+//  - "actividad": actividades del evento (tabla "actividad")
 // Se usa una clave compuesta para evitar conflictos si dos IDs coinciden.
 const attendanceActivities = computed(() => {
-  const talleres = (attendanceOptions.value.talleres || []).map(a => ({
-    ...a,
-    tipo: "taller",
-    clave: `taller:${a.id}`
-  }));
+  if (attendanceType.value === "taller") {
+    return (attendanceOptions.value.talleres || []).map(a => ({
+      ...a,
+      tipo: "taller",
+      clave: `taller:${a.id}`
+    }));
+  }
 
-  const actividades = (attendanceOptions.value.actividades || []).map(a => ({
-    ...a,
-    tipo: "actividad",
-    clave: `actividad:${a.id}`
-  }));
+  if (attendanceType.value === "actividad") {
+    return (attendanceOptions.value.actividades || []).map(a => ({
+      ...a,
+      tipo: "actividad",
+      clave: `actividad:${a.id}`
+    }));
+  }
 
-  return [...talleres, ...actividades];
+  return [];
 });
 
 // Actividad elegida en el segundo desplegable.
@@ -3071,7 +3137,7 @@ const selectedAttendanceActivity = computed(() =>
   attendanceActivities.value.find(a => a.clave === attendanceActivityId.value) || null
 );
 
-// El backend sigue recibiendo los tipos originales: evento, taller o actividad.
+// El backend sigue recibiendo los tipos originales
 const attendanceBackendType = computed(() => {
   if (attendanceType.value === "evento") return "evento";
   return selectedAttendanceActivity.value?.tipo ?? null;
@@ -3084,17 +3150,19 @@ const attendanceActivityName = computed(() => {
 
 // Quien aparece en la lista.
 const attendanceParticipants = computed(() => {
+  // Si falta elegir actividad (o no hay ninguna), la lista queda vacía.
+  if (attendanceType.value !== "evento" && !selectedAttendanceActivity.value) {
+    return [];
+  }
+
   const nombre = attendanceActivityName.value;
 
+  // Taller o visita: quienes lo eligieron en cualquiera de los dos campos.
   if (attendanceBackendType.value === "taller") {
     return participants.value.filter(p => p.workshop === nombre || p.industrialVisit === nombre);
   }
 
-  if (attendanceBackendType.value === "actividad") {
-    const inscritos = participants.value.filter(p => p.industrialVisit === nombre);
-    return inscritos.length ? inscritos : participants.value;
-  }
-
+  // Evento general y actividades: todos los participantes.
   return participants.value;
 });
 
@@ -3178,17 +3246,17 @@ async function cargarAsistencia() {
   }
 }
 
-// Al cambiar entre evento general y la lista combinada, selecciona la primera actividad.
+// Al cambiar el tipo de actividad, selecciona la primera opción de esa lista.
 watch(attendanceType, () => {
   attendanceActivityId.value =
-    attendanceType.value === "combinado"
-      ? attendanceActivities.value[0]?.clave ?? null
-      : null;
+    attendanceType.value === "evento"
+      ? null
+      : attendanceActivities.value[0]?.clave ?? null;
 });
 
 // Cuando llegan las opciones desde el backend, establece una selección inicial.
 watch(attendanceOptions, () => {
-  if (attendanceType.value === "combinado" &&
+  if (attendanceType.value !== "evento" &&
       !attendanceActivities.value.some(a => a.clave === attendanceActivityId.value)) {
     attendanceActivityId.value = attendanceActivities.value[0]?.clave ?? null;
   }
@@ -3223,6 +3291,69 @@ function clearAttendanceMarks() {
     return;
   }
   attendanceMarks.value = {};
+}
+
+
+// =====================================================
+// EXPORTAR LISTA 
+// =====================================================
+function csvCell(value, soloTexto = false) {
+  let texto = value === null || value === undefined ? "" : String(value);
+
+  if (soloTexto && /^\d+$/.test(texto)) {
+    return `"=""${texto}"""`;
+  }
+
+  if (/^[=+\-@\t\r]/.test(texto)) {
+    texto = `'${texto}`;
+  }
+
+  return `"${texto.replace(/"/g, '""')}"`;
+}
+
+// Exporta la lista completa de la actividad 
+function exportAttendance() {
+  const lista = attendanceParticipants.value;
+
+  if (!lista.length) return;
+
+  const filas = [
+    [csvCell("Actividad"), csvCell(attendanceActivityName.value)],
+    [csvCell("Fecha"), csvCell(attendanceDate.value)],
+    [],
+    ["Nombre", "Folio", "Control", "NSS", "Asistencia"].map(titulo => csvCell(titulo))
+  ];
+
+  lista.forEach(p => {
+    filas.push([
+      csvCell(p.name || ""),
+      csvCell(getStudentFolio(p), true),
+      csvCell(p.control && p.control !== "0" ? p.control : "", true),
+      csvCell(p.nss || "", true),
+      csvCell(isPresent(p) ? "Presente" : "Ausente")
+    ]);
+  });
+
+  // "\uFEFF" 
+  const contenido = "\uFEFF" + filas.map(fila => fila.join(",")).join("\r\n");
+
+  const nombreArchivo = attendanceActivityName.value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 60);
+
+  const blob = new Blob([contenido], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download =
+    `lista_${nombreArchivo || "asistencia"}_${attendanceDate.value || "sin_fecha"}.csv`;
+  link.click();
+
+  URL.revokeObjectURL(url);
 }
 
 // Pistola 
@@ -5984,6 +6115,13 @@ td {
   font-weight: 600;
 }
 
+.attendance-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .attendance-save {
   flex-shrink: 0;
   padding: 12px 18px;
@@ -6003,6 +6141,27 @@ td {
 .attendance-save:disabled {
   background: #cfd8dc;
   color: #78909c;
+  cursor: not-allowed;
+}
+
+.attendance-export {
+  flex-shrink: 0;
+  padding: 12px 18px;
+  border: 1px solid #dfe5eb;
+  border-radius: 9px;
+  background: #f8fafc;
+  color: #003366;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attendance-export:hover:not(:disabled) {
+  background: #e3f2fd;
+}
+
+.attendance-export:disabled {
+  opacity: .5;
   cursor: not-allowed;
 }
 
@@ -6034,7 +6193,13 @@ td {
     flex-direction: column;
   }
 
-  .attendance-save {
+  .attendance-footer-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .attendance-save,
+  .attendance-export {
     width: 100%;
   }
 

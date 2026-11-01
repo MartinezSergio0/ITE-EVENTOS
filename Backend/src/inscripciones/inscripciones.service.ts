@@ -8,6 +8,7 @@ import { SupabaseService } from '../supabase/supabase.service';
 import { CreateInscripcionDto } from './dto/create-inscripcion.dto';
 import { SubirComprobanteDto } from './dto/subir-comprobante.dto';
 import { GuardarAsistenciaDto } from './dto/guardar-asistencia.dto';
+import { ActualizarParticipanteDto } from './dto/actualizar-participante.dto';
 
 const CODIGO_TIPO: Record<string, number> = {
   'Participante general': 1,
@@ -40,7 +41,8 @@ interface DatosInscripcion {
   nss: string | null;
 }
 
-// Opciones del QR. Nivel de corrección "M"  y margen de 2 modulos
+// Opciones del código QR del folio. Nivel de corrección "M" (aguanta
+// ~15% de daño) y margen de 2 módulos para que la pistola lo lea fácil.
 const OPCIONES_QR = {
   errorCorrectionLevel: 'M',
   margin: 2,
@@ -145,6 +147,9 @@ export class InscripcionesService {
     };
   }
 
+  // Turno de un taller o visita según el sufijo de su nombre en la tabla
+  // "taller": "(matutino)", "(vespertino)" o "(vespertino II)".
+  // Si el nombre no trae turno, devuelve null y no se bloquea nada.
   private turnoDe(nombre: string): 'matutino' | 'vespertino' | null {
     const match = /\((matutino|vespertino)/i.exec(nombre);
     return match ? (match[1].toLowerCase() as 'matutino' | 'vespertino') : null;
@@ -162,6 +167,9 @@ export class InscripcionesService {
       );
     }
 
+    // NSS del IMSS: obligatorio, 11 dígitos (se aceptan espacios o guiones
+    // al escribirlo). La BD rechaza cualquier valor que no sean 11 dígitos,
+    // por eso aquí nunca se manda una cadena vacía.
     const nss = this.requerir(dto.nss, 'NSS').replace(/[\s-]/g, '');
     if (!/^\d{11}$/.test(nss)) {
       throw new BadRequestException('El NSS debe tener exactamente 11 dígitos.');
@@ -187,6 +195,10 @@ export class InscripcionesService {
   // =====================================================
   // HELPERS — cupo de talleres y visitas (ARGOS)
   // =====================================================
+  // Los talleres y las visitas viven en la misma tabla "taller".
+  // Un lugar cuenta a toda persona registrada (sin importar el estado
+  // de su pago) que tenga ese nombre en "taller" o en "visita_empresa".
+  // Si "capacidad" viene vacía, el lugar no tiene límite.
 
   private async verificarCupo(
     db: Pick<PrismaService, 'taller' | 'participantes'>,
@@ -222,18 +234,24 @@ export class InscripcionesService {
     }
   }
 
+  // La columna nss es UNIQUE: se revisa antes de insertar para responder
+  // con un mensaje claro en lugar de un error de base de datos.
   private async verificarNssLibre(
     db: Pick<PrismaService, 'participantes'>,
     nss: string,
+    excluirFolio?: string,
   ): Promise<void> {
     const existe = await db.participantes.findFirst({
-      where: { nss },
+      where: {
+        nss,
+        ...(excluirFolio ? { NOT: { folio: excluirFolio } } : {}),
+      },
       select: { folio: true },
     });
 
     if (existe) {
       throw new ConflictException(
-        'Ese NSS ya está registrado', //Mensaje a cambiar
+        'Ese NSS ya está registrado. Si crees que es un error, contacta al comité organizador.',
       );
     }
   }
@@ -303,9 +321,9 @@ export class InscripcionesService {
         },
       });
 
-    // revisa el cupo del taller/visita  antes de
-    // inscribir evita que dos personas tomen el último lugar
-    // al mismo tiempo (se libera solo al terminar la transaccion).
+    // ARGOS: se revisa el cupo del taller y de la visita justo antes de
+    // inscribir. El candado evita que dos personas tomen el último lugar
+    // al mismo tiempo (se libera solo al terminar la transacción).
     const participante =
       perfil === 'estudiantil'
         ? await this.prisma.$transaction(async (tx) => {
@@ -317,9 +335,11 @@ export class InscripcionesService {
           })
         : await crearRegistro(this.prisma);
 
+    // El QR contiene únicamente el folio. Si falla al generarse, el
+    // registro ya quedó guardado, así que se responde con qr: null.
     const qr = await this.generarQrDataUrl(participante.folio);
 
-    // El NSS no se devuelve en la respuesta publica del registro.
+    // El NSS no se devuelve en la respuesta pública del registro.
     const { nss: _nss, ...registro } = participante;
 
     return { ...registro, qr };
@@ -360,8 +380,12 @@ export class InscripcionesService {
   }
 
   // =====================================================
-  // PUBLICO — codigo QR del folio
+  // PUBLICO — código QR del folio
   // =====================================================
+  // El QR codifica solo el folio, como texto plano. Así la pistola lo
+  // "escribe" igual que si lo tecleara y handleScan lo compara con el folio.
+
+  // Imagen en base64 (data URL) para usar directo en <img :src="...">
   private async generarQrDataUrl(folio: string): Promise<string | null> {
     try {
       return await QRCode.toDataURL(folio.trim(), OPCIONES_QR);
@@ -371,17 +395,19 @@ export class InscripcionesService {
       return null;
     }
   }
- 
+
+  // PNG para el endpoint GET .../qr/:folio. Solo genera QR de folios que
+  // existen en este evento, para que no sirva como generador de QR en general.
   async obtenerQrPng(eventoId: number, folio: string): Promise<Buffer> {
     const participante = await this.prisma.participantes.findFirst({
       where: { evento: eventoId, folio },
       select: { folio: true },
     });
- 
+
     if (!participante) {
       throw new NotFoundException('No se encontró una inscripción con ese folio.');
     }
- 
+
     return QRCode.toBuffer(participante.folio.trim(), OPCIONES_QR);
   }
 
@@ -412,6 +438,7 @@ export class InscripcionesService {
       fechaRegistro: participante.fecha_registro
         ? new Date(participante.fecha_registro).toLocaleDateString('es-MX')
         : null,
+      qr: await this.generarQrDataUrl(participante.folio),
     };
   }
 
@@ -667,6 +694,101 @@ export class InscripcionesService {
   }
   
   // =====================================================
+  // ADMIN — editar participante
+  // =====================================================
+  // Solo se modifica lo que llega en el body. Si cambia el taller o la
+  // visita se valida el turno y el cupo de lo nuevo, con el mismo candado
+  // que usa el registro. Lo que no cambia no se vuelve a validar, para que
+  // corregir un nombre no falle porque el taller ya esté lleno.
+
+  async actualizarParticipante(
+    eventoId: number,
+    folio: string,
+    dto: ActualizarParticipanteDto,
+  ) {
+    const actual = await this.prisma.participantes.findFirst({
+      where: { evento: eventoId, folio },
+    });
+
+    if (!actual) {
+      throw new NotFoundException('Participante no encontrado.');
+    }
+
+    const data: {
+      nombre?: string;
+      matricula?: string;
+      correo_electronico?: string;
+      nss?: string;
+      taller?: string;
+      visita_empresa?: string;
+    } = {};
+
+    if (dto.nombre !== undefined) {
+      const nombre = dto.nombre.trim();
+      if (!nombre) {
+        throw new BadRequestException('El nombre no puede quedar vacío.');
+      }
+      data.nombre = nombre;
+    }
+
+    if (dto.matricula !== undefined) {
+      data.matricula = dto.matricula.trim() || '0';
+    }
+
+    if (dto.email !== undefined) {
+      data.correo_electronico = dto.email.trim();
+    }
+
+    // NSS: 11 dígitos. Si viene vacío no se modifica (es obligatorio).
+    const nssTexto = dto.nss?.trim();
+    if (nssTexto) {
+      const nss = nssTexto.replace(/[\s-]/g, '');
+      if (!/^\d{11}$/.test(nss)) {
+        throw new BadRequestException('El NSS debe tener exactamente 11 dígitos.');
+      }
+      if (nss !== actual.nss) data.nss = nss;
+    }
+
+    const tallerNuevo = dto.taller?.trim();
+    const visitaNueva = dto.visitaEmpresa?.trim();
+    const cambiaTaller = Boolean(tallerNuevo) && tallerNuevo !== actual.taller;
+    const cambiaVisita = Boolean(visitaNueva) && visitaNueva !== actual.visita_empresa;
+
+    if (cambiaTaller || cambiaVisita) {
+      const tallerFinal = (cambiaTaller ? tallerNuevo : actual.taller) ?? '';
+      const visitaFinal = (cambiaVisita ? visitaNueva : actual.visita_empresa) ?? '';
+
+      const turnoTaller = this.turnoDe(tallerFinal);
+      if (turnoTaller && turnoTaller === this.turnoDe(visitaFinal)) {
+        throw new BadRequestException(
+          'El taller y la visita industrial no pueden estar en el mismo turno.',
+        );
+      }
+
+      if (cambiaTaller) data.taller = tallerNuevo!;
+      if (cambiaVisita) data.visita_empresa = visitaNueva!;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return { folio, actualizado: false };
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(${eventoId}::bigint)`;
+
+      if (data.nss) await this.verificarNssLibre(tx, data.nss, folio);
+      if (data.taller) await this.verificarCupo(tx, eventoId, data.taller, 'taller');
+      if (data.visita_empresa) {
+        await this.verificarCupo(tx, eventoId, data.visita_empresa, 'visita');
+      }
+
+      await tx.participantes.update({ where: { folio }, data });
+    });
+
+    return { folio, actualizado: true };
+  }
+
+  // =====================================================
   // ADMIN — asistencia
   // =====================================================
 
@@ -710,7 +832,7 @@ export class InscripcionesService {
 
     if (!evento) throw new NotFoundException('El evento no existe');
 
-    // Los ids son BigInt convertirlos o JSON.stringify truena
+    // Los ids son BigInt: hay que convertirlos o JSON.stringify truena
     return {
       evento: { id: eventoId, nombre: evento.nombre },
       talleres: talleres.map((t) => ({ id: Number(t.id), nombre: t.nombre })),
@@ -735,8 +857,8 @@ export class InscripcionesService {
     return { presentes: filas.map((f) => f.participante.trim()) };
   }
 
-  // Aplica solo los cambios de este locales (agregar / quitar),
-  //  varios  pueden guardar sin pisarse
+  // Aplica solo los cambios de este dispositivo (agregar / quitar),
+  // así varias pistolas pueden guardar sin pisarse entre sí.
   async guardarAsistencia(eventoId: number, dto: GuardarAsistenciaDto) {
     const objetivo = await this.objetivoAsistencia(eventoId, dto.tipo, dto.actividadId);
     const { inicio, fin } = this.rangoDia(dto.fecha);
