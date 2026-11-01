@@ -1500,10 +1500,6 @@
     ====================================================== -->
 
 
-<!-- =====================================================
-     MODAL PARTICIPANTE
-====================================================== -->
-
 <div
   v-if="selectedParticipant"
   class="modal-overlay"
@@ -1596,23 +1592,78 @@
         />
       </div>
 
-      <div class="edit-field">
-        <label>Taller</label>
-        <input
-          v-model="participantForm.workshop"
-          type="text"
-          placeholder="Taller registrado"
-        />
-      </div>
+      
+<div class="edit-field">
+  <label for="editWorkshop">Taller</label>
 
-      <div class="edit-field">
-        <label>Visita industrial</label>
-        <input
-          v-model="participantForm.industrialVisit"
-          type="text"
-          placeholder="Visita industrial"
-        />
-      </div>
+  <select
+    id="editWorkshop"
+    v-model="participantForm.workshop"
+    :disabled="savingParticipant"
+  >
+    <option value="">Selecciona un taller</option>
+
+    <optgroup label="Matutino">
+      <option
+        v-for="item in talleresMatutinosEdicion"
+        :key="item.id"
+        :value="item.nombre"
+      >
+        {{ item.nombre }} — {{ textoCupo(item) }}
+      </option>
+    </optgroup>
+
+    <optgroup label="Vespertino">
+      <option
+        v-for="item in talleresVespertinosEdicion"
+        :key="item.id"
+        :value="item.nombre"
+      >
+        {{ item.nombre }} — {{ textoCupo(item) }}
+      </option>
+    </optgroup>
+  </select>
+</div>
+
+<div class="edit-field">
+  <label for="editIndustrialVisit">Visita industrial</label>
+
+  <select
+    id="editIndustrialVisit"
+    v-model="participantForm.industrialVisit"
+    :disabled="savingParticipant"
+  >
+    <option value="">Selecciona una visita industrial</option>
+
+    <optgroup label="Matutinas">
+      <option
+        v-for="item in empresasMatutinasEdicion"
+        :key="item.id"
+        :value="item.nombre"
+      >
+        {{ item.nombre }} — {{ textoCupo(item) }}
+      </option>
+    </optgroup>
+
+    <optgroup label="Vespertinas">
+      <option
+        v-for="item in empresasVespertinasEdicion"
+        :key="item.id"
+        :value="item.nombre"
+      >
+        {{ item.nombre }} — {{ textoCupo(item) }}
+      </option>
+    </optgroup>
+  </select>
+</div>
+
+<p
+  v-if="errorActividades"
+  class="activity-error"
+>
+  {{ errorActividades }}
+</p>
+
 
     </div>
 
@@ -1848,6 +1899,139 @@ const route = useRoute();
 const EVENTO_ID = 5;
 
 
+const cuposEdicion = ref({});
+const errorActividades = ref("");
+
+async function cargarCuposEdicion() {
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/cupos`
+    );
+
+    if (!response.ok) {
+      throw new Error("No se pudieron consultar los cupos.");
+    }
+
+    const data = await response.json();
+
+    cuposEdicion.value = Object.fromEntries(
+      data.map(item => [item.nombre, item])
+    );
+  } catch (error) {
+    console.error("Error al cargar cupos:", error);
+    errorActividades.value =
+      "No se pudieron consultar los cupos. Intenta nuevamente.";
+  }
+}
+
+function conCupoEdicion(item, seleccionActual) {
+  const cupo = cuposEdicion.value[item.nombre];
+
+  // Si la actividad no aparece en la respuesta, no inventamos disponibilidad.
+  if (!cupo) {
+    return {
+      ...item,
+      disponible: false,
+      esSeleccionActual: item.nombre === seleccionActual,
+      textoDisponibilidad: "Cupo no confirmado"
+    };
+  }
+
+  const disponibles = Number(cupo.disponibles ?? 0);
+  const esSeleccionActual = item.nombre === seleccionActual;
+
+  return {
+    ...item,
+    capacidad: cupo.capacidad ?? item.capacidad,
+    disponibles,
+    esSeleccionActual,
+
+    // Se conserva la selección actual aunque esté llena.
+    disponible: disponibles > 0 || esSeleccionActual,
+
+    textoDisponibilidad:
+      disponibles > 0
+        ? `${disponibles} lugares disponibles`
+        : esSeleccionActual
+          ? "Selección actual"
+          : "Sin lugares disponibles"
+  };
+}
+
+const talleresMatutinosEdicion = computed(() =>
+  talleres
+    .filter(item => item.turno === "Matutino")
+    .map(item =>
+      conCupoEdicion(item, participantForm.value.workshop)
+    )
+    .filter(item => item.disponible)
+);
+
+const talleresVespertinosEdicion = computed(() =>
+  talleres
+    .filter(item => item.turno === "Vespertino")
+    .map(item =>
+      conCupoEdicion(item, participantForm.value.workshop)
+    )
+    .filter(item => item.disponible)
+);
+
+const empresasMatutinasEdicion = computed(() =>
+  empresas
+    .filter(item => item.turno === "Matutino")
+    .map(item =>
+      conCupoEdicion(item, participantForm.value.industrialVisit)
+    )
+    .filter(item => item.disponible)
+);
+
+const empresasVespertinasEdicion = computed(() =>
+  empresas
+    .filter(item => item.turno === "Vespertino")
+    .map(item =>
+      conCupoEdicion(item, participantForm.value.industrialVisit)
+    )
+    .filter(item => item.disponible)
+);
+
+function textoCupo(item) {
+  return item.textoDisponibilidad;
+}
+
+const mismoTurnoEdicion = computed(() => {
+  const taller = talleres.find(
+    item => item.nombre === participantForm.value.workshop
+  );
+
+  const empresa = empresas.find(
+    item => item.nombre === participantForm.value.industrialVisit
+  );
+
+  return Boolean(
+    taller &&
+    empresa &&
+    taller.turno === empresa.turno
+  );
+});
+
+watch(
+  () => [
+    participantForm.value.workshop,
+    participantForm.value.industrialVisit
+  ],
+  () => {
+    errorActividades.value = "";
+
+    if (mismoTurnoEdicion.value) {
+      errorActividades.value =
+        "El taller y la visita industrial no pueden ser del mismo turno. " +
+        "Elige un taller matutino y una visita vespertina, o al contrario.";
+    }
+  }
+);
+
+
+
 // =====================================================
 // SIDEBAR
 // =====================================================
@@ -1935,8 +2119,8 @@ const participantForm = ref({
 });
 
 // Abrir formulario de edicion
-function startEditingParticipant() {
 
+async function startEditingParticipant() {
   if (!selectedParticipant.value) return;
 
   const participant = selectedParticipant.value;
@@ -1978,7 +2162,11 @@ function startEditingParticipant() {
   };
 
   editingParticipant.value = true;
+  errorActividades.value = "";
+
+  await cargarCuposEdicion();
 }
+
 
 // Cancelar edicion
 function cancelEditingParticipant() {
@@ -2018,20 +2206,72 @@ watch(selectedParticipant, (participant) => {
 // PARA GUARDAR LA NUEVA INFO DEL PARTICIPANTE 
 // =====================================================
 
+
 /* async function saveParticipantChanges() {
+  if (!selectedParticipant.value || savingParticipant.value) return;
 
-  if (!selectedParticipant.value) return;
+  const form = participantForm.value;
 
-  if (savingParticipant.value) return;
-
-  // Validaciones basicas
-  if (!participantForm.value.name.trim()) {
+  if (!form.name.trim()) {
     alert("El nombre del participante es obligatorio.");
     return;
   }
 
-  if (!participantForm.value.email.trim()) {
-    alert("El correo electronico es obligatorio.");
+  if (!form.email.trim()) {
+    alert("El correo electrónico es obligatorio.");
+    return;
+  }
+
+  if (!form.workshop || !form.industrialVisit) {
+    errorActividades.value =
+      "Selecciona un taller y una visita industrial.";
+    return;
+  }
+
+  if (mismoTurnoEdicion.value) {
+    errorActividades.value =
+      "El taller y la visita industrial no pueden ser del mismo turno.";
+    return;
+  }
+
+  // Evita seleccionar una actividad agotada como nueva opción.
+  const tallerOriginal =
+    selectedParticipant.value.workshop ||
+    selectedParticipant.value.taller ||
+    "";
+
+  const visitaOriginal =
+    selectedParticipant.value.industrialVisit ||
+    selectedParticipant.value.visitaIndustrial ||
+    "";
+
+  const tallerElegido = talleres.find(
+    item => item.nombre === form.workshop
+  );
+
+  const visitaElegida = empresas.find(
+    item => item.nombre === form.industrialVisit
+  );
+
+  if (!tallerElegido || !visitaElegida) {
+    alert("Una de las actividades seleccionadas no es válida.");
+    return;
+  }
+
+  const cupoTaller = cuposEdicion.value[form.workshop];
+  const cupoVisita = cuposEdicion.value[form.industrialVisit];
+
+  if (form.workshop !== tallerOriginal &&
+      (!cupoTaller || Number(cupoTaller.disponibles ?? 0) <= 0)) {
+    alert("El taller seleccionado no tiene lugares disponibles.");
+    await cargarCuposEdicion();
+    return;
+  }
+
+  if (form.industrialVisit !== visitaOriginal &&
+      (!cupoVisita || Number(cupoVisita.disponibles ?? 0) <= 0)) {
+    alert("La visita industrial seleccionada no tiene lugares disponibles.");
+    await cargarCuposEdicion();
     return;
   }
 
@@ -2043,16 +2283,15 @@ watch(selectedParticipant, (participant) => {
 
     // Datos que recibira el backend
     const dataToSend = {
-      name: participantForm.value.name.trim(),
-      control: participantForm.value.control.trim(),
-      email: participantForm.value.email.trim(),
-      socialSecurityNumber:
-        participantForm.value.socialSecurityNumber.trim(),
-      workshop: participantForm.value.workshop.trim(),
-      industrialVisit: participantForm.value.industrialVisit.trim()
+      name: form.name.trim(),
+      control: form.control.trim(),
+      email: form.email.trim(),
+      socialSecurityNumber: form.socialSecurityNumber.trim(),
+      workshop: form.workshop,
+      industrialVisit: form.industrialVisit
     };
 
-    // Ruta que debera crear el backend
+     // Ruta que debera crear el backend
     const response = await fetch(
       `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participantId}`,
       {
@@ -2069,39 +2308,48 @@ watch(selectedParticipant, (participant) => {
 
     if (!response.ok) {
       throw new Error(
-        result.message || "No se pudieron guardar los cambios."
+        result.message ||
+        result.error ||
+        "No se pudieron guardar los cambios. Verifica la ruta del backend."
       );
     }
 
     // Actualizar los datos en la tabla
     await cargarParticipantes();
+    await cargarCuposEdicion();
 
-    // Recuperar el participante actualizado
     const updatedParticipant = participants.value.find(
-      p => String(p.id) === String(participantId)
+      participant => String(participant.id) === String(participantId)
     );
 
     if (updatedParticipant) {
       selectedParticipant.value = updatedParticipant;
+    } else {
+      selectedParticipant.value = {
+        ...selectedParticipant.value,
+        ...dataToSend
+      };
     }
 
     editingParticipant.value = false;
+    errorActividades.value = "";
 
-    alert("Los datos del participante se actualizaron correctamente.");
-
+    alert("Los cambios se guardaron correctamente.");
   } catch (error) {
 
     console.error("Error al actualizar participante:", error);
 
-    alert(error.message || "Ocurrio un error al guardar los cambios.");
-
+    alert(
+      error.message ||
+      "Ocurrió un error al guardar los cambios."
+    );
   } finally {
 
     savingParticipant.value = false;
-
   }
 
-} */
+}
+ */
 
 
 
