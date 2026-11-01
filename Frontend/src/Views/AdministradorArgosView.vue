@@ -1603,34 +1603,35 @@
   <div class="custom-dropdown">
 
     <!-- BOTON PRINCIPAL -->
-    <button
-      id="editWorkshop"
-      type="button"
-      class="dropdown-trigger"
-      :class="{
-        'dropdown-active': dropdownEdicionAbierto === 'taller'
-      }"
-      :disabled="savingParticipant"
-      :aria-expanded="dropdownEdicionAbierto === 'taller'"
-      @click="toggleDropdownEdicion('taller')"
-    >
-      <span
-        :class="{
-          'dropdown-placeholder': !participantForm.workshop
-        }"
-      >
-        {{ participantForm.workshop || 'Selecciona un taller' }}
-      </span>
+<button
+  id="editWorkshop"
+  type="button"
+  class="dropdown-trigger"
+  :class="{
+    'dropdown-active': dropdownEdicionAbierto === 'taller'
+  }"
+  :disabled="savingParticipant"
+  :aria-expanded="dropdownEdicionAbierto === 'taller'"
+  @click="toggleDropdownEdicion('taller')"
+>
+  <span class="dropdown-icon">📚</span>
 
-      <span
-        class="dropdown-arrow"
-        :class="{
-          rotated: dropdownEdicionAbierto === 'taller'
-        }"
-      >
-        ▼
-      </span>
-    </button>
+  <span class="dropdown-trigger-content">
+    <strong>
+      {{ participantForm.workshop || 'Selecciona un taller' }}
+    </strong>
+    <small>Elige el taller al que asistirá el participante</small>
+  </span>
+
+  <span
+    class="dropdown-arrow"
+    :class="{
+      rotated: dropdownEdicionAbierto === 'taller'
+    }"
+  >
+    ▼
+  </span>
+</button>
 
     <!-- LISTA DE TALLERES -->
     <div
@@ -1761,36 +1762,35 @@
 
     <!-- BOTON PRINCIPAL -->
     <button
-      id="editIndustrialVisit"
-      type="button"
-      class="dropdown-trigger"
-      :class="{
-        'dropdown-active': dropdownEdicionAbierto === 'empresa'
-      }"
-      :disabled="savingParticipant"
-      :aria-expanded="dropdownEdicionAbierto === 'empresa'"
-      @click="toggleDropdownEdicion('empresa')"
-    >
-      <span
-        :class="{
-          'dropdown-placeholder': !participantForm.industrialVisit
-        }"
-      >
-        {{
-          participantForm.industrialVisit ||
-          'Selecciona una visita industrial'
-        }}
-      </span>
+  id="editIndustrialVisit"
+  type="button"
+  class="dropdown-trigger"
+  :class="{
+    'dropdown-active': dropdownEdicionAbierto === 'empresa',
+    'has-selection': participantForm.industrialVisit
+  }"
+  :disabled="savingParticipant"
+  :aria-expanded="dropdownEdicionAbierto === 'empresa'"
+  @click="toggleDropdownEdicion('empresa')"
+>
+  <span class="dropdown-icon">🏭</span>
 
-      <span
-        class="dropdown-arrow"
-        :class="{
-          rotated: dropdownEdicionAbierto === 'empresa'
-        }"
-      >
-        ▼
-      </span>
-    </button>
+  <span class="dropdown-trigger-content">
+    <strong>
+      {{ participantForm.industrialVisit || 'Selecciona una visita industrial' }}
+    </strong>
+    <small>
+      {{ participantForm.industrialVisit ? 'Visita seleccionada' : 'Elige una empresa disponible' }}
+    </small>
+  </span>
+
+  <span
+    class="dropdown-arrow"
+    :class="{ rotated: dropdownEdicionAbierto === 'empresa' }"
+  >
+    ▼
+  </span>
+</button>
 
     <!-- LISTA DE EMPRESAS -->
     <div
@@ -4485,6 +4485,279 @@ async function cargarEvento() {
 
   margin: auto;
 
+}
+
+
+/* =========================================
+   DROPDOWNS DE EDICION
+========================================= */
+
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+/* BOTON PRINCIPAL */
+
+.dropdown-trigger {
+  width: 100%;
+  min-height: 76px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid #dce3ed;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #263449;
+}
+
+.dropdown-trigger:hover {
+  border-color: #8ba8d8;
+  background: #f9fbff;
+}
+
+.dropdown-trigger.dropdown-active {
+  border-color: #315fba;
+  box-shadow: 0 0 0 3px rgba(49, 95, 186, 0.10);
+}
+
+.dropdown-trigger.has-selection {
+  border-color: #b8c9e9;
+  background: #f8faff;
+}
+
+.dropdown-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dropdown-icon {
+  width: 43px;
+  height: 43px;
+  min-width: 43px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #edf3ff;
+  border-radius: 12px;
+  font-size: 21px;
+}
+
+.dropdown-trigger-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown-trigger-content strong {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.dropdown-trigger-content small {
+  color: #8490a3;
+  font-size: 11px;
+}
+
+.dropdown-arrow {
+  color: #738198;
+  font-size: 12px;
+  transition: transform 0.25s ease;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+/* MENU DESPLEGABLE */
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 100;
+  top: calc(100% + 9px);
+  left: 0;
+  right: 0;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 9px;
+  background: #ffffff;
+  border: 1px solid #e3e8f0;
+  border-radius: 15px;
+  box-shadow: 0 14px 35px rgba(25, 42, 70, 0.15);
+  animation: dropdownAppear 0.18s ease;
+}
+
+@keyframes dropdownAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ENCABEZADOS DE TURNOS */
+
+.dropdown-group-title {
+  position: sticky;
+  top: -9px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 10px;
+  margin-bottom: 5px;
+  background: #f3f6fb;
+  color: #52637c;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  border-radius: 8px;
+}
+
+/* OPCIONES */
+
+.dropdown-option {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px;
+  margin-bottom: 5px;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dropdown-option:hover:not(:disabled) {
+  background: #f5f8ff;
+  border-color: #d5e2fa;
+}
+
+.dropdown-option.option-selected {
+  background: #eef4ff;
+  border-color: #9bb8ed;
+}
+
+.dropdown-option.option-disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  background: #f7f7f8;
+}
+
+.option-name {
+  padding-right: 25px;
+  color: #29384e;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.option-details {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.option-details span {
+  padding: 5px 8px;
+  color: #65738a;
+  background: #f1f4f8;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.option-details span:last-child {
+  color: #23734c;
+  background: #eaf7ef;
+}
+
+.option-details span.option-full {
+  color: #b42318;
+  background: #fff0ef;
+}
+
+.option-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 21px;
+  height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: #315fba;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* MENSAJE DE VALIDACION */
+
+.activity-error {
+  margin-top: 12px;
+  padding: 12px 14px;
+  color: #a52b2b;
+  background: #fff1f0;
+  border: 1px solid #ffd2ce;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* SCROLL DEL MENU */
+
+.dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+  background: #cbd4e1;
+  border-radius: 10px;
+}
+
+/* MOVILES */
+
+@media (max-width: 600px) {
+  .dropdown-menu {
+    max-height: 280px;
+  }
+
+  .dropdown-trigger {
+    min-height: 70px;
+    padding: 11px;
+  }
+
+  .dropdown-trigger-content strong {
+    font-size: 12px;
+  }
+
+  .option-details {
+    gap: 5px;
+  }
 }
 
 
