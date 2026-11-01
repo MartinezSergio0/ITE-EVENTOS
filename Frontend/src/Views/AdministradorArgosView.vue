@@ -1631,14 +1631,44 @@
     <!-- CERRAR -->
     <div class="participant-modal-footer">
 
-      <button
-        class="participant-close-button"
-        @click="selectedParticipant = null"
-      >
-        Cerrar ficha
-      </button>
+  <template v-if="!editingParticipant">
 
-    </div>
+    <button
+      class="participant-edit-button"
+      @click="startEditingParticipant"
+    >
+      ✏️ Editar participante
+    </button>
+
+    <button
+      class="participant-close-button"
+      @click="selectedParticipant = null"
+    >
+      Cerrar ficha
+    </button>
+
+  </template>
+
+  <template v-else>
+
+    <button
+      class="participant-cancel-button"
+      @click="cancelEditingParticipant"
+    >
+      Cancelar
+    </button>
+
+    <button
+      class="participant-save-button"
+      :disabled="savingParticipant"
+      @click="saveParticipantChanges"
+    >
+      {{ savingParticipant ? 'Guardando...' : 'Guardar cambios' }}
+    </button>
+
+  </template>
+
+</div>
 
   </div>
 </div>
@@ -1806,6 +1836,46 @@ const typeFilter = ref("all");
 const selectedParticipant = ref(null);
 
 const selectedReceipt = ref(null);
+
+
+// =====================================================
+// EDICION DE PARTICIPANTE
+// =====================================================
+
+const editingParticipant = ref(false);
+const savingParticipant = ref(false);
+
+const participantForm = ref({
+  name: "",
+  control: "",
+  email: "",
+  socialSecurityNumber: "",
+  workshop: "",
+  industrialVisit: ""
+});
+
+function startEditingParticipant() {
+  if (!selectedParticipant.value) return;
+
+  participantForm.value = {
+    name: selectedParticipant.value.name || "",
+    control: selectedParticipant.value.control || "",
+    email: selectedParticipant.value.email || "",
+    socialSecurityNumber:
+      selectedParticipant.value.socialSecurityNumber ||
+      selectedParticipant.value.nss ||
+      selectedParticipant.value.numeroSeguroSocial ||
+      "",
+    workshop: selectedParticipant.value.workshop || "",
+    industrialVisit: selectedParticipant.value.industrialVisit || ""
+  };
+
+  editingParticipant.value = true;
+}
+
+function cancelEditingParticipant() {
+  editingParticipant.value = false;
+}
 
 // =====================================================
 // INFORMACION COMPLETA DEL PARTICIPANTE
@@ -5318,6 +5388,51 @@ td {
   color: #1e3a8a;
   font-size: 17px;
   font-weight: 800;
+}
+
+
+.participant-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.participant-edit-button,
+.participant-close-button,
+.participant-cancel-button,
+.participant-save-button {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.participant-edit-button {
+  background: #e3f2fd;
+  color: #0066b3;
+}
+
+.participant-close-button {
+  background: #003366;
+  color: white;
+}
+
+.participant-cancel-button {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.participant-save-button {
+  background: #15803d;
+  color: white;
+}
+
+.participant-save-button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
 }
 
 @media(max-width: 600px) {
