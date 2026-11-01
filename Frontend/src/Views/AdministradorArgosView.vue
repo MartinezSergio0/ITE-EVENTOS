@@ -1499,6 +1499,11 @@
          MODAL PARTICIPANTE
     ====================================================== -->
 
+
+<!-- =====================================================
+     MODAL PARTICIPANTE
+====================================================== -->
+
 <div
   v-if="selectedParticipant"
   class="modal-overlay"
@@ -1537,41 +1542,107 @@
 
     <div class="participant-modal-divider"></div>
 
-    <!-- INFORMACION COMPLETA -->
+    <!-- INFORMACION DEL PARTICIPANTE -->
     <div class="participant-details-header">
       <h3>Información del participante</h3>
 
       <p>
-        Datos registrados en el sistema.
+        {{ editingParticipant
+          ? 'Modifica los datos que necesites actualizar.'
+          : 'Datos registrados en el sistema.'
+        }}
       </p>
     </div>
 
-   <div
-  v-if="selectedParticipantDetails.length"
-  class="participant-details-grid"
->
+    <!-- MODO EDICION -->
+    <div
+      v-if="editingParticipant"
+      class="participant-edit-form"
+    >
 
-  <div
-    v-for="detail in selectedParticipantDetails"
-    :key="detail.key"
-    class="participant-detail-item"
-    :class="{ 'detail-highlight': detail.highlight }"
-  >
+      <div class="edit-field">
+        <label>Nombre completo</label>
+        <input
+          v-model="participantForm.name"
+          type="text"
+          placeholder="Nombre del participante"
+        />
+      </div>
 
-    <span class="detail-label">
-      {{ formatDetailLabel(detail.key) }}
-    </span>
+      <div class="edit-field">
+        <label>Número de control</label>
+        <input
+          v-model="participantForm.control"
+          type="text"
+          placeholder="Número de control"
+        />
+      </div>
 
-    <strong class="detail-value">
-      {{ formatDetailValue(detail.value) }}
-    </strong>
+      <div class="edit-field">
+        <label>Correo electrónico</label>
+        <input
+          v-model="participantForm.email"
+          type="email"
+          placeholder="Correo electrónico"
+        />
+      </div>
 
-  </div>
+      <div class="edit-field">
+        <label>Número de Seguro Social</label>
+        <input
+          v-model="participantForm.socialSecurityNumber"
+          type="text"
+          placeholder="Número de Seguro Social"
+        />
+      </div>
 
-</div>
+      <div class="edit-field">
+        <label>Taller</label>
+        <input
+          v-model="participantForm.workshop"
+          type="text"
+          placeholder="Taller registrado"
+        />
+      </div>
+
+      <div class="edit-field">
+        <label>Visita industrial</label>
+        <input
+          v-model="participantForm.industrialVisit"
+          type="text"
+          placeholder="Visita industrial"
+        />
+      </div>
+
+    </div>
+
+    <!-- MODO VISUALIZACION -->
+    <div
+      v-else-if="selectedParticipantDetails.length"
+      class="participant-details-grid"
+    >
+
+      <div
+        v-for="detail in selectedParticipantDetails"
+        :key="detail.key"
+        class="participant-detail-item"
+        :class="{ 'detail-highlight': detail.highlight }"
+      >
+
+        <span class="detail-label">
+          {{ formatDetailLabel(detail.key) }}
+        </span>
+
+        <strong class="detail-value">
+          {{ formatDetailValue(detail.value) }}
+        </strong>
+
+      </div>
+
+    </div>
 
     <div
-      v-else
+      v-else-if="!editingParticipant"
       class="empty-table"
     >
       No hay información adicional disponible.
@@ -1628,50 +1699,54 @@
 
     </div>
 
-    <!-- CERRAR -->
+    <!-- BOTONES DEL MODAL -->
     <div class="participant-modal-footer">
 
-  <template v-if="!editingParticipant">
+      <template v-if="!editingParticipant">
 
-    <button
-      class="participant-edit-button"
-      @click="startEditingParticipant"
-    >
-      ✏️ Editar participante
-    </button>
+        <button
+          class="participant-edit-button"
+          @click="startEditingParticipant"
+        >
+          ✏️ Editar participante
+        </button>
 
-    <button
-      class="participant-close-button"
-      @click="selectedParticipant = null"
-    >
-      Cerrar ficha
-    </button>
+        <button
+          class="participant-close-button"
+          @click="selectedParticipant = null"
+        >
+          Cerrar ficha
+        </button>
 
-  </template>
+      </template>
 
-  <template v-else>
+      <template v-else>
 
-    <button
-      class="participant-cancel-button"
-      @click="cancelEditingParticipant"
-    >
-      Cancelar
-    </button>
+        <button
+          class="participant-cancel-button"
+          @click="cancelEditingParticipant"
+        >
+          Cancelar
+        </button>
 
-    <button
-      class="participant-save-button"
-      :disabled="savingParticipant"
-      @click="saveParticipantChanges"
-    >
-      {{ savingParticipant ? 'Guardando...' : 'Guardar cambios' }}
-    </button>
+        <button
+          class="participant-save-button"
+          :disabled="savingParticipant"
+          @click="saveParticipantChanges"
+        >
+          {{ savingParticipant
+            ? 'Guardando...'
+            : 'Guardar cambios'
+          }}
+        </button>
 
-  </template>
+      </template>
 
-</div>
+    </div>
 
   </div>
 </div>
+
 
 
     <!-- =====================================================
@@ -1842,6 +1917,11 @@ const selectedReceipt = ref(null);
 // EDICION DE PARTICIPANTE
 // =====================================================
 
+
+// =====================================================
+// EDICION DE PARTICIPANTE
+// =====================================================
+
 const editingParticipant = ref(false);
 const savingParticipant = ref(false);
 
@@ -1854,28 +1934,176 @@ const participantForm = ref({
   industrialVisit: ""
 });
 
+// Abrir formulario de edicion
 function startEditingParticipant() {
+
   if (!selectedParticipant.value) return;
 
+  const participant = selectedParticipant.value;
+
   participantForm.value = {
-    name: selectedParticipant.value.name || "",
-    control: selectedParticipant.value.control || "",
-    email: selectedParticipant.value.email || "",
-    socialSecurityNumber:
-      selectedParticipant.value.socialSecurityNumber ||
-      selectedParticipant.value.nss ||
-      selectedParticipant.value.numeroSeguroSocial ||
+    name:
+      participant.name ||
+      participant.nombre ||
+      participant.fullName ||
+      participant.nombreCompleto ||
       "",
-    workshop: selectedParticipant.value.workshop || "",
-    industrialVisit: selectedParticipant.value.industrialVisit || ""
+
+    control:
+      participant.control ||
+      participant.controlNumber ||
+      participant.numeroControl ||
+      "",
+
+    email:
+      participant.email ||
+      participant.correo ||
+      "",
+
+    socialSecurityNumber:
+      participant.socialSecurityNumber ||
+      participant.nss ||
+      participant.numeroSeguroSocial ||
+      "",
+
+    workshop:
+      participant.workshop ||
+      participant.taller ||
+      "",
+
+    industrialVisit:
+      participant.industrialVisit ||
+      participant.visitaIndustrial ||
+      ""
   };
 
   editingParticipant.value = true;
 }
 
+// Cancelar edicion
 function cancelEditingParticipant() {
+
   editingParticipant.value = false;
+
+  participantForm.value = {
+    name: "",
+    control: "",
+    email: "",
+    socialSecurityNumber: "",
+    workshop: "",
+    industrialVisit: ""
+  };
+
 }
+
+watch(selectedParticipant, (participant) => {
+  editingParticipant.value = false;
+
+  if (!participant) {
+    participantForm.value = {
+      name: "",
+      control: "",
+      email: "",
+      socialSecurityNumber: "",
+      workshop: "",
+      industrialVisit: ""
+    };
+  }
+});
+
+
+// =====================================================
+// GUARDAR CAMBIOS DEL PARTICIPANTE  AQUI DEDES DE TRABAJAR 
+// O MAS BIEN DEBES DE DESCOMENTAR CUANDO HAGAS LA RUTA NUEVA 
+// PARA GUARDAR LA NUEVA INFO DEL PARTICIPANTE 
+// =====================================================
+
+/* async function saveParticipantChanges() {
+
+  if (!selectedParticipant.value) return;
+
+  if (savingParticipant.value) return;
+
+  // Validaciones basicas
+  if (!participantForm.value.name.trim()) {
+    alert("El nombre del participante es obligatorio.");
+    return;
+  }
+
+  if (!participantForm.value.email.trim()) {
+    alert("El correo electronico es obligatorio.");
+    return;
+  }
+
+  savingParticipant.value = true;
+
+  try {
+
+    const participantId = selectedParticipant.value.id;
+
+    // Datos que recibira el backend
+    const dataToSend = {
+      name: participantForm.value.name.trim(),
+      control: participantForm.value.control.trim(),
+      email: participantForm.value.email.trim(),
+      socialSecurityNumber:
+        participantForm.value.socialSecurityNumber.trim(),
+      workshop: participantForm.value.workshop.trim(),
+      industrialVisit: participantForm.value.industrialVisit.trim()
+    };
+
+    // Ruta que debera crear el backend
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participantId}`,
+      {
+        method: "PUT",
+        headers: {
+          ...authHeaders(),
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataToSend)
+      }
+    );
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || "No se pudieron guardar los cambios."
+      );
+    }
+
+    // Actualizar los datos en la tabla
+    await cargarParticipantes();
+
+    // Recuperar el participante actualizado
+    const updatedParticipant = participants.value.find(
+      p => String(p.id) === String(participantId)
+    );
+
+    if (updatedParticipant) {
+      selectedParticipant.value = updatedParticipant;
+    }
+
+    editingParticipant.value = false;
+
+    alert("Los datos del participante se actualizaron correctamente.");
+
+  } catch (error) {
+
+    console.error("Error al actualizar participante:", error);
+
+    alert(error.message || "Ocurrio un error al guardar los cambios.");
+
+  } finally {
+
+    savingParticipant.value = false;
+
+  }
+
+} */
+
+
 
 // =====================================================
 // INFORMACION COMPLETA DEL PARTICIPANTE
@@ -5434,6 +5662,121 @@ td {
   opacity: .6;
   cursor: not-allowed;
 }
+
+
+/* FORMULARIO DE EDICION DEL PARTICIPANTE */
+
+.participant-edit-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+  margin-bottom: 25px;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.edit-field input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.edit-field input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* BOTONES */
+
+.participant-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+.participant-edit-button,
+.participant-close-button,
+.participant-cancel-button,
+.participant-save-button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.participant-edit-button {
+  background: #2563eb;
+  color: white;
+}
+
+.participant-edit-button:hover {
+  background: #1d4ed8;
+}
+
+.participant-close-button,
+.participant-cancel-button {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.participant-close-button:hover,
+.participant-cancel-button:hover {
+  background: #e2e8f0;
+}
+
+.participant-save-button {
+  background: #16a34a;
+  color: white;
+}
+
+.participant-save-button:hover {
+  background: #15803d;
+}
+
+.participant-save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 600px) {
+  .participant-edit-form {
+    grid-template-columns: 1fr;
+  }
+
+  .participant-modal-footer {
+    flex-direction: column;
+  }
+
+  .participant-modal-footer button {
+    width: 100%;
+  }
+}
+
 
 @media(max-width: 600px) {
   .participant-modal {
