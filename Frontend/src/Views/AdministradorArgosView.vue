@@ -2473,136 +2473,6 @@ const empresas = [
   }
 ];
 
-const cuposEdicion = ref({});
-const errorActividades = ref("");
-
-async function cargarCuposEdicion() {
-  try {
-    const response = await fetch(
-      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/cupos`
-    );
-
-    if (!response.ok) {
-      throw new Error("No se pudieron consultar los cupos.");
-    }
-
-    const data = await response.json();
-
-    cuposEdicion.value = Object.fromEntries(
-      data.map(item => [item.nombre, item])
-    );
-  } catch (error) {
-    console.error("Error al cargar cupos:", error);
-    errorActividades.value =
-      "No se pudieron consultar los cupos. Intenta nuevamente.";
-  }
-}
-
-function conCupoEdicion(item, seleccionActual) {
-  const cupo = cuposEdicion.value[item.nombre];
-
-  // Si la actividad no aparece en la respuesta, no inventamos disponibilidad.
-  if (!cupo) {
-    return {
-      ...item,
-      disponible: false,
-      esSeleccionActual: item.nombre === seleccionActual,
-      textoDisponibilidad: "Cupo no confirmado"
-    };
-  }
-
-  const disponibles = Number(cupo.disponibles ?? 0);
-  const esSeleccionActual = item.nombre === seleccionActual;
-
-  return {
-    ...item,
-    capacidad: cupo.capacidad ?? item.capacidad,
-    disponibles,
-    esSeleccionActual,
-
-    // Se conserva la selección actual aunque esté llena.
-    disponible: disponibles > 0 || esSeleccionActual,
-
-    textoDisponibilidad:
-      disponibles > 0
-        ? `${disponibles} lugares disponibles`
-        : esSeleccionActual
-          ? "Selección actual"
-          : "Sin lugares disponibles"
-  };
-}
-
-const talleresMatutinosEdicion = computed(() =>
-  talleres
-    .filter(item => item.turno === "Matutino")
-    .map(item =>
-      conCupoEdicion(item, participantForm.value.workshop)
-    )
-    .filter(item => item.disponible)
-);
-
-const talleresVespertinosEdicion = computed(() =>
-  talleres
-    .filter(item => item.turno === "Vespertino")
-    .map(item =>
-      conCupoEdicion(item, participantForm.value.workshop)
-    )
-    .filter(item => item.disponible)
-);
-
-const empresasMatutinasEdicion = computed(() =>
-  empresas
-    .filter(item => item.turno === "Matutino")
-    .map(item =>
-      conCupoEdicion(item, participantForm.value.industrialVisit)
-    )
-    .filter(item => item.disponible)
-);
-
-const empresasVespertinasEdicion = computed(() =>
-  empresas
-    .filter(item => item.turno === "Vespertino")
-    .map(item =>
-      conCupoEdicion(item, participantForm.value.industrialVisit)
-    )
-    .filter(item => item.disponible)
-);
-
-function textoCupo(item) {
-  return item.textoDisponibilidad;
-}
-
-const mismoTurnoEdicion = computed(() => {
-  const taller = talleres.find(
-    item => item.nombre === participantForm.value.workshop
-  );
-
-  const empresa = empresas.find(
-    item => item.nombre === participantForm.value.industrialVisit
-  );
-
-  return Boolean(
-    taller &&
-    empresa &&
-    taller.turno === empresa.turno
-  );
-});
-
-watch(
-  () => [
-    participantForm.value.workshop,
-    participantForm.value.industrialVisit
-  ],
-  () => {
-    errorActividades.value = "";
-
-    if (mismoTurnoEdicion.value) {
-      errorActividades.value =
-        "El taller y la visita industrial no pueden ser del mismo turno. " +
-        "Elige un taller matutino y una visita vespertina, o al contrario.";
-    }
-  }
-);
 
 
 
@@ -2672,9 +2542,9 @@ const selectedReceipt = ref(null);
 
 
 
-// =====================================================
-// EDICION DE PARTICIPANTE
-// =====================================================
+ // =====================================================
+ // EDICION DE PARTICIPANTE
+ // =====================================================
 
 const editingParticipant = ref(false);
 const savingParticipant = ref(false);
@@ -2688,15 +2558,14 @@ const participantForm = ref({
   industrialVisit: ""
 });
 
-// =====================================================
-// CUPOS Y ACTIVIDADES
-// =====================================================
-
 const cuposEdicion = ref({});
 const errorActividades = ref("");
 const dropdownEdicionAbierto = ref("");
 
-// Consultar cupos disponibles
+// =====================================================
+// CARGAR CUPOS
+// =====================================================
+
 async function cargarCuposEdicion() {
   try {
     const response = await fetch(
@@ -2713,7 +2582,6 @@ async function cargarCuposEdicion() {
       data.map(item => [item.nombre, item])
     );
 
-    errorActividades.value = "";
   } catch (error) {
     console.error("Error al cargar cupos:", error);
 
@@ -2722,20 +2590,23 @@ async function cargarCuposEdicion() {
   }
 }
 
-// Agregar disponibilidad a cada actividad
+// =====================================================
+// DISPONIBILIDAD DE ACTIVIDADES
+// =====================================================
+
 function conCupoEdicion(item, seleccionActual) {
   const cupo = cuposEdicion.value[item.nombre];
   const esSeleccionActual = item.nombre === seleccionActual;
 
-  // Si el backend no devuelve información de esta actividad,
-  // no se marca como agotada.
   if (!cupo) {
     return {
       ...item,
       disponibles: null,
       esSeleccionActual,
-      disponible: true,
-      textoDisponibilidad: "Cupo por consultar"
+      disponible: esSeleccionActual,
+      textoDisponibilidad: esSeleccionActual
+        ? "Selección actual"
+        : "Cupo no confirmado"
     };
   }
 
@@ -2746,8 +2617,6 @@ function conCupoEdicion(item, seleccionActual) {
     capacidad: cupo.capacidad ?? item.capacidad,
     disponibles,
     esSeleccionActual,
-
-    // La selección actual se conserva aunque esté llena.
     disponible: disponibles > 0 || esSeleccionActual,
 
     textoDisponibilidad:
@@ -2755,12 +2624,12 @@ function conCupoEdicion(item, seleccionActual) {
         ? `${disponibles} lugares disponibles`
         : esSeleccionActual
           ? "Selección actual"
-          : "Sin cupo"
+          : "Sin lugares disponibles"
   };
 }
 
 // =====================================================
-// LISTAS DE TALLERES
+// TALLERES
 // =====================================================
 
 const talleresMatutinosEdicion = computed(() =>
@@ -2780,7 +2649,7 @@ const talleresVespertinosEdicion = computed(() =>
 );
 
 // =====================================================
-// LISTAS DE VISITAS INDUSTRIALES
+// EMPRESAS
 // =====================================================
 
 const empresasMatutinasEdicion = computed(() =>
@@ -2934,7 +2803,10 @@ function cancelEditingParticipant() {
   };
 }
 
-// Cerrar edición cuando se selecciona otro participante
+// =====================================================
+// CAMBIO DE PARTICIPANTE
+// =====================================================
+
 watch(selectedParticipant, (participant) => {
   editingParticipant.value = false;
   dropdownEdicionAbierto.value = "";
@@ -2953,156 +2825,73 @@ watch(selectedParticipant, (participant) => {
 });
 
 // =====================================================
-// GUARDAR CAMBIOS DEL PARTICIPANTE
+// GUARDAR CAMBIOS
 // =====================================================
 
-// Esta función queda preparada para cuando el backend
-// confirme y cree la ruta PUT correspondiente.
-//
-// No descomentar ni conectar hasta confirmar el endpoint.
+// Pendiente de confirmar la ruta PUT con el backend.
+// Mantener comentada hasta que el compañero confirme el endpoint.
 
 /*
-async function saveParticipantChanges() {
-  if (!selectedParticipant.value || savingParticipant.value) return;
+Aquí conserva tu función saveParticipantChanges() comentada.
 
-  const form = participantForm.value;
-
-  if (!form.name.trim()) {
-    alert("El nombre del participante es obligatorio.");
-    return;
-  }
-
-  if (!form.email.trim()) {
-    alert("El correo electrónico es obligatorio.");
-    return;
-  }
-
-  if (!form.workshop || !form.industrialVisit) {
-    errorActividades.value =
-      "Selecciona un taller y una visita industrial.";
-    return;
-  }
-
-  if (mismoTurnoEdicion.value) {
-    errorActividades.value =
-      "El taller y la visita industrial no pueden ser del mismo turno.";
-    return;
-  }
-
-  const tallerOriginal =
-    selectedParticipant.value.workshop ||
-    selectedParticipant.value.taller ||
-    "";
-
-  const visitaOriginal =
-    selectedParticipant.value.industrialVisit ||
-    selectedParticipant.value.visitaIndustrial ||
-    "";
-
-  const tallerElegido = talleres.find(
-    item => item.nombre === form.workshop
-  );
-
-  const visitaElegida = empresas.find(
-    item => item.nombre === form.industrialVisit
-  );
-
-  if (!tallerElegido || !visitaElegida) {
-    alert("Una de las actividades seleccionadas no es válida.");
-    return;
-  }
-
-  const cupoTaller = cuposEdicion.value[form.workshop];
-  const cupoVisita = cuposEdicion.value[form.industrialVisit];
-
-  if (
-    form.workshop !== tallerOriginal &&
-    (!cupoTaller || Number(cupoTaller.disponibles ?? 0) <= 0)
-  ) {
-    alert("El taller seleccionado no tiene lugares disponibles.");
-    await cargarCuposEdicion();
-    return;
-  }
-
-  if (
-    form.industrialVisit !== visitaOriginal &&
-    (!cupoVisita || Number(cupoVisita.disponibles ?? 0) <= 0)
-  ) {
-    alert("La visita seleccionada no tiene lugares disponibles.");
-    await cargarCuposEdicion();
-    return;
-  }
-
-  savingParticipant.value = true;
+const guardarCambiosParticipante = async () => {
+  if (!selectedParticipant.value) return;
 
   try {
-    const participantId = selectedParticipant.value.id;
+    savingParticipant.value = true;
+    errorActividades.value = '';
 
-    const dataToSend = {
-      name: form.name.trim(),
-      control: form.control.trim(),
-      email: form.email.trim(),
-      socialSecurityNumber: form.socialSecurityNumber.trim(),
-      workshop: form.workshop,
-      industrialVisit: form.industrialVisit
+    const participanteId = selectedParticipant.value.id;
+
+    const datosActualizados = {
+      ...participantForm.value,
+      taller: participantForm.value.workshop || null,
+      visitaIndustrial: participantForm.value.industrialVisit || null
     };
 
     const response = await fetch(
-      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participantId}`,
+      `${API_URL}/participantes/${participanteId}`,
       {
-        method: "PUT",
+        method: 'PUT',
         headers: {
           ...authHeaders(),
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(dataToSend)
+        body: JSON.stringify(datosActualizados)
       }
     );
 
-    const result = await response.json().catch(() => ({}));
-
     if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
       throw new Error(
-        result.message ||
-        result.error ||
-        "No se pudieron guardar los cambios."
+        error.message || 'No se pudieron guardar los cambios.'
       );
     }
 
     await cargarParticipantes();
-    await cargarCuposEdicion();
 
-    const updatedParticipant = participants.value.find(
-      participant => String(participant.id) === String(participantId)
+    // Actualizar el participante seleccionado con los datos del formulario
+    const participanteActualizado = participants.value.find(
+      participante => participante.id === participanteId
     );
 
-    if (updatedParticipant) {
-      selectedParticipant.value = updatedParticipant;
-    } else {
-      selectedParticipant.value = {
-        ...selectedParticipant.value,
-        ...dataToSend
-      };
+    if (participanteActualizado) {
+      selectedParticipant.value = participanteActualizado;
     }
 
     editingParticipant.value = false;
-    dropdownEdicionAbierto.value = "";
-    errorActividades.value = "";
 
-    alert("Los cambios se guardaron correctamente.");
+    alert('Los cambios se guardaron correctamente.');
 
   } catch (error) {
-    console.error("Error al actualizar participante:", error);
-    alert(error.message || "Ocurrió un error al guardar los cambios.");
+    console.error('Error al guardar participante:', error);
+    errorActividades.value = error.message || 'Ocurrio un error al guardar los cambios.';
 
   } finally {
     savingParticipant.value = false;
   }
-}
+};
 */
-
-
-
 
 // =====================================================
 // INFORMACION COMPLETA DEL PARTICIPANTE
