@@ -807,6 +807,12 @@
                   <p>Continuación de los recorridos empresariales.</p>
                 </div>
               </div>
+              <div class="program-item">
+                <span class="program-time">20:00 - 21:00</span>
+                <div>
+                  <strong>Rompehielos para alumnos</strong>
+                </div>
+              </div>
             </div>
 
             <div class="program-day">
@@ -1368,10 +1374,6 @@ const programaMiercoles = [
   {
     hora: "17:00 - 20:00",
     nombre: "Ponencias - Aulas 600"
-  },
-  {
-    hora: "20:00 - 21:00",
-    nombre: "Rompehielos para alumnos"
   }
 ];
 
