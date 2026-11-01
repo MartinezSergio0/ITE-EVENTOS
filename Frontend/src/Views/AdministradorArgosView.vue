@@ -1499,84 +1499,148 @@
          MODAL PARTICIPANTE
     ====================================================== -->
 
-    <div
-      v-if="selectedParticipant"
-      class="modal-overlay"
-      @click.self="selectedParticipant = null"
+<div
+  v-if="selectedParticipant"
+  class="modal-overlay"
+  @click.self="selectedParticipant = null"
+>
+  <div class="modal participant-modal">
+
+    <!-- BOTON CERRAR -->
+    <button
+      class="close"
+      @click="selectedParticipant = null"
     >
+      ✕
+    </button>
 
-      <div class="modal">
+    <!-- ENCABEZADO -->
+    <div class="participant-modal-header">
 
-        <button
-          class="close"
-          @click="selectedParticipant = null"
-        >
-          ✕
-        </button>
+      <div class="modal-avatar">
+        {{ getInitials(selectedParticipant.name || '') }}
+      </div>
 
-
-        <div class="modal-avatar">
-
-          {{ getInitials(selectedParticipant.name) }}
-
-        </div>
-
+      <div class="participant-modal-title">
+        <span>CONGRESO ARGOS</span>
 
         <h2>
-          {{ selectedParticipant.name }}
+          {{ selectedParticipant.name || 'Participante' }}
         </h2>
 
         <p>
-          {{ selectedParticipant.control }}
+          Folio: {{ getStudentFolio(selectedParticipant) }}
         </p>
+      </div>
 
+    </div>
 
-        <div class="modal-data">
+    <div class="participant-modal-divider"></div>
 
-          <div>
-            <span>Correo</span>
-            <strong>
-              {{ selectedParticipant.email }}
-            </strong>
-          </div>
+    <!-- INFORMACION COMPLETA -->
+    <div class="participant-details-header">
+      <h3>Información del participante</h3>
 
-          <div>
-            <span>Tipo</span>
-            <strong>
-              {{ selectedParticipant.type }}
-            </strong>
-          </div>
+      <p>
+        Datos registrados en el sistema.
+      </p>
+    </div>
 
-          <div>
-            <span>Referencia</span>
-            <strong>
-              {{ selectedParticipant.reference }}
-            </strong>
-          </div>
+    <div
+      v-if="selectedParticipantDetails.length"
+      class="participant-details-grid"
+    >
 
-          <div>
-            <span>Pago</span>
-            <strong>
-              {{ paymentText(selectedParticipant.payment) }}
-            </strong>
-          </div>
+      <div
+        v-for="detail in selectedParticipantDetails"
+        :key="detail.key"
+        class="participant-detail-item"
+      >
 
-          <div>
-            <span>Asistencia</span>
-            <strong>
-              {{
-                selectedParticipant.attended
-                  ? '✓ Presente'
-                  : 'No registrada'
-              }}
-            </strong>
-          </div>
+        <span>
+          {{ formatDetailLabel(detail.key) }}
+        </span>
 
+        <strong>
+          {{ formatDetailValue(detail.value) }}
+        </strong>
+
+      </div>
+
+    </div>
+
+    <div
+      v-else
+      class="empty-table"
+    >
+      No hay información adicional disponible.
+    </div>
+
+    <!-- ESTADO DEL REGISTRO -->
+    <div class="participant-status-section">
+
+      <h3>Estado del participante</h3>
+
+      <div class="participant-status-grid">
+
+        <div>
+          <span>Pago</span>
+
+          <strong
+            class="payment"
+            :class="selectedParticipant.payment"
+          >
+            {{ paymentText(selectedParticipant.payment) }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Asistencia</span>
+
+          <strong
+            :class="[
+              'attendance',
+              { present: selectedParticipant.attended }
+            ]"
+          >
+            {{
+              selectedParticipant.attended
+                ? '✓ Presente'
+                : 'No registrada'
+            }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Constancia</span>
+
+          <strong>
+            {{
+              selectedParticipant.certificate
+                ? '✓ Generada'
+                : 'Pendiente'
+            }}
+          </strong>
         </div>
 
       </div>
 
     </div>
+
+    <!-- CERRAR -->
+    <div class="participant-modal-footer">
+
+      <button
+        class="participant-close-button"
+        @click="selectedParticipant = null"
+      >
+        Cerrar ficha
+      </button>
+
+    </div>
+
+  </div>
+</div>
 
 
     <!-- =====================================================
@@ -1742,6 +1806,117 @@ const selectedParticipant = ref(null);
 
 const selectedReceipt = ref(null);
 
+// =====================================================
+// INFORMACION COMPLETA DEL PARTICIPANTE
+// =====================================================
+
+// Obtener todos los campos que devuelve el backend.
+// Se excluyen credenciales y datos internos de autenticacion.
+const selectedParticipantDetails = computed(() => {
+
+  if (!selectedParticipant.value) {
+    return [];
+  }
+
+  const excludedFields = [
+    "password",
+    "passwordhash",
+    "token",
+    "accesstoken",
+    "refreshtoken",
+    "secret"
+  ];
+
+  return Object.entries(selectedParticipant.value)
+
+    .filter(([key]) => {
+      const normalizedKey = key
+        .toLowerCase()
+        .replace(/[_-]/g, "");
+
+      return !excludedFields.some(field =>
+        normalizedKey.includes(field)
+      );
+    })
+
+    .map(([key, value]) => ({
+      key,
+      value
+    }));
+
+});
+
+
+// Convertir nombres de campos a etiquetas legibles.
+function formatDetailLabel(key) {
+
+  const labels = {
+    name: "Nombre completo",
+    nombre: "Nombre",
+    fullName: "Nombre completo",
+    nombreCompleto: "Nombre completo",
+    email: "Correo electrónico",
+    correo: "Correo electrónico",
+    control: "Número de control",
+    controlNumber: "Número de control",
+    nss: "Número de Seguro Social (NSS)",
+    socialSecurityNumber: "Número de Seguro Social (NSS)",
+    numeroSeguroSocial: "Número de Seguro Social (NSS)",
+    workshop: "Taller seleccionado",
+    industrialVisit: "Visita industrial",
+    type: "Tipo de participante",
+    payment: "Estado del pago",
+    reference: "Referencia de pago",
+    attended: "Asistencia",
+    certificate: "Constancia",
+    folio: "Folio de inscripción",
+    phone: "Teléfono",
+    telefono: "Teléfono",
+    institution: "Institución",
+    institucion: "Institución",
+    career: "Carrera",
+    carrera: "Carrera",
+    semester: "Semestre",
+    semestre: "Semestre"
+  };
+
+  return labels[key] ||
+    key
+      .replace(/([A-Z])/g, " $1")
+      .replace(/[_-]/g, " ")
+      .replace(/^./, letter => letter.toUpperCase());
+
+}
+
+
+// Mostrar correctamente valores simples, arreglos y objetos.
+function formatDetailValue(value) {
+
+  if (value === null || value === undefined || value === "") {
+    return "No proporcionado";
+  }
+
+  if (typeof value === "boolean") {
+    return value ? "Sí" : "No";
+  }
+
+  if (Array.isArray(value)) {
+    return value.length
+      ? value.map(item =>
+          typeof item === "object"
+            ? JSON.stringify(item)
+            : String(item)
+        ).join(", ")
+      : "Sin registros";
+  }
+
+  if (typeof value === "object") {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
+
+}
 
 // =====================================================
 // PLANTILLA
@@ -4963,6 +5138,179 @@ td {
 
   gap: 10px;
 
+}
+
+
+/* =====================================================
+   MODAL COMPLETO DEL PARTICIPANTE
+===================================================== */
+
+.participant-modal {
+  width: 100%;
+  max-width: 850px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px;
+}
+
+.participant-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-right: 35px;
+}
+
+.participant-modal-header .modal-avatar {
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.participant-modal-title {
+  min-width: 0;
+}
+
+.participant-modal-title > span {
+  color: #0066b3;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.participant-modal-title h2 {
+  text-align: left;
+  margin: 5px 0;
+  font-size: 23px;
+  overflow-wrap: anywhere;
+}
+
+.participant-modal-title p {
+  text-align: left;
+  margin: 0;
+  color: #78909c;
+  font-size: 12px;
+}
+
+.participant-modal-divider {
+  height: 1px;
+  background: #edf0f3;
+  margin: 25px 0;
+}
+
+.participant-details-header h3,
+.participant-status-section h3 {
+  color: #003366;
+  font-size: 15px;
+  margin: 0 0 5px;
+}
+
+.participant-details-header p {
+  color: #90a4ae;
+  font-size: 11px;
+  margin: 0 0 18px;
+}
+
+.participant-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.participant-detail-item {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #edf0f3;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.participant-detail-item span {
+  display: block;
+  color: #78909c;
+  font-size: 10px;
+  margin-bottom: 7px;
+}
+
+.participant-detail-item strong {
+  display: block;
+  color: #263238;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.participant-status-section {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #edf0f3;
+}
+
+.participant-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.participant-status-grid > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 13px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.participant-status-grid span {
+  color: #78909c;
+  font-size: 10px;
+}
+
+.participant-status-grid strong {
+  font-size: 11px;
+}
+
+.participant-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 25px;
+}
+
+.participant-close-button {
+  padding: 11px 22px;
+  border: none;
+  border-radius: 9px;
+  background: #003366;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.participant-close-button:hover {
+  background: #005b96;
+}
+
+@media(max-width: 600px) {
+  .participant-modal {
+    padding: 22px 16px;
+    max-height: 92vh;
+  }
+
+  .participant-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .participant-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .participant-modal-header {
+    align-items: flex-start;
+  }
+
+  .participant-modal-title h2 {
+    font-size: 18px;
+  }
 }
 
 
