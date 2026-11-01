@@ -1593,69 +1593,324 @@
       </div>
 
       
+<!-- =====================================================
+     TALLER
+====================================================== -->
+
 <div class="edit-field">
   <label for="editWorkshop">Taller</label>
 
-  <select
-    id="editWorkshop"
-    v-model="participantForm.workshop"
-    :disabled="savingParticipant"
-  >
-    <option value="">Selecciona un taller</option>
+  <div class="custom-dropdown">
 
-    <optgroup label="Matutino">
-      <option
+    <!-- BOTON PRINCIPAL -->
+    <button
+      id="editWorkshop"
+      type="button"
+      class="dropdown-trigger"
+      :class="{
+        'dropdown-active': dropdownEdicionAbierto === 'taller'
+      }"
+      :disabled="savingParticipant"
+      :aria-expanded="dropdownEdicionAbierto === 'taller'"
+      @click="toggleDropdownEdicion('taller')"
+    >
+      <span
+        :class="{
+          'dropdown-placeholder': !participantForm.workshop
+        }"
+      >
+        {{ participantForm.workshop || 'Selecciona un taller' }}
+      </span>
+
+      <span
+        class="dropdown-arrow"
+        :class="{
+          rotated: dropdownEdicionAbierto === 'taller'
+        }"
+      >
+        ▼
+      </span>
+    </button>
+
+    <!-- LISTA DE TALLERES -->
+    <div
+      v-if="dropdownEdicionAbierto === 'taller'"
+      class="dropdown-menu"
+    >
+
+      <!-- TURNO MATUTINO -->
+      <div class="dropdown-group-title">
+        <span>☀️</span>
+        TURNO MATUTINO
+      </div>
+
+      <button
         v-for="item in talleresMatutinosEdicion"
         :key="item.id"
-        :value="item.nombre"
+        type="button"
+        class="dropdown-option"
+        :class="{
+          'option-disabled': !item.disponible,
+          'option-selected': participantForm.workshop === item.nombre
+        }"
+        :disabled="!item.disponible"
+        @click="seleccionarTallerEdicion(item)"
       >
-        {{ item.nombre }} — {{ textoCupo(item) }}
-      </option>
-    </optgroup>
+        <span class="option-name">
+          {{ item.nombre }}
+        </span>
 
-    <optgroup label="Vespertino">
-      <option
+        <span class="option-details">
+          <span>🕒 {{ item.horario }}</span>
+
+          <span>
+            Capacidad: {{ item.capacidad }}
+          </span>
+
+          <span
+            :class="{
+              'option-full': item.disponibles === 0
+            }"
+          >
+            {{
+              item.disponibles === null
+                ? 'Cupo por consultar'
+                : item.disponibles === 0
+                  ? 'Sin cupo'
+                  : `Disponibles: ${item.disponibles}`
+            }}
+          </span>
+        </span>
+
+        <span
+          v-if="participantForm.workshop === item.nombre"
+          class="option-check"
+        >
+          ✓
+        </span>
+      </button>
+
+
+      <!-- TURNO VESPERTINO -->
+      <div class="dropdown-group-title">
+        <span>🌙</span>
+        TURNO VESPERTINO
+      </div>
+
+      <button
         v-for="item in talleresVespertinosEdicion"
         :key="item.id"
-        :value="item.nombre"
+        type="button"
+        class="dropdown-option"
+        :class="{
+          'option-disabled': !item.disponible,
+          'option-selected': participantForm.workshop === item.nombre
+        }"
+        :disabled="!item.disponible"
+        @click="seleccionarTallerEdicion(item)"
       >
-        {{ item.nombre }} — {{ textoCupo(item) }}
-      </option>
-    </optgroup>
-  </select>
+        <span class="option-name">
+          {{ item.nombre }}
+        </span>
+
+        <span class="option-details">
+          <span>🕒 {{ item.horario }}</span>
+
+          <span>
+            Capacidad: {{ item.capacidad }}
+          </span>
+
+          <span
+            :class="{
+              'option-full': item.disponibles === 0
+            }"
+          >
+            {{
+              item.disponibles === null
+                ? 'Cupo por consultar'
+                : item.disponibles === 0
+                  ? 'Sin cupo'
+                  : `Disponibles: ${item.disponibles}`
+            }}
+          </span>
+        </span>
+
+        <span
+          v-if="participantForm.workshop === item.nombre"
+          class="option-check"
+        >
+          ✓
+        </span>
+      </button>
+
+    </div>
+  </div>
 </div>
+
+
+<!-- =====================================================
+     VISITA INDUSTRIAL
+====================================================== -->
 
 <div class="edit-field">
-  <label for="editIndustrialVisit">Visita industrial</label>
+  <label for="editIndustrialVisit">
+    Visita industrial
+  </label>
 
-  <select
-    id="editIndustrialVisit"
-    v-model="participantForm.industrialVisit"
-    :disabled="savingParticipant"
-  >
-    <option value="">Selecciona una visita industrial</option>
+  <div class="custom-dropdown">
 
-    <optgroup label="Matutinas">
-      <option
+    <!-- BOTON PRINCIPAL -->
+    <button
+      id="editIndustrialVisit"
+      type="button"
+      class="dropdown-trigger"
+      :class="{
+        'dropdown-active': dropdownEdicionAbierto === 'empresa'
+      }"
+      :disabled="savingParticipant"
+      :aria-expanded="dropdownEdicionAbierto === 'empresa'"
+      @click="toggleDropdownEdicion('empresa')"
+    >
+      <span
+        :class="{
+          'dropdown-placeholder': !participantForm.industrialVisit
+        }"
+      >
+        {{
+          participantForm.industrialVisit ||
+          'Selecciona una visita industrial'
+        }}
+      </span>
+
+      <span
+        class="dropdown-arrow"
+        :class="{
+          rotated: dropdownEdicionAbierto === 'empresa'
+        }"
+      >
+        ▼
+      </span>
+    </button>
+
+    <!-- LISTA DE EMPRESAS -->
+    <div
+      v-if="dropdownEdicionAbierto === 'empresa'"
+      class="dropdown-menu"
+    >
+
+      <!-- TURNO MATUTINO -->
+      <div class="dropdown-group-title">
+        <span>☀️</span>
+        TURNO MATUTINO
+      </div>
+
+      <button
         v-for="item in empresasMatutinasEdicion"
         :key="item.id"
-        :value="item.nombre"
+        type="button"
+        class="dropdown-option"
+        :class="{
+          'option-disabled': !item.disponible,
+          'option-selected': participantForm.industrialVisit === item.nombre
+        }"
+        :disabled="!item.disponible"
+        @click="seleccionarEmpresaEdicion(item)"
       >
-        {{ item.nombre }} — {{ textoCupo(item) }}
-      </option>
-    </optgroup>
+        <span class="option-name">
+          {{ item.nombre }}
+        </span>
 
-    <optgroup label="Vespertinas">
-      <option
+        <span class="option-details">
+          <span>🕒 Salida: {{ item.horario }}</span>
+
+          <span>
+            Capacidad: {{ item.capacidad }} personas
+          </span>
+
+          <span
+            :class="{
+              'option-full': item.disponibles === 0
+            }"
+          >
+            {{
+              item.disponibles === null
+                ? 'Cupo por consultar'
+                : item.disponibles === 0
+                  ? 'Sin cupo'
+                  : `Disponibles: ${item.disponibles}`
+            }}
+          </span>
+        </span>
+
+        <span
+          v-if="participantForm.industrialVisit === item.nombre"
+          class="option-check"
+        >
+          ✓
+        </span>
+      </button>
+
+
+      <!-- TURNO VESPERTINO -->
+      <div class="dropdown-group-title">
+        <span>🌙</span>
+        TURNO VESPERTINO
+      </div>
+
+      <button
         v-for="item in empresasVespertinasEdicion"
         :key="item.id"
-        :value="item.nombre"
+        type="button"
+        class="dropdown-option"
+        :class="{
+          'option-disabled': !item.disponible,
+          'option-selected': participantForm.industrialVisit === item.nombre
+        }"
+        :disabled="!item.disponible"
+        @click="seleccionarEmpresaEdicion(item)"
       >
-        {{ item.nombre }} — {{ textoCupo(item) }}
-      </option>
-    </optgroup>
-  </select>
+        <span class="option-name">
+          {{ item.nombre }}
+        </span>
+
+        <span class="option-details">
+          <span>🕒 Salida: {{ item.horario }}</span>
+
+          <span>
+            Capacidad: {{ item.capacidad }} personas
+          </span>
+
+          <span
+            :class="{
+              'option-full': item.disponibles === 0
+            }"
+          >
+            {{
+              item.disponibles === null
+                ? 'Cupo por consultar'
+                : item.disponibles === 0
+                  ? 'Sin cupo'
+                  : `Disponibles: ${item.disponibles}`
+            }}
+          </span>
+        </span>
+
+        <span
+          v-if="participantForm.industrialVisit === item.nombre"
+          class="option-check"
+        >
+          ✓
+        </span>
+      </button>
+
+    </div>
+  </div>
 </div>
+
+
+<!-- =====================================================
+     MENSAJE DE VALIDACION
+====================================================== -->
 
 <p
   v-if="errorActividades"
@@ -2097,10 +2352,6 @@ const selectedParticipant = ref(null);
 const selectedReceipt = ref(null);
 
 
-// =====================================================
-// EDICION DE PARTICIPANTE
-// =====================================================
-
 
 // =====================================================
 // EDICION DE PARTICIPANTE
@@ -2118,7 +2369,184 @@ const participantForm = ref({
   industrialVisit: ""
 });
 
-// Abrir formulario de edicion
+// =====================================================
+// CUPOS Y ACTIVIDADES
+// =====================================================
+
+const cuposEdicion = ref({});
+const errorActividades = ref("");
+const dropdownEdicionAbierto = ref("");
+
+// Consultar cupos disponibles
+async function cargarCuposEdicion() {
+  try {
+    const response = await fetch(
+      `${API_URL}/eventos/${EVENTO_ID}/inscripciones/cupos`
+    );
+
+    if (!response.ok) {
+      throw new Error("No se pudieron consultar los cupos.");
+    }
+
+    const data = await response.json();
+
+    cuposEdicion.value = Object.fromEntries(
+      data.map(item => [item.nombre, item])
+    );
+
+    errorActividades.value = "";
+  } catch (error) {
+    console.error("Error al cargar cupos:", error);
+
+    errorActividades.value =
+      "No se pudieron consultar los cupos. Intenta nuevamente.";
+  }
+}
+
+// Agregar disponibilidad a cada actividad
+function conCupoEdicion(item, seleccionActual) {
+  const cupo = cuposEdicion.value[item.nombre];
+  const esSeleccionActual = item.nombre === seleccionActual;
+
+  // Si el backend no devuelve información de esta actividad,
+  // no se marca como agotada.
+  if (!cupo) {
+    return {
+      ...item,
+      disponibles: null,
+      esSeleccionActual,
+      disponible: true,
+      textoDisponibilidad: "Cupo por consultar"
+    };
+  }
+
+  const disponibles = Number(cupo.disponibles ?? 0);
+
+  return {
+    ...item,
+    capacidad: cupo.capacidad ?? item.capacidad,
+    disponibles,
+    esSeleccionActual,
+
+    // La selección actual se conserva aunque esté llena.
+    disponible: disponibles > 0 || esSeleccionActual,
+
+    textoDisponibilidad:
+      disponibles > 0
+        ? `${disponibles} lugares disponibles`
+        : esSeleccionActual
+          ? "Selección actual"
+          : "Sin cupo"
+  };
+}
+
+// =====================================================
+// LISTAS DE TALLERES
+// =====================================================
+
+const talleresMatutinosEdicion = computed(() =>
+  talleres
+    .filter(item => item.turno === "Matutino")
+    .map(item =>
+      conCupoEdicion(item, participantForm.value.workshop)
+    )
+);
+
+const talleresVespertinosEdicion = computed(() =>
+  talleres
+    .filter(item => item.turno === "Vespertino")
+    .map(item =>
+      conCupoEdicion(item, participantForm.value.workshop)
+    )
+);
+
+// =====================================================
+// LISTAS DE VISITAS INDUSTRIALES
+// =====================================================
+
+const empresasMatutinasEdicion = computed(() =>
+  empresas
+    .filter(item => item.turno === "Matutino")
+    .map(item =>
+      conCupoEdicion(item, participantForm.value.industrialVisit)
+    )
+);
+
+const empresasVespertinasEdicion = computed(() =>
+  empresas
+    .filter(item => item.turno === "Vespertino")
+    .map(item =>
+      conCupoEdicion(item, participantForm.value.industrialVisit)
+    )
+);
+
+// =====================================================
+// DROPDOWNS
+// =====================================================
+
+function toggleDropdownEdicion(tipo) {
+  if (dropdownEdicionAbierto.value === tipo) {
+    dropdownEdicionAbierto.value = "";
+    return;
+  }
+
+  dropdownEdicionAbierto.value = tipo;
+  cargarCuposEdicion();
+}
+
+function seleccionarTallerEdicion(taller) {
+  if (!taller.disponible) return;
+
+  participantForm.value.workshop = taller.nombre;
+  dropdownEdicionAbierto.value = "";
+}
+
+function seleccionarEmpresaEdicion(empresa) {
+  if (!empresa.disponible) return;
+
+  participantForm.value.industrialVisit = empresa.nombre;
+  dropdownEdicionAbierto.value = "";
+}
+
+// =====================================================
+// VALIDAR TURNOS
+// =====================================================
+
+const mismoTurnoEdicion = computed(() => {
+  const taller = talleres.find(
+    item => item.nombre === participantForm.value.workshop
+  );
+
+  const empresa = empresas.find(
+    item => item.nombre === participantForm.value.industrialVisit
+  );
+
+  return Boolean(
+    taller &&
+    empresa &&
+    taller.turno === empresa.turno
+  );
+});
+
+watch(
+  () => [
+    participantForm.value.workshop,
+    participantForm.value.industrialVisit
+  ],
+  () => {
+    errorActividades.value = "";
+
+    if (mismoTurnoEdicion.value) {
+      errorActividades.value =
+        "El taller y la visita industrial no pueden ser del mismo turno. " +
+        "Elige un taller matutino y una visita vespertina, o al contrario.";
+    }
+  }
+);
+
+// =====================================================
+// ABRIR EDICION
+// =====================================================
 
 async function startEditingParticipant() {
   if (!selectedParticipant.value) return;
@@ -2162,16 +2590,20 @@ async function startEditingParticipant() {
   };
 
   editingParticipant.value = true;
+  dropdownEdicionAbierto.value = "";
   errorActividades.value = "";
 
   await cargarCuposEdicion();
 }
 
+// =====================================================
+// CANCELAR EDICION
+// =====================================================
 
-// Cancelar edicion
 function cancelEditingParticipant() {
-
   editingParticipant.value = false;
+  dropdownEdicionAbierto.value = "";
+  errorActividades.value = "";
 
   participantForm.value = {
     name: "",
@@ -2181,11 +2613,13 @@ function cancelEditingParticipant() {
     workshop: "",
     industrialVisit: ""
   };
-
 }
 
+// Cerrar edición cuando se selecciona otro participante
 watch(selectedParticipant, (participant) => {
   editingParticipant.value = false;
+  dropdownEdicionAbierto.value = "";
+  errorActividades.value = "";
 
   if (!participant) {
     participantForm.value = {
@@ -2199,15 +2633,17 @@ watch(selectedParticipant, (participant) => {
   }
 });
 
-
 // =====================================================
-// GUARDAR CAMBIOS DEL PARTICIPANTE  AQUI DEDES DE TRABAJAR 
-// O MAS BIEN DEBES DE DESCOMENTAR CUANDO HAGAS LA RUTA NUEVA 
-// PARA GUARDAR LA NUEVA INFO DEL PARTICIPANTE 
+// GUARDAR CAMBIOS DEL PARTICIPANTE
 // =====================================================
 
+// Esta función queda preparada para cuando el backend
+// confirme y cree la ruta PUT correspondiente.
+//
+// No descomentar ni conectar hasta confirmar el endpoint.
 
-/* async function saveParticipantChanges() {
+/*
+async function saveParticipantChanges() {
   if (!selectedParticipant.value || savingParticipant.value) return;
 
   const form = participantForm.value;
@@ -2234,7 +2670,6 @@ watch(selectedParticipant, (participant) => {
     return;
   }
 
-  // Evita seleccionar una actividad agotada como nueva opción.
   const tallerOriginal =
     selectedParticipant.value.workshop ||
     selectedParticipant.value.taller ||
@@ -2261,16 +2696,20 @@ watch(selectedParticipant, (participant) => {
   const cupoTaller = cuposEdicion.value[form.workshop];
   const cupoVisita = cuposEdicion.value[form.industrialVisit];
 
-  if (form.workshop !== tallerOriginal &&
-      (!cupoTaller || Number(cupoTaller.disponibles ?? 0) <= 0)) {
+  if (
+    form.workshop !== tallerOriginal &&
+    (!cupoTaller || Number(cupoTaller.disponibles ?? 0) <= 0)
+  ) {
     alert("El taller seleccionado no tiene lugares disponibles.");
     await cargarCuposEdicion();
     return;
   }
 
-  if (form.industrialVisit !== visitaOriginal &&
-      (!cupoVisita || Number(cupoVisita.disponibles ?? 0) <= 0)) {
-    alert("La visita industrial seleccionada no tiene lugares disponibles.");
+  if (
+    form.industrialVisit !== visitaOriginal &&
+    (!cupoVisita || Number(cupoVisita.disponibles ?? 0) <= 0)
+  ) {
+    alert("La visita seleccionada no tiene lugares disponibles.");
     await cargarCuposEdicion();
     return;
   }
@@ -2278,10 +2717,8 @@ watch(selectedParticipant, (participant) => {
   savingParticipant.value = true;
 
   try {
-
     const participantId = selectedParticipant.value.id;
 
-    // Datos que recibira el backend
     const dataToSend = {
       name: form.name.trim(),
       control: form.control.trim(),
@@ -2291,7 +2728,6 @@ watch(selectedParticipant, (participant) => {
       industrialVisit: form.industrialVisit
     };
 
-     // Ruta que debera crear el backend
     const response = await fetch(
       `${API_URL}/eventos/${EVENTO_ID}/inscripciones/admin/${participantId}`,
       {
@@ -2310,11 +2746,10 @@ watch(selectedParticipant, (participant) => {
       throw new Error(
         result.message ||
         result.error ||
-        "No se pudieron guardar los cambios. Verifica la ruta del backend."
+        "No se pudieron guardar los cambios."
       );
     }
 
-    // Actualizar los datos en la tabla
     await cargarParticipantes();
     await cargarCuposEdicion();
 
@@ -2332,24 +2767,21 @@ watch(selectedParticipant, (participant) => {
     }
 
     editingParticipant.value = false;
+    dropdownEdicionAbierto.value = "";
     errorActividades.value = "";
 
     alert("Los cambios se guardaron correctamente.");
+
   } catch (error) {
-
     console.error("Error al actualizar participante:", error);
+    alert(error.message || "Ocurrió un error al guardar los cambios.");
 
-    alert(
-      error.message ||
-      "Ocurrió un error al guardar los cambios."
-    );
   } finally {
-
     savingParticipant.value = false;
   }
-
 }
- */
+*/
+
 
 
 
