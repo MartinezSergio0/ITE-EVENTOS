@@ -1546,28 +1546,29 @@
       </p>
     </div>
 
-    <div
-      v-if="selectedParticipantDetails.length"
-      class="participant-details-grid"
-    >
+   <div
+  v-if="selectedParticipantDetails.length"
+  class="participant-details-grid"
+>
 
-      <div
-        v-for="detail in selectedParticipantDetails"
-        :key="detail.key"
-        class="participant-detail-item"
-      >
+  <div
+    v-for="detail in selectedParticipantDetails"
+    :key="detail.key"
+    class="participant-detail-item"
+    :class="{ 'detail-highlight': detail.highlight }"
+  >
 
-        <span>
-          {{ formatDetailLabel(detail.key) }}
-        </span>
+    <span class="detail-label">
+      {{ formatDetailLabel(detail.key) }}
+    </span>
 
-        <strong>
-          {{ formatDetailValue(detail.value) }}
-        </strong>
+    <strong class="detail-value">
+      {{ formatDetailValue(detail.value) }}
+    </strong>
 
-      </div>
+  </div>
 
-    </div>
+</div>
 
     <div
       v-else
@@ -1812,6 +1813,7 @@ const selectedReceipt = ref(null);
 
 // Obtener todos los campos que devuelve el backend.
 // Se excluyen credenciales y datos internos de autenticacion.
+
 const selectedParticipantDetails = computed(() => {
 
   if (!selectedParticipant.value) {
@@ -1819,29 +1821,33 @@ const selectedParticipantDetails = computed(() => {
   }
 
   const excludedFields = [
-    "password",
-    "passwordhash",
-    "token",
-    "accesstoken",
-    "refreshtoken",
-    "secret"
+    "id",
+    "receiptname",
+    "receipturl",
+    "receiptdate",
+    "paymentreference",
+    "reference",
+    "certificate",
+    "constancia"
   ];
 
   return Object.entries(selectedParticipant.value)
-
     .filter(([key]) => {
       const normalizedKey = key
         .toLowerCase()
         .replace(/[_-]/g, "");
 
-      return !excludedFields.some(field =>
-        normalizedKey.includes(field)
-      );
+      return !excludedFields.includes(normalizedKey);
     })
-
     .map(([key, value]) => ({
       key,
-      value
+      value,
+      highlight: [
+        "workshop",
+        "industrialvisit"
+      ].includes(
+        key.toLowerCase().replace(/[_-]/g, "")
+      )
     }));
 
 });
@@ -5288,6 +5294,30 @@ td {
 
 .participant-close-button:hover {
   background: #005b96;
+}
+
+/* DESTACAR TALLER Y VISITA INDUSTRIAL */
+
+.detail-highlight {
+  grid-column: 1 / -1;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-left: 5px solid #2563eb;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.detail-highlight .detail-label {
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.detail-highlight .detail-value {
+  color: #1e3a8a;
+  font-size: 17px;
+  font-weight: 800;
 }
 
 @media(max-width: 600px) {
