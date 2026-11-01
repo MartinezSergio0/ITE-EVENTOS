@@ -2153,6 +2153,325 @@ const route = useRoute();
 
 const EVENTO_ID = 5;
 
+const talleres = [
+  // TURNO MATUTINO (ID 1 AL 10)
+  {
+    id: 1,
+    nombre: "DISEÑO SOLID WORD BASICO (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 2,
+    nombre: "MANUFACTURA ADITIVA (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 3,
+    nombre: "DISEÑO DE EXPERIMENTOS (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 4,
+    nombre: "CORROCIÓN (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 5,
+    nombre: "REDISEÑO DE LA SEGURIDAD E HIGIENE INDUSTRIAL (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 6,
+    nombre: "TALLER DE IA (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 7,
+    nombre: "ERGONOMIA + IA (matutino)",
+    horario: "10:00 - 13:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 8,
+    nombre: "IMPACTO DE CAMBIOS DE INGENIERIA EN LAS CADENAS DE SUMINISTROS (matutino)",
+    horario: "10:00 - 12:00",
+    capacidad: 25,
+    turno: "Matutino"
+  },
+  {
+    id: 9,
+    nombre: "USABILIDAD EN INGENIERIA INDUSTRIAL (matutino)",
+    horario: "10:00 - 14:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 10,
+    nombre: "TALLER DE EXCEL PARA OPTIMIZAR LOS PROCESOS (matutino)",
+    horario: "10:00 - 14:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+
+  // TURNO VESPERTINO (ID 11 AL 19)
+  {
+    id: 11,
+    nombre: "PROMODEL BASICO (vespertino)",
+    horario: "16:00 - 18:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 12,
+    nombre: "PROMODEL BASICO (vespertino II)",
+    horario: "18:00 - 20:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 13,
+    nombre: "DISEÑO SOLID WORD BASICO (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 14,
+    nombre: "MANUFACTURA ADITIVA (vespertino)",
+    horario: "16:00 - 20:00",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 15,
+    nombre: "DISEÑO DE EXPERIMENTOS (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 16,
+    nombre: "AUTOMATIZACION + IA: DOS FORMAS DE RESOLVER EL PROCESO (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 16,
+    turno: "Vespertino"
+  },
+  {
+    id: 17,
+    nombre: "DISEÑO DE TUTORES DE IA PARA ING. INDUSTRIAL (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 18,
+    nombre: "ERGONOMIA + IA (vespertino)",
+    horario: "16:00 - 19:00",
+    capacidad: 25,
+    turno: "Vespertino"
+  },
+  {
+    id: 19,
+    nombre: "TALLER DE METROLOGIA Y CALIBRACION (vespertino)",
+    horario: "16:00 - 20:00",
+    capacidad: 20,
+    turno: "Vespertino"
+  }
+];
+
+const empresas = [
+  // TURNO MATUTINO
+  {
+    id: 20,
+    nombre: "INSTRUMENTOS MUSICALES FENDER S.A. DE C.V. (matutino)",
+    horario: "8:30",
+    capacidad: 15,
+    turno: "Matutino"
+  },
+  {
+    id: 22,
+    nombre: "BAJA TACKLE (matutino)",
+    horario: "8:30",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 24,
+    nombre: "SCHLAGE DE MEXICO S.A. DE C.V. (matutino)",
+    horario: "8:30",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 25,
+    nombre: "PLENIMEX S.A. DE C.V. (matutino)",
+    horario: "9:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 26,
+    nombre: "GRUPO ZAPATA (matutino)",
+    horario: "9:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 28,
+    nombre: "ZIRCON DE MEXICO S.A. DE C.V. (matutino)",
+    horario: "8:00",
+    capacidad: 12,
+    turno: "Matutino"
+  },
+  {
+    id: 30,
+    nombre: "DIALIGHT S.A DE C.V. (matutino)",
+    horario: "8:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 32,
+    nombre: "FABRICAS MONTERREY S.A. DE C.V. (matutino)",
+    horario: "8:00",
+    capacidad: 30,
+    turno: "Matutino"
+  },
+  {
+    id: 34,
+    nombre: "CSI EN ENSENADA, S. DE R.L. DE C.V. (matutino)",
+    horario: "8:30",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 36,
+    nombre: "VINOS KRUGER (matutino)",
+    horario: "8:30",
+    capacidad: 30,
+    turno: "Matutino"
+  },
+  {
+    id: 37,
+    nombre: "ICU MEDICAL (matutino)",
+    horario: "9:00",
+    capacidad: 20,
+    turno: "Matutino"
+  },
+  {
+    id: 39,
+    nombre: "DOVINTO VINICOLA (matutino)",
+    horario: "8:30",
+    capacidad: 50,
+    turno: "Matutino"
+  },
+  {
+    id: 41,
+    nombre: "VINOS BIBAYOFF (matutino)",
+    horario: "8:30",
+    capacidad: 30,
+    turno: "Matutino"
+  },
+  {
+    id: 43,
+    nombre: "VINOS PALAFOX (matutino)",
+    horario: "9:00",
+    capacidad: 30,
+    turno: "Matutino"
+  },
+
+  // TURNO VESPERTINO
+  {
+    id: 21,
+    nombre: "INSTRUMENTOS MUSICALES FENDER S.A. DE C.V. (vespertino)",
+    horario: "13:30",
+    capacidad: 15,
+    turno: "Vespertino"
+  },
+  {
+    id: 23,
+    nombre: "BAJA TACKLE (vespertino)",
+    horario: "13:30",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 27,
+    nombre: "GRUPO ZAPATA (vespertino)",
+    horario: "14:00",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 29,
+    nombre: "ZIRCON DE MEXICO S.A. DE C.V. (vespertino)",
+    horario: "12:15",
+    capacidad: 12,
+    turno: "Vespertino"
+  },
+  {
+    id: 31,
+    nombre: "DIALIGHT S.A DE C.V. (vespertino)",
+    horario: "12:15",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 33,
+    nombre: "FABRICAS MONTERREY S.A. DE C.V. (vespertino)",
+    horario: "12:15",
+    capacidad: 30,
+    turno: "Vespertino"
+  },
+  {
+    id: 35,
+    nombre: "CSI EN ENSENADA, S. DE R.L. DE C.V. (vespertino)",
+    horario: "13:30",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 38,
+    nombre: "ICU MEDICAL (vespertino)",
+    horario: "14:00",
+    capacidad: 20,
+    turno: "Vespertino"
+  },
+  {
+    id: 40,
+    nombre: "DOVINTO VINICOLA (vespertino)",
+    horario: "13:30",
+    capacidad: 50,
+    turno: "Vespertino"
+  },
+  {
+    id: 42,
+    nombre: "VINOS BIBAYOFF (vespertino)",
+    horario: "13:30",
+    capacidad: 30,
+    turno: "Vespertino"
+  },
+  {
+    id: 44,
+    nombre: "VINOS PALAFOX (vespertino)",
+    horario: "13:00",
+    capacidad: 30,
+    turno: "Vespertino"
+  }
+];
 
 const cuposEdicion = ref({});
 const errorActividades = ref("");
